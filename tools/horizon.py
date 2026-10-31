@@ -117,7 +117,10 @@ def main():
     parser.add_argument("--horizon", type=Path, default=Path(os.environ.get("HORIZON_CHECKOUT", ROOT / "target/upstream/horizon")))
     parser.add_argument("--target-dir", type=Path, default=ROOT / "target/horizon-cargo")
     parser.add_argument("--no-audio", action="store_true", help="drop audio and controllers (a server build)")
+    parser.add_argument("--library", action="store_true", help="test native library payloads instead of the game binary")
     args = parser.parse_args()
+    if args.library and args.action != "test":
+        parser.error("--library is only valid with test")
     horizon = args.horizon.resolve()
     target = args.target_dir.resolve()
     if target.is_relative_to(horizon):
@@ -130,20 +133,21 @@ def main():
         report = {"stage": str(output), "stage_changed": changed,
                   "horizon_revision": PIN, "staging_seconds": time.monotonic()-started}
         if args.action != "stage":
-            command = ["cargo", args.action, "--locked", "--offline", "-p", "horizon-client",
-                       "--bin", "horizon-client", "--target-dir", str(target)]
+            command = ["cargo", args.action, "--locked", "--offline", "-p", "horizon-client"]
+            command.extend(["--lib"] if args.library else ["--bin", "horizon-client"])
+            command.extend(["--target-dir", str(target)])
             if args.no_audio:
                 command.append("--no-default-features")
             if args.action == "build":
                 command.extend(["--profile", "fast"])
             if args.action == "test":
-                command.extend(["game::ae2_", "--", "--nocapture"])
+                command.extend(["ae2_" if args.library else "game::ae2_", "--", "--nocapture"])
             with lock(target.parent / (target.name + ".mod-template.lock")):
                 run_start = time.monotonic()
                 result = subprocess.run(command, cwd=output, capture_output=True, text=True)
             report.update(cargo_seconds=time.monotonic()-run_start, cargo_command=command,
                           cargo_exit=result.returncode)
-            log = ROOT / "target" / f"horizon-{args.action}.log"
+            log = ROOT / "target" / f"horizon-{args.action}{'-lib' if args.library else ''}.log"
             log.write_text(result.stdout + result.stderr)
             report["cargo_log"] = str(log)
             if result.returncode:

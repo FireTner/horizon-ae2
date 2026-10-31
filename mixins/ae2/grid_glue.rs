@@ -143,6 +143,9 @@ pub(super) fn reset() {
     NETWORKS.lock().unwrap_or_else(|e| e.into_inner()).clear();
 }
 pub(super) fn flush_drives(game: &mut Game<'_>) {
+    if game.serving.is_none() && game.options.dedicated.is_none() {
+        return;
+    }
     let mut networks = NETWORKS.lock().unwrap_or_else(|e| e.into_inner());
     if let Some(state) = networks.get_mut(game.dim.id()) {
         state.drives.read(game);

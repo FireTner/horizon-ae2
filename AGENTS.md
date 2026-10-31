@@ -16,7 +16,10 @@ tooltip/codec adapter. energy.rs/grid.rs/power.rs feed network.rs and the
 grid_glue.rs world adapter (currently Charger + three energy-cell kinds + Drive).
 mounts.rs/service.rs/drive.rs are consumed by drive_glue.rs and belong in the
 native manifest. Drive currently has ten real cell slots/providers, original
-inv persistence and power/channel gating; GUI and filtered automation remain open.
+inv persistence and power/channel gating; its filtered ten-slot screen works,
+while priority UI, special bulk actions and filtered automation remain open.
+slot_rules.rs is shared with native library menu policy; guest_slots.rs scopes
+server rules by authoritative player/window/block identity, never by chest size.
 Injected payloads cannot use inner attributes/comments, external mod files or
 include!. Helpers are tiny, uniquely named ae2_* functions.
 

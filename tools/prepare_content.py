@@ -97,6 +97,11 @@ def fit(content, jar):
     # for this milestone; the exact animation needs render/sync work.
 
     with zipfile.ZipFile(jar) as archive:
+        # Native GUI atlases scan textures/gui, whereas AE2 styles use guis.
+        # Copy the original bytes; the adapter only changes the resource route.
+        gui = content / "assets/ae2/textures/gui/drive.png"
+        gui.parent.mkdir(parents=True, exist_ok=True)
+        gui.write_bytes(archive.read("assets/ae2/textures/guis/drive.png"))
         for name in CRAFTING:
             path = f"data/ae2/recipe/{name}"
             data = json.loads(archive.read(path))

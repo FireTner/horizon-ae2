@@ -28,15 +28,14 @@ pub(super) fn ticks(block: &str, ticks: &mut bool) {
 
 pub(super) fn container(block: &str, out: &mut Option<ModContainer>) {
     if block == "ae2:drive" {
-        // The real ten cell slots are backed by Drive providers. Opening the
-        // exact GUI and all filtered menu/automation paths is separate work;
-        // do not expose an unfiltered vanilla container as an ME Drive menu.
+        // The wire menu carries 18 slots; the native screen and server hide
+        // 10..18. Only the original ten slots are mounted as storage cells.
         *out = Some(ModContainer {
-            slots: 10,
+            slots: 18,
             faces: std::array::from_fn(|_| vec![]),
             inputs: vec![],
             outputs: vec![],
-            menu: None,
+            menu: Some("minecraft:generic_9x2".to_owned()),
         });
     }
     if block == CHARGER {
@@ -262,6 +261,7 @@ pub(super) fn right_click(game: &mut Game<'_>, pos: Pos, canceled: &mut bool) {
                 }
             }
         }
+        "ae2:drive" => super::ae2_grid_glue::flush_drives(game),
         _ if super::ae2_grid_glue::owns(&game.native_block(pos)) => {
             // Native energy cells have no vanilla template menu.
             *canceled = true;

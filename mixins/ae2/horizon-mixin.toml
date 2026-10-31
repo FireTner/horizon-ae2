@@ -7,6 +7,171 @@ priority = 100
 horizon_revision = "aa27eca326db26e999d4e59d7899576016764b1e"
 
 [[module]]
+id = "slot-rules"
+file = "crates/horizon-client/src/lan/menu.rs"
+name = "ae2_slot_rules"
+source = "slot_rules.rs"
+visibility = "pub"
+
+[[module]]
+id = "drive-context"
+file = "crates/horizon-client/src/lan/menu.rs"
+name = "ae2_drive_context"
+source = "guest_slots.rs"
+visibility = "pub"
+
+[[module]]
+id = "gui"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_gui"
+source = "gui.rs"
+
+
+[[injection]]
+id = "menu-place"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::menu::Menu::may_place"
+helper = "menu_place.rs"
+bindings = [
+  { name = "menu", ty = "&crate::menu::Menu", value = "&*self" },
+  { name = "slot", ty = "usize", value = "s" },
+  { name = "stack", ty = "&crate::items::ItemStack", value = "stack" },
+]
+
+[[injection]]
+id = "menu-max"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::menu::Menu::slot_max"
+helper = "menu_max.rs"
+bindings = [
+  { name = "menu", ty = "&crate::menu::Menu", value = "&*self" },
+  { name = "slot", ty = "usize", value = "s" },
+]
+
+[[injection]]
+id = "menu-quick"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::menu::Menu::quick_move"
+helper = "menu_quick.rs"
+bindings = [
+  { name = "menu", ty = "&mut crate::menu::Menu", value = "&mut *self" },
+  { name = "env", ty = "&crate::menu::Env<'_>", value = "env" },
+  { name = "index", ty = "usize", value = "index" },
+]
+
+[[injection]]
+id = "guest-quick"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::lan::menu::quick_move"
+helper = "guest_quick.rs"
+bindings = [
+  { name = "view", ty = "&mut crate::lan::menu::View<'_>", value = "&mut *view" },
+  { name = "slot", ty = "usize", value = "i" },
+  { name = "rules", ty = "&dyn crate::lan::menu::Rules", value = "rules" },
+]
+
+[[injection]]
+id = "guest-begin"
+kind = "HEAD"
+target = "horizon_client::lan::containers::Hub::container_click"
+helper = "guest_begin.rs"
+bindings = [
+  { name = "hub", ty = "&crate::lan::hub::Hub", value = "&*self" },
+  { name = "conn", ty = "u32", value = "conn" },
+  { name = "packet", ty = "&horizon_protocol::packets::play::ContainerClick", value = "p" },
+  { name = "world", ty = "&crate::world::World", value = "&*world" },
+]
+
+[[injection]]
+id = "guest-place"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::lan::menu::View<'_>::may_place"
+helper = "guest_place.rs"
+bindings = [
+  { name = "view", ty = "&crate::lan::menu::View<'_>", value = "&*self" },
+  { name = "slot", ty = "usize", value = "i" },
+  { name = "stack", ty = "&crate::items::ItemStack", value = "stack" },
+]
+
+[[injection]]
+id = "guest-max"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::lan::menu::View<'_>::slot_max"
+helper = "guest_max.rs"
+bindings = [
+  { name = "view", ty = "&crate::lan::menu::View<'_>", value = "&*self" },
+  { name = "slot", ty = "usize", value = "i" },
+]
+
+[[injection]]
+id = "drive-screen"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_screen"
+helper = "screen.rs"
+bindings = [
+  { name = "block", ty = "&str", value = "block" },
+  { name = "screen", ty = "&mut Option<crate::game::native_hooks::NativeScreen>", value = "&mut *screen" },
+]
+
+[[injection]]
+id = "drive-draw"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::native_hooks::Game<'_>::draw_native_screen"
+helper = "screen_draw.rs"
+bindings = [
+  { name = "game", ty = "&crate::game::Game<'_>", value = "&*self" },
+  { name = "batch", ty = "&mut horizon_client::hud::HudBatch", value = "&mut *batch" },
+  { name = "x", ty = "f32", value = "ox" },
+  { name = "y", ty = "f32", value = "oy" },
+]
+
+[[injection]]
+id = "drive-screen-open"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::open_native_screen"
+helper = "screen_open.rs"
+bindings = [
+  { name = "game", ty = "&crate::game::Game<'_>", value = "&*self" },
+  { name = "key", ty = "(i32, i32, i32)", value = "key" },
+  { name = "target", ty = "Option<(i32, i32, i32)>", value = "target" },
+]
+
+[[injection]]
+id = "drive-screen-close"
+kind = "HEAD"
+target = "horizon_client::game::remote::Game<'_>::remote_close_local"
+helper = "screen_close.rs"
+
+[[injection]]
+id = "local-slot-rule"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::stations::Game<'_>::slot_rules"
+helper = "local_slot_rule.rs"
+bindings = [
+  { name = "game", ty = "&crate::game::Game<'_>", value = "&*self" },
+  { name = "slot", ty = "usize", value = "slot" },
+  { name = "stack", ty = "&horizon_client::items::ItemStack", value = "stack" },
+]
+
+[[injection]]
+id = "drive-before-packet"
+kind = "HEAD"
+target = "horizon_client::game::lan_actions::Game<'_>::lan_guest_packet"
+helper = "before_packet.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "packet", ty = "&horizon_protocol::packets::play::Serverbound", value = "&packet" },
+]
+
+[[module]]
 id = "mounts"
 file = "crates/horizon-client/src/game.rs"
 name = "ae2_mounts"

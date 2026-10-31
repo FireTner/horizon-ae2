@@ -38,6 +38,7 @@ class ContentTests(unittest.TestCase):
         })
         jar = self.root / "test.jar"
         with zipfile.ZipFile(jar, "w") as z:
+            z.writestr("assets/ae2/textures/guis/drive.png", b"original-gui-fixture")
             for name in content.CRAFTING:
                 z.writestr("data/ae2/recipe/" + name, json.dumps({
                     "type": "minecraft:crafting_shaped", "key": {"a": {"tag": "c:ingots/iron"}},
@@ -78,6 +79,7 @@ class ContentTests(unittest.TestCase):
         drive = json.loads((carried / "assets/ae2/blockstates/drive.json").read_text())
         self.assertEqual(set(drive["variants"]), {f"facing={face}" for face in content.FACINGS})
         self.assertTrue(all(v["model"] == "ae2:block/drive/drive_base" for v in drive["variants"].values()))
+        self.assertEqual((carried / "assets/ae2/textures/gui/drive.png").read_bytes(), b"original-gui-fixture")
 
     def test_wrong_jar_is_rejected_without_touching_output(self):
         carried, jar = self.fixture()

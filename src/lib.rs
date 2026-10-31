@@ -17,5 +17,7 @@ pub mod ae2_network;
 pub mod ae2_power;
 #[path = "../mixins/ae2/service.rs"]
 pub mod ae2_service;
+#[path = "../mixins/ae2/slot_rules.rs"]
+pub mod ae2_slot_rules;
 #[path = "../mixins/ae2/storage.rs"]
 pub mod ae2_storage;

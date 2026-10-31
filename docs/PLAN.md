@@ -85,7 +85,9 @@ AEKey/GenericStack/component persistence и GridNode/Connection/Pathing уже
 energy cells; finite/creative power и restart проверены в игре.
 StorageService и Drive basic-cell backend уже подключены: online/priority mounts,
 idle/channel costs и исходный inv persistence проверены, в том числе restart.
-Следующий слой — полный Drive GUI/filters/синхронизация и lifecycle сохранения,
+Drive GUI уже показывает original layout и десять filtered cell slots; серверные
+pickup/drag/hotbar/shift правила и игровой restart проверены. Следующий слой —
+priority UI, special bulk actions, automation и полный lifecycle сохранения,
 ME Chest, затем terminal UI; CableBus и полные ownership/events остаются открытыми.
 Рендер и сетевое
 состояние Charger/Crank остаются открытыми задачами первого этапа.

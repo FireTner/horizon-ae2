@@ -3,7 +3,34 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## StorageService и Drive backend — текущая проверка
+## Drive GUI — текущая проверка
+
+- Standalone: **76 PASS**, fmt/rustfmt/clippy `-D warnings` PASS, Python **8 PASS**,
+  inventory **51 partial / 1378 pending**, complete нет. Лог target/drive-gui-final-checks.log.
+- Native binary tests: **85 PASS**, target/drive-gui-native-tests.json.
+  Native library tests: **5 PASS**, target/drive-gui-library-second.json;
+  три из них вызывают настоящий server menu click engine с реальным Items catalog.
+  Проверены reject/cap=1, drag, hotbar swap, forward shift order, hidden padding
+  и actor/window metadata isolation; ни один resource test не пропущен.
+- Native build PASS: target/drive-gui-native-build.json; final check:
+  target/drive-gui-native-check-final.json. Ранее при планировании выявлены
+  ограничения HEAD/RETURN для функций с closures и syntactic helper result types;
+  новая интеграция использует поддерживаемые HEAD hooks, engine pin не менялся.
+- Game GUI smoke PASS: target/smoke/drive-gui-4o68o5bf, копия отчёта
+  docs/drive-gui-smoke.json. Original drive.png осмотрен на screenshot:
+  176x201, два столбца/пять строк, правильное положение inventory и текста.
+  Проверены pickup/shift, отказ stone, порядок main inventory перед hotbar,
+  сохранение предметов и restart; следующая vanilla barrel сохраняет свои правила.
+- Повторный backend smoke на клиенте с GUI: PASS,
+  target/smoke/drive-kvmdpegz. Exact idle costs, original inv.item0/item9,
+  counts 123/1000, front isolation и restart снова прошли.
+- Не закрыты: priority button/subscreen, ghost icons, специальные bulk actions
+  AEBaseMenu, external multiplayer, hopper access и runtime chassis/LED renderer.
+  GUI принимает все 23 исходных built-in типа ячеек; storage backend подключает
+  только десять basic item/fluid cells. Native warnings о неиспользованных API
+  и toolchain strip warning остаются видимыми. Тестовые процессы завершены.
+
+## StorageService и Drive backend — предыдущая проверка
 
 - Standalone: **74 PASS**, fmt/clippy с `-D warnings` и Python **8 PASS**.
 - Native: **85 PASS**, в том числе полное подключение mounts/service/drive,

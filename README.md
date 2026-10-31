@@ -19,8 +19,8 @@
   симуляция, извлечение, точные/fuzzy фильтры, inverter/equal distribution/void.
   Добавлены компонентные item/fluid keys, GenericStack, signed KeyCounter и
   native codec исходных компонентов ячеек. Tooltip использует реальные значения,
-  локализацию и цвета оригинала. **Drive backend подключён; меню Drive и
-  терминал ещё не перенесены.**
+  локализацию и цвета оригинала. **Drive backend и базовый экран подключены;
+  priority UI, специальные действия меню и терминал ещё не перенесены.**
 - `StoredEnergyAmount`, EnergyService и per-node buffer: приоритеты хранилищ,
   симуляция, события, power delay, overlay/passive rules. В мире подключены
   обычная/плотная/творческая energy cell и Charger. CableBus/QuartzFiber parts
@@ -39,11 +39,13 @@
   и защита от рекурсии; 2000 сценариев / 410882 операции совпали с Java.
   StorageService подключает десять дисков Drive, priority/online mounts,
   ленивый кэш и подписки; диски сохраняются в исходном `inv.itemN`. В игре
-  проверены точный расход энергии, item/fluid cells и restart. GUI Drive,
-  его динамический рендер и терминалы ещё не перенесены.
+  проверены точный расход энергии, item/fluid cells и restart. GUI Drive показывает
+  исходную текстуру и десять filtered slots: pickup/shift, drag/hotbar rules,
+  сохранение и изоляция от обычных контейнеров проверены. Priority UI,
+  динамический рендер и терминалы ещё не перенесены.
 - Подготовка контента, source-only `.hnmod`, закреплённые исходники и
   проверяемый реестр **всех 1429 Java-файлов** оригинала. В реестре нет
-  полностью закрытых классов; 46 отмечены как частично перенесённые.
+  полностью закрытых классов; 51 отмечен как частично перенесённый.
 
 Полный объём и последовательность работ: [docs/PLAN.md](docs/PLAN.md).
 Текущие отличия: [docs/PARITY.md](docs/PARITY.md).
@@ -72,6 +74,7 @@ python3.12 tools/mounts_oracle.py --java-home /path/to/jdk21 --cases 2000
 
 python3.12 tools/horizon.py check
 python3.12 tools/horizon.py build
+python3.12 tools/horizon.py test --library
 ```
 
 Контент: `horizon-port-pack` из той же версии движка и подготовленные ресурсы
@@ -99,6 +102,8 @@ python3.12 tools/smoke.py --ctl /path/to/horizon-ctl \
 python3.12 tools/smoke_power.py --ctl /path/to/horizon-ctl \
   --resources /path/to/prepared/26.3
 python3.12 tools/smoke_drive.py --ctl /path/to/horizon-ctl \
+  --resources /path/to/prepared/26.3
+python3.12 tools/smoke_drive_gui.py --ctl /path/to/horizon-ctl \
   --resources /path/to/prepared/26.3
 ```
 

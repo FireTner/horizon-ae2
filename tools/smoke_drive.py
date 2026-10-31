@@ -86,7 +86,7 @@ def main():
 
     def contents():
         slots = ctl("container", *drive)["slots"]
-        assert len(slots) == 10, slots
+        assert len(slots) in (10, 18) and all(slot is None for slot in slots[10:]), slots
         assert slots[0] == {"item": "ae2:item_storage_cell_1k", "count": 1}, slots
         assert slots[9] == {"item": "ae2:fluid_storage_cell_4k", "count": 1}, slots
         value = nbt(drive)

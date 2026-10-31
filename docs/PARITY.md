@@ -5,13 +5,14 @@
 
 | Подсистема | Написано | Что остаётся |
 |---|---|---|
-| BasicCellInventory | байты/типы/округление, пять размеров, items/fluids, exact/fuzzy partitions, distribution/void, simulate/modulate/extract; native codec, nested restrictions и Drive mounts | GUI Drive/терминал, полное восстановление malformed/missing content, другие типы storage cells |
+| BasicCellInventory | байты/типы/округление, пять размеров, items/fluids, exact/fuzzy partitions, distribution/void, simulate/modulate/extract; native codec, nested restrictions и Drive mounts | терминал, полное восстановление malformed/missing content, другие типы storage cells |
 | AEKey / GenericStack / KeyCounter | компонентные ключи, typed NBT, signed long counts, fuzzyEquals и FuzzySearch, signed deficits/zero pruning | prototype normalization, wrapped items, packet codecs, missing-content placeholders, drop/display API |
 | ME topology/pathing | controller validation, BFS priorities, bottleneck ancestry, DFS counts, dense/normal/ad-hoc, P2P rules; 2000 Java differential cases; пять world full blocks, Drive require-channel | остальные block/part nodes, полная grid service identity/merge priorities, security/listeners/boot events |
 | StoredEnergyAmount / EnergyService | amount/capacity/simulation, storage events, приоритеты, per-node buffer, public power delay, averages/cache, overlay/passive rules; full-block world binding; 2000 Java traces | addon storage providers, полные watchers/event callbacks, QuartzFiber и passive-generator blocks, config integration, полные watcher/addon oracle scenarios |
 | NetworkStorage | mount priorities, preferred passes, mutation queues, recursion guard, weak links; 2000 Java traces/410882 операций; native StorageService/Drive consumers | MEStorage handler filters, ME Chest/terminal и остальные providers |
 | StorageService | node/global provider identity, refresh/unmount, lazy public cache/private counts, key/watch-all changes и permanent watcher destroy | Java service oracle, world watcher hosts, full callback/hash iteration/exception fidelity, debug dump |
-| DriveBlockEntity / DriveWatcher | десять basic cells, реальные mounts по online/priority, REQUIRE_CHANNEL, 2 AE + disk drain, front exclusion, original inv.itemN + Horizon Items mirror, packed status; world restart | GUI/menu filters и automation, dynamic cell chassis/LEDs/sync, creative/other cells, all inventory/drop/chunk/capability paths |
+| DriveBlockEntity / DriveWatcher | десять basic cells, реальные mounts по online/priority, REQUIRE_CHANNEL, 2 AE + disk drain, front exclusion, original inv.itemN + Horizon Items mirror, packed status; world restart | automation, dynamic cell chassis/LEDs/sync, creative/other cells, all inventory/drop/chunk/capability paths |
+| DriveMenu / DriveScreen | original texture/layout, десять cell slots с лимитом 1, authoritative filters, pickup/shift/drag/hotbar rules, main-before-hotbar shift order и isolation; game restart | priority button/subscreen, ghost icons, AEBaseMenu bulk actions, external multiplayer и addon cell registry |
 | EnergyCellBlockEntity | normal/dense/creative block entities, реальные сетевые хранилища, internalCurrentPower и proxy.e persistence | fullness drawing/sync, comparator, energy components у item/drop/placement, redstone/template side effects |
 | Charger recipes | таблица ae2:charger, local 1600 AE, threshold 1599, interval 10, random > 0.8, один предмет, сохранение энергии/слота; сеть пополняет private buffer до 800 AE/call | инструменты, config multiplier/rates, hopper фильтры, эффекты и рендер предмета |
 | Wooden Crank | rotation/hits/charge, 18 ticks/160 AE, busy window, 11 отказов ломают рукоятку, charger-side restriction | placement/survival, fake-player rule, статистика, анимация и sync |
@@ -64,15 +65,20 @@
   Невалидные провайдеры, возвращающие больше запрошенного, отклоняются;
   пользовательские Java equals/exception behaviours не являются текущим
   native API контрактом. Для циклических links используются weak handles.
-- Drive пока не открывает меню: его реальные десять слотов можно проверять
-  через test control/исходный inv NBT. Unfiltered vanilla menu и hopper access
-  отключены до переноса slot filters/limits, всех кликов и sync. Housing —
-  исходный drive_base, runtime cell models/LED renderer ещё не подключены.
+- Drive открывает экран с original PNG/layout и десятью cell slots. Транспорт
+  native protocol — generic_9x2 с восемью скрытыми, запрещёнными padding slots;
+  это не дополнительные слоты Drive и не AE2 wire protocol. Сервер определяет
+  policy по actor/window/реальному блоку на каждом click packet. Ordinary barrel
+  regression PASS. Из 23 допустимых upstream built-in cell families backend пока
+  подключает только десять basic item/fluid cells; остальные сохраняются как items.
+  Addon registry, priority UI, ghost slot icons и AEBaseMenu special bulk actions
+  ещё не перенесены. Hopper access пока отключён. Housing — исходный drive_base,
+  runtime cell models/LED renderer ещё не подключены.
 - Native Drive отражает inv.item0..item9 в Horizon Items для сохранения/слотов;
   это одни и те же ItemStacks, не два набора содержимого. Неизменённый echo
   не перезагружает изменённый backend; malformed inv сохраняется и unmount-ится.
   Это более строгий отказ, чем source recovery, и не доказательство всех ошибок
-  codecs. Перед player destroy добавлен flush; полные inventory extraction,
+  codecs. Перед menu packets и player destroy добавлен flush; полные inventory extraction,
   explosion/drop и chunk unload/save paths ещё нужно закрыть до терминалов.
 - StorageService пока не имеет Java oracle. Cache/watchers проверены Rust,
   world Drive и native merge/split tests. Уведомления в core синхронные;

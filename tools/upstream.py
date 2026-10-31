@@ -79,6 +79,15 @@ PARTIAL.update({
     "blockentity/grid/AENetworkedBlockEntity.java": ("mixins/ae2/grid_glue.rs", "Charger, three energy cells and Drive register by dimension, adjacency and proxy.e; full security/events/readiness/other block kinds pending"),
 })
 
+PARTIAL.update({
+    "menu/implementations/DriveMenu.java": ("mixins/ae2/guest_slots.rs", "ten authoritative filtered slots, limit one, pickup/drag/hotbar/quick-move and own-window policy; special AEBaseMenu actions and external multiplayer pending"),
+    "client/gui/implementations/DriveScreen.java": ("mixins/ae2/gui.rs", "original texture, dimensions, slot/inventory geometry and localized labels; priority button/subscreen and slot ghost icons pending"),
+    "menu/slot/RestrictedInputSlot.java": ("mixins/ae2/slot_rules.rs", "STORAGE_CELLS built-in family predicate and Drive slot limit only; addon registry and other slot kinds pending"),
+    "menu/AEBaseMenu.java": ("mixins/ae2/guest_quick.rs", "Drive-only forward quick-move order and remote client prediction suppression; bulk actions/security/other menus pending"),
+    "api/storage/StorageCells.java": ("mixins/ae2/slot_rules.rs", "isCellHandled built-in cell families for Drive menu only; extensible registry and non-basic native cell inventories pending"),
+    "blockentity/storage/DriveBlockEntity.java": ("mixins/ae2/drive_glue.rs", "ten basic cell mounts, priority/online/channel/idle state and inv persistence; filtered GUI with pre-extraction flush; dynamic render, automation/full lifecycle and other cell backends pending"),
+})
+
 
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()

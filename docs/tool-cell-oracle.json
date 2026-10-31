@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "cases": 2000,
+  "operations": 572000,
+  "failed_operations": 0,
+  "first_failures": [],
+  "upstream": "db17504a86128fdf3dae31f5fb7a112a646e0b93",
+  "input_sha256": "aec4a7e4f0f1a1a6e27cc9fe0b92ac7a8715b4855e956bf09844a2cbcd360ce5",
+  "source_sha256": {
+    "appeng/me/cells/BasicCellInventory.java": "86471cf7a482c96903192883d9f93dc71840ef0a052461c0ede95e7968bfaa3e",
+    "appeng/api/storage/cells/CellState.java": "32cd3a6780afedc66ae597fe0beaf27eef314d854c79f1465e28d5f9f572a78b"
+  },
+  "profile_source_sha256": {
+    "appeng/items/tools/powered/MatterCannonItem.java": "e969b914d71276cd6c60c7f7d931e998f91e81fb571ddea06ff72f3fd29c8ba9",
+    "appeng/items/tools/powered/ColorApplicatorItem.java": "65281cdce105ab55190813ab0fcefb8e3d581a49e8806a5b91b211388dab4151"
+  },
+  "scope": "unchanged BasicCellInventory/CellState; matter cannon/color applicator capacity/type profiles and actual restricted Rust backend, fake primary-item blacklist before void, simulated/committed operations, reload and exact counts/status/bytes per key",
+  "not_covered": [
+    "actual Java tool admission/recipe/tag implementations",
+    "Minecraft component and upgrade validation",
+    "handheld charging/use/painting/shooting",
+    "world lifecycle and NeoForge",
+    "Java hash/identity iteration and serialized list order"
+  ]
+}

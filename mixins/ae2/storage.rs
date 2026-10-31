@@ -10,6 +10,9 @@ use std::collections::{BTreeMap, BTreeSet};
 /// Key equality MUST include all data components, not just the registry ID.
 pub trait CellKey: Ord + Clone {
     fn key_type(&self) -> KeyType;
+    fn primary_id(&self) -> Option<&str> {
+        None
+    }
     fn can_fit_inside_cell(&self) -> bool {
         true
     }
@@ -24,6 +27,9 @@ pub trait CellKey: Ord + Clone {
 impl CellKey for super::ae2_keys::Key {
     fn key_type(&self) -> KeyType {
         self.kind()
+    }
+    fn primary_id(&self) -> Option<&str> {
+        Some(self.id())
     }
     fn can_fit_inside_cell(&self) -> bool {
         self.properties().can_fit_inside_cell
@@ -80,6 +86,22 @@ pub struct CellLayout {
     idle_drain: f64,
 }
 impl CellLayout {
+    pub fn matter_cannon() -> Self {
+        Self {
+            bytes: 512,
+            bytes_per_type: 8,
+            total_types: 1,
+            idle_drain: 0.5,
+        }
+    }
+    pub fn color_applicator() -> Self {
+        Self {
+            bytes: 2048,
+            bytes_per_type: 32,
+            total_types: 27,
+            idle_drain: 0.5,
+        }
+    }
     pub fn basic(tier: Tier, kind: KeyType) -> Self {
         Self {
             bytes: tier.bytes(),

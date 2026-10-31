@@ -158,10 +158,17 @@ impl Drives {
                                 drive.slots[slot] = items[slot]
                                     .as_ref()
                                     .and_then(|stack| {
-                                        codec::load_backend(stack, &|kind, id| {
+                                        let resolve = |kind, id: &str| {
                                             codec::resolve_key(game.items(), kind, id)
-                                        })
-                                        .ok()
+                                        };
+                                        if let Some(allowed) =
+                                            super::ae2_tool_glue::accepted(game, &stack.item)
+                                        {
+                                            codec::load_restricted_backend(stack, &resolve, allowed)
+                                                .ok()
+                                        } else {
+                                            codec::load_backend(stack, &resolve).ok()
+                                        }
                                     })
                                     .map(|cell| Arc::new(Mutex::new(DriveCell::new(cell))));
                                 host.refresh = true;

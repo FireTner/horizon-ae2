@@ -7,6 +7,18 @@ priority = 100
 horizon_revision = "aa27eca326db26e999d4e59d7899576016764b1e"
 
 [[module]]
+id = "tool-filters"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_tool_filters"
+source = "tool_filters.rs"
+
+[[module]]
+id = "tool-glue"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_tool_glue"
+source = "tool_glue.rs"
+
+[[module]]
 id = "cell-backend"
 file = "crates/horizon-client/src/game.rs"
 name = "ae2_backend"

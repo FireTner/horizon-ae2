@@ -107,6 +107,15 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "items/tools/powered/MatterCannonItem.java": ("mixins/ae2/tool_glue.rs", "512-byte/one-type inventory, first matching positive-weight ammo recipe or PaintBallItem admission, 0.5 idle drain, component-preserving native Drive backend and storable nested tool; charging/shooting/raycast/permissions/rendering and live recipe reload pending"),
+    "items/tools/powered/ColorApplicatorItem.java": ("mixins/ae2/tool_filters.rs", "2048-byte/27-type item inventory, vanilla/tagged dyes, snowball and paintball admission, 0.5 drain, native Drive persistence/nesting; charging/painting/cycle/select/render and live tag reload pending"),
+    "api/storage/StorageCells.java": ("mixins/ae2/cells.rs", "native dispatch/handled built-in families for all 23 storage items with tool admission context; extensible addon cell-handler registry and full API pending"),
+    "me/cells/BasicCellHandler.java": ("mixins/ae2/cells.rs", "finite/basic/portable/tool layouts and capacity/type/partition tooltip; tooltip images, settings and extensible registry pending"),
+    "blockentity/storage/DriveBlockEntity.java": ("mixins/ae2/drive_glue.rs", "ten slots mounting all 23 built-in cell handlers, priority/online/channel/idle state, original inv, filtered GUI/native automation; dynamic render, external capability/full lifecycle, data reload and special menu actions pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

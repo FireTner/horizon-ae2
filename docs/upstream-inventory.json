@@ -65,8 +65,8 @@
       "pending": 97
     },
     "items": {
-      "partial": 4,
-      "pending": 53
+      "partial": 6,
+      "pending": 51
     },
     "me": {
       "partial": 21,
@@ -1569,8 +1569,8 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/storage/StorageCells.java",
-      "port": "mixins/ae2/slot_rules.rs",
-      "scope": "isCellHandled built-in cell families for Drive menu only; extensible registry and non-basic native cell inventories pending",
+      "port": "mixins/ae2/cells.rs",
+      "scope": "native dispatch/handled built-in families for all 23 storage items with tool admission context; extensible addon cell-handler registry and full API pending",
       "sha256": "83580413b49cc3824ab8663be7e533e8f54e57b4f6daf87a608c9d7159e65351",
       "status": "partial"
     },
@@ -2394,7 +2394,7 @@
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/storage/DriveBlockEntity.java",
       "port": "mixins/ae2/drive_glue.rs",
-      "scope": "ten slots mounting basic/portable/creative cells, priority/online/channel/idle state, inv persistence, filtered GUI/native automation; dynamic render, external capability/full lifecycle and tool backends pending",
+      "scope": "ten slots mounting all 23 built-in cell handlers, priority/online/channel/idle state, original inv, filtered GUI/native automation; dynamic render, external capability/full lifecycle, data reload and special menu actions pending",
       "sha256": "1cd6e904a76eba014f8ba11d23a603815784b1e0c7558cc9c835bdf1ebcc0d27",
       "status": "partial"
     },
@@ -5959,8 +5959,10 @@
     {
       "family": "items",
       "path": "src/main/java/appeng/items/tools/powered/ColorApplicatorItem.java",
+      "port": "mixins/ae2/tool_filters.rs",
+      "scope": "2048-byte/27-type item inventory, vanilla/tagged dyes, snowball and paintball admission, 0.5 drain, native Drive persistence/nesting; charging/painting/cycle/select/render and live tag reload pending",
       "sha256": "65281cdce105ab55190813ab0fcefb8e3d581a49e8806a5b91b211388dab4151",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "items",
@@ -5971,8 +5973,10 @@
     {
       "family": "items",
       "path": "src/main/java/appeng/items/tools/powered/MatterCannonItem.java",
+      "port": "mixins/ae2/tool_glue.rs",
+      "scope": "512-byte/one-type inventory, first matching positive-weight ammo recipe or PaintBallItem admission, 0.5 idle drain, component-preserving native Drive backend and storable nested tool; charging/shooting/raycast/permissions/rendering and live recipe reload pending",
       "sha256": "e969b914d71276cd6c60c7f7d931e998f91e81fb571ddea06ff72f3fd29c8ba9",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "items",
@@ -6118,7 +6122,7 @@
       "family": "me",
       "path": "src/main/java/appeng/me/cells/BasicCellHandler.java",
       "port": "mixins/ae2/cells.rs",
-      "scope": "native bytes/types/partition tooltip; content image and handler registry pending",
+      "scope": "finite/basic/portable/tool layouts and capacity/type/partition tooltip; tooltip images, settings and extensible registry pending",
       "sha256": "e4bbaba16e48ae84ba1cd0a7d206cdb287816bd7180e03c8e171b3bbf5ebdc9c",
       "status": "partial"
     },

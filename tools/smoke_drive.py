@@ -25,9 +25,10 @@ def main():
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--portable", action="store_true", help="verify portable 256k item + 1k fluid cell backends")
     group.add_argument("--creative", action="store_true", help="verify configured and empty creative-cell persistence/idle cost")
+    group.add_argument("--tools", action="store_true", help="verify Matter Cannon and Color Applicator storage backends")
     args = parser.parse_args()
     parent = ROOT / "target/smoke"; parent.mkdir(exist_ok=True)
-    prefix = "drive-creative-" if args.creative else "drive-portable-" if args.portable else "drive-"
+    prefix = "drive-tools-" if args.tools else "drive-creative-" if args.creative else "drive-portable-" if args.portable else "drive-"
     work = Path(tempfile.mkdtemp(prefix=prefix, dir=parent)); game_dir = work / "game"; game_dir.mkdir()
     socket = Path(tempfile.gettempdir()) / f"ae2-drive-{os.getpid()}.sock"
     env = {**os.environ, "HORIZON_HOME": str(work / "home"), "HORIZON_NO_AUDIO": "1"}
@@ -66,6 +67,10 @@ def main():
     if args.creative:
         item_id = fluid_id = "ae2:creative_storage_cell"
         disk_drain = 0.0
+    stored_ids = ["minecraft:iron_ingot", "minecraft:water"]
+    if args.tools:
+        item_id = "ae2:matter_cannon"; fluid_id = "ae2:color_applicator"; disk_drain = 1.0
+        stored_ids = ["minecraft:iron_nugget", "minecraft:red_dye"]
 
     def nbt(pos):
         return "\n".join(ctl("command", f"data get block {' '.join(map(str, pos))}")["chat"])
@@ -100,13 +105,13 @@ def main():
         assert slots[0] == {"item": item_id, "count": 1}, slots
         assert slots[9] == {"item": fluid_id, "count": 1}, slots
         value = nbt(drive)
-        assert "minecraft:iron_ingot" in value and "minecraft:water" in value, value
+        assert all(id in value for id in stored_ids), value
         if args.creative:
             assert "ae2:storage_cell_config_inv" in value and re.search(r'"#"\s*:\s*0L', value), value
         else:
             assert re.search(r'"#"\s*:\s*123L', value), value
             assert re.search(r'"#"\s*:\s*1000L', value), value
-        if args.portable:
+        if args.portable or args.tools:
             energies = re.findall(r'"ae2:stored_energy":\s*([-+0-9.eE]+)d', value)
             assert len(energies) >= 2 and all(float(energy) == 1234.0 for energy in energies), value
 
@@ -121,6 +126,8 @@ def main():
             data = data.replace('components:{', 'components:{"ae2:stored_energy":1234.0d,')
         if args.creative:
             data = '''{inv:{item0:{id:"ae2:creative_storage_cell",count:1,components:{"ae2:storage_cell_config_inv":[{"#t":"ae2:i",id:"minecraft:iron_ingot","#":0L},{"#t":"ae2:f",id:"minecraft:water","#":0L}]}},item9:{id:"ae2:creative_storage_cell",count:1}}}'''
+        if args.tools:
+            data = '''{inv:{item0:{id:"ae2:matter_cannon",count:1,components:{"ae2:stored_energy":1234.0d,"ae2:storage_cell_inv":[{"#t":"ae2:i",id:"minecraft:iron_nugget","#":123L}]}},item9:{id:"ae2:color_applicator",count:1,components:{"ae2:stored_energy":1234.0d,"ae2:storage_cell_inv":[{"#t":"ae2:i",id:"minecraft:red_dye","#":1000L}]}}}}'''
         ctl("command", f"data merge block {' '.join(map(str, drive))} {data}"); ctl("wait", 20)
         contents(); rate(2.0 + disk_drain + 2.0 / 128.0)
         print("PASS: original inv.item0/item9 load item/fluid cells with their exact idle drain", flush=True)
@@ -142,6 +149,10 @@ def main():
             report["scope"].remove("item_fluid_cell_persistence")
             report["scope"].extend(["creative_mixed_config_keys", "empty_creative_cell", "zero_disk_idle_drain"])
             report["not_covered"].append("world extraction through terminal; mounting/extraction checked in native integration test")
+        if args.tools:
+            report["scope"].remove("item_fluid_cell_persistence")
+            report["scope"].extend(["tool_inventory_persistence", "tool_idle_cost_and_preserved_private_energy"])
+            report["not_covered"].extend(["handheld tool charging/use/painting/shooting", "world terminal admission; covered by core/native tests"])
         (work / "result.json").write_text(json.dumps(report, indent=2) + "\n")
         print(f"PASS: Drive backend survives restart; logs: {work}", flush=True)
     finally:

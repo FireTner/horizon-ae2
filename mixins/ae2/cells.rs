@@ -18,6 +18,15 @@ pub const INVENTORY: &str = "ae2:storage_cell_inv";
 const CONFIG: &str = "ae2:storage_cell_config_inv";
 
 pub fn cell_type(id: &str) -> Option<(Tier, KeyType, CellLayout)> {
+    // Tools do not expose a StorageTier. These internal markers retain the
+    // shared codec identity check; their explicit layouts control every limit.
+    match id {
+        "ae2:matter_cannon" => return Some((Tier::K1, KeyType::Item, CellLayout::matter_cannon())),
+        "ae2:color_applicator" => {
+            return Some((Tier::K4, KeyType::Item, CellLayout::color_applicator()));
+        }
+        _ => {}
+    }
     let rest = id.strip_prefix("ae2:")?;
     let (kind, tier, portable) = if let Some(t) = rest.strip_prefix("item_storage_cell_") {
         (KeyType::Item, t, false)
@@ -99,7 +108,10 @@ fn key_with_properties(stack: &ItemStack, mut properties: KeyProperties) -> Resu
     if let Some(value) = int(components.get("minecraft:max_stack_size")) {
         properties.max_stack = value.clamp(1, 99) as u32;
     }
-    if cell_type(&stack.item).is_some() {
+    if tool_cell(&stack.item) {
+        // Both tools explicitly override storableInStorageCell to true.
+        properties.can_fit_inside_cell = true;
+    } else if cell_type(&stack.item).is_some() {
         properties.can_fit_inside_cell = component(stack, INVENTORY)
             .is_none_or(|tag| matches!(tag,Tag::List(values) if values.is_empty()));
     } else if &*stack.item == "ae2:creative_storage_cell" {
@@ -224,11 +236,28 @@ fn config_keys(
     Ok(keys)
 }
 
+pub fn tool_cell(id: &str) -> bool {
+    matches!(id, "ae2:matter_cannon" | "ae2:color_applicator")
+}
+pub fn load_restricted_backend(
+    stack: &ItemStack,
+    resolve: &impl Fn(KeyType, &str) -> Option<KeyProperties>,
+    allowed: BTreeSet<String>,
+) -> Result<CellBackend<Key>, String> {
+    if !tool_cell(&stack.item) {
+        return Err("not a tool cell".into());
+    }
+    load_cell(stack, resolve).map(|cell| CellBackend::restricted(cell, allowed))
+}
 pub fn load_backend(
     stack: &ItemStack,
     resolve: &impl Fn(KeyType, &str) -> Option<KeyProperties>,
 ) -> Result<CellBackend<Key>, String> {
-    if &*stack.item == "ae2:creative_storage_cell" {
+    if stack.count == 0 {
+        Err("empty cell stack".into())
+    } else if tool_cell(&stack.item) {
+        Err("tool cell requires recipe/tag admission context".into())
+    } else if &*stack.item == "ae2:creative_storage_cell" {
         Ok(CreativeCell::new(config_keys(stack, resolve)?).into())
     } else {
         load_cell(stack, resolve).map(Into::into)
@@ -236,7 +265,9 @@ pub fn load_backend(
 }
 pub fn persist_backend(stack: &mut ItemStack, cell: &CellBackend<Key>) -> Result<(), String> {
     match cell {
-        CellBackend::Basic(cell) => persist_cell(stack, cell),
+        CellBackend::Basic(cell) | CellBackend::Restricted { cell, .. } => {
+            persist_cell(stack, cell)
+        }
         CellBackend::Creative(_) if &*stack.item == "ae2:creative_storage_cell" => Ok(()),
         _ => Err("creative cell identity changed during operation".into()),
     }
@@ -246,6 +277,9 @@ pub fn load_cell(
     stack: &ItemStack,
     resolve: &impl Fn(KeyType, &str) -> Option<KeyProperties>,
 ) -> Result<Cell<Key>, String> {
+    if stack.count == 0 {
+        return Err("empty cell stack".into());
+    }
     let (tier, kind, layout) = cell_type(&stack.item).ok_or("not a basic cell")?;
     let mut contents = BTreeMap::new();
     match component(stack, INVENTORY) {
@@ -400,6 +434,66 @@ mod tests {
     }
     fn resolve(_: KeyType, id: &str) -> Option<KeyProperties> {
         (!id.starts_with("missing:")).then_some(KeyProperties::default())
+    }
+    #[test]
+    fn tool_backend_needs_admission_and_preserves_private_energy_and_nested_contents() {
+        let paint = Key::new(
+            KeyType::Item,
+            "ae2:red_paint_ball".to_owned(),
+            vec![],
+            Default::default(),
+        )
+        .unwrap();
+        for id in ["ae2:matter_cannon", "ae2:color_applicator"] {
+            let mut stack = item(id);
+            stack
+                .data_mut()
+                .set_other("ae2:stored_energy", Some(Tag::Double(1234.0f64.to_bits())));
+            let energy = component(&stack, "ae2:stored_energy").cloned();
+            assert!(load_backend(&stack, &resolve).is_err());
+            let mut cell = load_restricted_backend(
+                &stack,
+                &resolve,
+                BTreeSet::from(["ae2:red_paint_ball".to_owned()]),
+            )
+            .unwrap();
+            assert_eq!(cell.insert(paint.clone(), 17, true), 17);
+            persist_backend(&mut stack, &cell).unwrap();
+            assert_eq!(component(&stack, "ae2:stored_energy"), energy.as_ref());
+            let mut loaded = load_restricted_backend(
+                &stack,
+                &resolve,
+                BTreeSet::from(["ae2:red_paint_ball".to_owned()]),
+            )
+            .unwrap();
+            assert_eq!(loaded.extract(&paint, 17, false), 17);
+            let tool_key = key_with_properties(
+                &stack,
+                KeyProperties {
+                    can_fit_inside_cell: false,
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+            assert!(tool_key.properties().can_fit_inside_cell);
+            let mut ordinary = load_cell(&item("ae2:item_storage_cell_1k"), &resolve).unwrap();
+            assert_eq!(ordinary.insert(tool_key, 1, true), 1);
+        }
+    }
+    #[test]
+    fn zero_count_stacks_never_become_live_storage_handlers() {
+        for id in [
+            "ae2:item_storage_cell_1k",
+            "ae2:portable_fluid_cell_4k",
+            "ae2:creative_storage_cell",
+            "ae2:matter_cannon",
+            "ae2:color_applicator",
+        ] {
+            let mut stack = item(id);
+            stack.count = 0;
+            assert!(load_backend(&stack, &resolve).is_err());
+            assert!(load_cell(&stack, &resolve).is_err());
+        }
     }
     #[test]
     fn creative_backend_uses_configured_item_and_fluid_keys_and_persists_nothing() {

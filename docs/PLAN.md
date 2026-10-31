@@ -95,8 +95,10 @@ Portable item/fluid cells уже используют отдельные half-by
 в Drive, исходные компоненты и capacity tooltip. Original BasicCellInventory
 oracle: 2000 traces/572000 операций PASS; handheld UI/charge/use/disassembly
 остаются открытыми. Creative backend уже подключён к Drive, сверён с original
-Java и проверен native integration/world persistence. Следующие storage backends
-— Matter Cannon и Color Applicator с их source admission filters.
+Java и проверен native integration/world persistence. Matter Cannon и Color
+Applicator storage backends тоже подключены: capacities/type limits, source recipe/tag
+admission, nested storage и private-energy retention. Следующие части этих items —
+charging/use/painting/shooting, capability/API и live recipe/tag reload.
 Для их recipes/tag predicates уже восстановлены исходные c tags зависимости
 NeoForge 21.1.169. 461 файла с provenance/licence, overlay/replace тестами и
 world item-predicate/restart smoke; остальные API/conditions платформы ещё нужны.

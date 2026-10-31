@@ -1,4 +1,5 @@
 use ae2_horizon::{
+    ae2_backend::CellBackend,
     ae2_keys::KeyType,
     ae2_storage::{Cell, CellKey, CellLayout, CellState, Tier},
 };
@@ -11,6 +12,7 @@ use std::{
 struct Key {
     kind: KeyType,
     id: usize,
+    tool: bool,
 }
 impl CellKey for Key {
     fn key_type(&self) -> KeyType {
@@ -20,10 +22,17 @@ impl CellKey for Key {
         self.kind == KeyType::Fluid || self.id != 79
     }
     fn blacklisted(&self) -> bool {
-        self.id == 78
+        !self.tool && self.id == 78
+    }
+    fn primary_id(&self) -> Option<&str> {
+        Some(if self.id.is_multiple_of(7) {
+            "rejected"
+        } else {
+            "allowed"
+        })
     }
 }
-fn key(kind: KeyType, id: usize) -> Key {
+fn key(kind: KeyType, id: usize, tool: bool) -> Key {
     Key {
         kind: if id == 81 {
             if kind == KeyType::Item {
@@ -35,6 +44,7 @@ fn key(kind: KeyType, id: usize) -> Key {
             kind
         },
         id,
+        tool,
     }
 }
 fn main() {
@@ -49,23 +59,34 @@ fn main() {
         } else {
             KeyType::Fluid
         };
-        let layout = if input.next().unwrap() == 0 {
-            CellLayout::basic(tier, kind)
-        } else {
-            CellLayout::portable(tier, kind)
+        let profile = input.next().unwrap();
+        let tool = profile >= 2;
+        let layout = match profile {
+            0 => CellLayout::basic(tier, kind),
+            1 => CellLayout::portable(tier, kind),
+            2 => CellLayout::matter_cannon(),
+            3 => CellLayout::color_applicator(),
+            _ => panic!("unknown cell profile"),
         };
         let flags = input.next().unwrap();
         let filters = input.next().unwrap();
         let partition: BTreeSet<_> = (0..filters)
-            .map(|_| key(kind, input.next().unwrap() as usize))
+            .map(|_| key(kind, input.next().unwrap() as usize, tool))
             .collect();
-        let mut cell = Cell::new_with_layout(tier, kind, layout);
-        cell.configure(
-            partition.clone(),
-            flags & 1 != 0,
-            flags & 2 != 0,
-            flags & 4 != 0,
-        );
+        let wrap = |mut cell: Cell<Key>| {
+            cell.configure(
+                partition.clone(),
+                flags & 1 != 0,
+                flags & 2 != 0,
+                flags & 4 != 0,
+            );
+            if tool {
+                CellBackend::restricted(cell, BTreeSet::from(["allowed".to_owned()]))
+            } else {
+                cell.into()
+            }
+        };
+        let mut backend = wrap(Cell::new_with_layout(tier, kind, layout));
         let operations = input.next().unwrap();
         for _ in 0..operations {
             let op = input.next().unwrap();
@@ -73,26 +94,22 @@ fn main() {
             let amount = input.next().unwrap();
             let commit = input.next().unwrap() != 0;
             let result = match op {
-                0 => cell.insert(key(kind, id), amount, commit),
-                1 => cell.extract(&key(kind, id), amount, commit),
+                0 => backend.insert(key(kind, id, tool), amount, commit),
+                1 => backend.extract(&key(kind, id, tool), amount, commit),
                 2 => {
-                    let contents = cell
+                    let contents = backend
                         .stacks()
                         .iter()
                         .filter(|(_, n)| **n > 0)
                         .map(|(k, n)| (k.clone(), *n))
                         .collect();
-                    cell = Cell::restore_with_layout(tier, kind, layout, contents).unwrap();
-                    cell.configure(
-                        partition.clone(),
-                        flags & 1 != 0,
-                        flags & 2 != 0,
-                        flags & 4 != 0,
-                    );
+                    backend =
+                        wrap(Cell::restore_with_layout(tier, kind, layout, contents).unwrap());
                     0
                 }
                 _ => panic!("unknown operation"),
             };
+            let cell = backend.finite().unwrap();
             let state = match cell.state() {
                 CellState::Empty => 1,
                 CellState::NotEmpty => 2,
@@ -111,7 +128,10 @@ fn main() {
             for id in 0..82 {
                 print!(
                     " {}",
-                    cell.stacks().get(&key(kind, id)).copied().unwrap_or(0)
+                    cell.stacks()
+                        .get(&key(kind, id, tool))
+                        .copied()
+                        .unwrap_or(0)
                 );
             }
             println!();

@@ -97,7 +97,7 @@ fn crank_target(game: &Game<'_>, pos: Pos) -> Option<Pos> {
     (game.native_block(target) == CHARGER && facing(game, target) != dir).then_some(target)
 }
 
-fn ingredient_json(value: &serde_json::Value) -> Option<serde_json::Value> {
+pub(super) fn ingredient_json(value: &serde_json::Value) -> Option<serde_json::Value> {
     use serde_json::Value;
     match value {
         Value::String(_) => Some(value.clone()),

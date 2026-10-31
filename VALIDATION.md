@@ -3,7 +3,36 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## Общие теги платформы — текущая проверка
+## Storage backends двух инструментов — текущая проверка
+
+- Standalone **85 PASS**, fmt/rustfmt/clippy `-D warnings` и Python **10 PASS**,
+  target/tool-checks-final.log. Native **105 PASS**, target/tool-native-tests-final.json.
+  Проверены capacities 4032/16128 для одного типа, 27 component variants у Color,
+  blacklist before void, old-content extraction, source recipe first-match,
+  реальные Ingredient/tag lookups, known conditions и отказ при unknown/not.
+- Codec tests проверяют required admission context, nonempty tool nesting,
+  private stored_energy retention, roundtrip и zero-count handler rejection.
+  Tool CellLayout задаёт source bytes/type/drain явно; внутренний Tier marker
+  используется только для codec identity, не показывается как свойство tool.
+- **2000 tool traces / 572000 операций PASS**, docs/tool-cell-oracle.json.
+  Компилируются unchanged BasicCellInventory/CellState; profiles и callback
+  blacklist — stubs. Сверяется настоящий restricted Rust backend. Actual Java
+  tool admission methods, world/recipe ordering/reload этим oracle не проверены.
+  Basic/portable regression с новым wrapper: ещё 572000 PASS.
+- Native build/check PASS: target/tool-native-build.json,
+  target/tool-native-check-final.json. Ранний compiler error выявил Arc<Value>
+  у CustomRecipe.json; adapter использует настоящий object view, pins сохранены.
+- World smoke PASS: target/smoke/drive-tools-yj8oapg3, отчёт docs/tool-world-smoke.json.
+  Matter Cannon с 123 iron nuggets + Color Applicator с 1000 red dye,
+  собственная энергия каждого 1234 AE, original inv/Items, front/offline и restart.
+  Точный расход Drive/channel + оба tools — **3.015625 AE/tick**. Полные world
+  terminal admission/transfer ещё не проверены; соответствующие фильтры — core/native tests.
+- В Drive теперь 23 встроенных handlers. Handheld charge/use/shoot/paint,
+  dynamic render/API, reload invalidation, unknown addon conditions/class handlers
+  и RecipeManager ordering ties остаются открытыми. Source inventory:
+  **59 partial / 1370 pending**, complete нет. Свои test processes завершены.
+
+## Общие теги платформы — предыдущая проверка
 
 - Generated c tags берутся из чистого pinned NeoForge checkout 863802b6dfdb1d5e48c2fda093ed9d01df0f4cd9.
   Version mapping: official 21.1.169 changelog → PR 2245 → merge commit;

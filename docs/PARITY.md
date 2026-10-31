@@ -5,13 +5,14 @@
 
 | Подсистема | Написано | Что остаётся |
 |---|---|---|
-| BasicCellInventory | обычные и portable профили пяти размеров, items/fluids, байты/типы/округление, exact/fuzzy partitions, distribution/void, simulate/modulate/extract; native codec, nested restrictions и Drive mounts; 2000 Java traces/572000 операций | терминал, полное восстановление malformed/missing content, tool cells и addon handlers |
+| BasicCellInventory | basic/portable/tool layouts, байты/типы/округление, exact/fuzzy partitions, distribution/void, simulate/modulate/extract; native codec, nested restrictions и Drive mounts; original Java basic и tool profile traces | терминал, полное восстановление malformed/missing content, addon handlers и actual upgrade validation |
 | AEKey / GenericStack / KeyCounter | компонентные ключи, typed NBT, signed long counts, fuzzyEquals и FuzzySearch, signed deficits/zero pruning | prototype normalization, wrapped items, packet codecs, missing-content placeholders, drop/display API |
 | ME topology/pathing | controller validation, BFS priorities, bottleneck ancestry, DFS counts, dense/normal/ad-hoc, P2P rules; 2000 Java differential cases; пять world full blocks, Drive require-channel | остальные block/part nodes, полная grid service identity/merge priorities, security/listeners/boot events |
 | StoredEnergyAmount / EnergyService | amount/capacity/simulation, storage events, приоритеты, per-node buffer, public power delay, averages/cache, overlay/passive rules; full-block world binding; 2000 Java traces | addon storage providers, полные watchers/event callbacks, QuartzFiber и passive-generator blocks, config integration, полные watcher/addon oracle scenarios |
 | NetworkStorage | mount priorities, preferred passes, mutation queues, recursion guard, weak links; 2000 Java traces/410882 операций; native StorageService/Drive consumers | MEStorage handler filters, ME Chest/terminal и остальные providers |
 | StorageService | node/global provider identity, refresh/unmount, lazy public cache/private counts, key/watch-all changes и permanent watcher destroy | Java service oracle, world watcher hosts, full callback/hash iteration/exception fidelity, debug dump |
-| DriveBlockEntity / DriveWatcher | десять slots для 21 basic/portable/creative cell types, реальные mounts по online/priority, REQUIRE_CHANNEL, 2 AE + disk drain, front exclusion, original inv.itemN + Horizon Items mirror, packed status; native hopper/dropper filter/limit/flush и world restart | external capability API, dynamic cell chassis/LEDs/sync, tool cells, all inventory/drop/chunk paths |
+| DriveBlockEntity / DriveWatcher | десять slots для всех 23 built-in storage handlers, online/priority mounts, REQUIRE_CHANNEL, 2 AE + disk drain, front exclusion, original inv.itemN + Horizon Items mirror, packed status; native hopper/dropper filter/limit/flush и world restart | external capability API, dynamic cell chassis/LEDs/sync, all inventory/drop/chunk paths, reload invalidation и special menu actions |
+| MatterCannon / ColorApplicator storage | 512 bytes/1 type и 2048 bytes/27 types, recipe/tag item admission before void, positive-weight first recipe, paintballs/dyes/snowball, 0.5 idle drain, filled-tool nesting и private-energy retention | handheld charging/shooting/painting/cycling, full item APIs/visuals, live recipe/tag reload, unknown addon condition/class adapters и matching recipe iteration ties |
 | CreativeCellInventory / Handler | exact configured item/fluid keys, unlimited insert/extract simulate/commit, Integer.MAX_VALUE listing, preferred, TYPES_FULL и zero drain, empty nesting, no-op persist; native mounts и 2000 Java traces | tooltip image/shift list, workbench/config writer, descriptions, full item/handler/addon API и source iteration order |
 | PortableCellItem | половина bytes, прежний overhead, item type limits 54/45/36/27/18 и fluid 18, 0.5 idle drain, component-preserving backend/Drive mounts и storage tooltip | handheld terminal/menu, private charging/use/disassembly, energy tooltip, item color/LED и full upgrades lifecycle |
 | DriveMenu / DriveScreen | original texture/layout, десять cell slots с лимитом 1, authoritative filters, pickup/shift/drag/hotbar rules, main-before-hotbar shift order и isolation; game restart | priority button/subscreen, ghost icons, AEBaseMenu bulk actions, external multiplayer и addon cell registry |
@@ -73,8 +74,9 @@
   это не дополнительные слоты Drive и не AE2 wire protocol. Сервер определяет
   policy по actor/window/реальному блоку на каждом click packet. Ordinary barrel
   regression PASS. Из 23 допустимых upstream built-in cell families backend пока
-  подключает двадцать basic/portable item/fluid cells и creative cell; два tools
-  сохраняются как items, их backend ещё не подключён.
+  подключает все 23: двадцать basic/portable, creative, Matter Cannon и Color
+  Applicator. Для tools required recipe/tag context; fallback unrestricted
+  handler запрещён. Это storage backends, не полные handheld tool actions.
   Addon registry, priority UI, ghost slot icons и AEBaseMenu special bulk actions
   ещё не перенесены. Hopper/dropper access со всех шести сторон проверен,
   включая offline, full Drive и failed pull с возвратом компонентов; внешнего
@@ -106,6 +108,15 @@
   Полные config component normalization, writer/UI и actual NeoForge lifecycle
   остаются открытыми. World smoke подтверждает config/power/restart; реальное
   unlimited extraction/mount/unmount проверено native integration, не терминалом.
+- Tool profile oracle: ещё 2000 traces/572000 операций с unchanged
+  BasicCellInventory/CellState и настоящим restricted Rust backend. Java tool
+  classes не компилируются: capacity descriptors и blacklist callback stubbed.
+  Actual recipe/tag expansion проверено native tests с реальным Items catalog;
+  known `not(tag_empty)` conditions supported, unknown conditions (даже под not)
+  не допускают рецепт. Полная NeoForge condition API остаётся открытой.
+  Admission snapshot обновляется при загрузке/смене item; live reload invalidation
+  ещё нужен. Для overlapping recipes используется порядок native recipe table;
+  source RecipeManager ties ещё не сверены. Отчёт docs/tool-cell-oracle.json.
 - Блоки world adapter опрашивают loaded block entities в pre/post hooks. Это
   сохраняет изменения NBT/блоков внутри тика, но полная source lifecycle/event
   модель и производительность больших сетей ещё не подтверждены. Неизменённый

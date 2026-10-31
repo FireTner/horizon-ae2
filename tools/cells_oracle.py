@@ -85,12 +85,13 @@ public Iterable<Object2LongMap.Entry<K>> object2LongEntrySet(){var out=new java.
         "Main.java": """import java.util.*;import java.io.*;import appeng.api.stacks.*;import appeng.api.config.*;import appeng.api.storage.cells.*;import appeng.me.cells.*;import appeng.util.*;import net.minecraft.world.item.*;
 public class Main {
 static AEKey key(AEKeyType kind,int id){if(id==81)kind=kind==AEKeyType.ITEMS?AEKeyType.FLUIDS:AEKeyType.ITEMS;return kind==AEKeyType.ITEMS?new AEItemKey(id):new AEKey(id,kind);}
-record Cell(int bytes,int overhead,int types,AEKeyType kind,int flags,ConfigInventory config) implements IBasicCellItem {
+record Cell(int profile,int bytes,int overhead,int types,AEKeyType kind,int flags,ConfigInventory config) implements IBasicCellItem {
 public int getBytes(ItemStack s){return bytes;}public int getBytesPerType(ItemStack s){return overhead;}public int getTotalTypes(ItemStack s){return types;}public AEKeyType getKeyType(){return kind;}public ConfigInventory getConfigInventory(ItemStack s){return config;}
+public boolean isBlackListed(ItemStack s,AEKey k){return profile>=2?k.id%7==0:k.id==78;}
 public appeng.api.upgrades.IUpgradeInventory getUpgrades(ItemStack s){return item->switch((appeng.core.definitions.AEItems)item){case INVERTER_CARD->(flags&1)!=0;case EQUAL_DISTRIBUTION_CARD->(flags&2)!=0;case VOID_CARD->(flags&4)!=0;default->false;};}}
 public static void main(String[] args) throws Exception {var in=new Scanner(new BufferedInputStream(System.in));var out=new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));int cases=in.nextInt();
-for(int c=0;c<cases;c++){int tier=in.nextInt();AEKeyType kind=in.nextInt()==0?AEKeyType.ITEMS:AEKeyType.FLUIDS;boolean portable=in.nextInt()!=0;int flags=in.nextInt(),n=in.nextInt();var keys=new HashSet<AEKey>();for(int k=0;k<n;k++)keys.add(key(kind,in.nextInt()));
-int base=1024<<(2*tier),types=kind==AEKeyType.ITEMS?(portable?63-(tier+1)*9:63):18;var item=new Cell(portable?base/2:base,base/128,types,kind,flags,new ConfigInventory(keys));var stack=new ItemStack(item);var inv=BasicCellInventory.createInventory(stack,null);int operations=in.nextInt();
+for(int c=0;c<cases;c++){int tier=in.nextInt();AEKeyType kind=in.nextInt()==0?AEKeyType.ITEMS:AEKeyType.FLUIDS;int profile=in.nextInt();boolean portable=profile==1;int flags=in.nextInt(),n=in.nextInt();var keys=new HashSet<AEKey>();for(int k=0;k<n;k++)keys.add(key(kind,in.nextInt()));
+int base=1024<<(2*tier),types=kind==AEKeyType.ITEMS?(portable?63-(tier+1)*9:63):18;int bytes=portable?base/2:base,overhead=base/128;if(profile==2){bytes=512;overhead=8;types=1;}else if(profile==3){bytes=2048;overhead=32;types=27;}var item=new Cell(profile,bytes,overhead,types,kind,flags,new ConfigInventory(keys));var stack=new ItemStack(item);var inv=BasicCellInventory.createInventory(stack,null);int operations=in.nextInt();
 for(int step=0;step<operations;step++){int op=in.nextInt(),id=in.nextInt();long amount=in.nextLong();Actionable mode=in.nextInt()==0?Actionable.SIMULATE:Actionable.MODULATE;long result=0;
 switch(op){case 0->result=inv.insert(key(kind,id),amount,mode,null);case 1->result=inv.extract(key(kind,id),amount,mode,null);case 2->{inv.persist();inv=BasicCellInventory.createInventory(stack,null);}default->throw new IllegalArgumentException();}
 out.print(result+" "+inv.getStoredItemCount()+" "+inv.getStoredItemTypes()+" "+inv.getUsedBytes()+" "+inv.getFreeBytes()+" "+inv.getRemainingItemTypes()+" "+inv.getRemainingItemCount()+" "+inv.getStatus().ordinal());var counts=inv.getAvailableStacks();for(int k=0;k<82;k++)out.print(" "+counts.get(key(kind,k)));out.println();}}
@@ -118,12 +119,19 @@ out.flush();}}
     return [root / name for name in sorted(files)]
 
 
-def cases(count, creative=False):
+def cases(count, creative=False, tools=False):
     rng = random.Random(0xAE219218CE)
     lines = [str(count)]; operations = 0
     for case in range(count):
         tier = case % 5; kind = case // 5 % 2; portable = case // 10 % 2; flags = case // 20 % 8
-        filters = rng.sample(range(82), rng.choice([0, 1, 3, 20, 63])) if creative else rng.sample(range(82 - 1), rng.choice([0, 1, 3, 20, 70]))
+        if tools:
+            portable = 2 + case % 2; tier = case % 2; kind = 0; flags = case // 2 % 8
+        if creative:
+            filters = rng.sample(range(82), rng.choice([0, 1, 3, 20, 63]))
+        elif tools:
+            filters = rng.sample(range(81), rng.choice([0, 1, 3, 20, 63]))
+        else:
+            filters = rng.sample(range(81), rng.choice([0, 1, 3, 20, 70]))
         lines.append(f"{tier} {kind} {portable} {flags} {len(filters)} " + " ".join(map(str, filters)))
         ops = [[0, key, 1, 1] for key in range(82)]
         # Fill, reject, extract and reopen at byte/type boundaries, then mix
@@ -141,17 +149,21 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--java-home", type=Path, default=Path(os.environ.get("JAVA_HOME", "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home")))
     parser.add_argument("--cases", type=int, default=200)
-    parser.add_argument("--creative", action="store_true", help="compare original CreativeCellInventory instead")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--creative", action="store_true", help="compare original CreativeCellInventory instead")
+    group.add_argument("--tools", action="store_true", help="compare tool layouts/restricted backend with original basic inventory and fake blacklist")
     args = parser.parse_args()
     if args.cases < 1:
         parser.error("--cases must be positive")
     upstream.verify(ROOT / "target/upstream/ae2")
     if args.creative:
         WORK = ROOT / "target/creative-cell-oracle"
+    elif args.tools:
+        WORK = ROOT / "target/tool-cell-oracle"
     original = CREATIVE_ORIGINAL if args.creative else ORIGINAL
     sources = generate(args.creative); classes = WORK / "classes"; classes.mkdir(exist_ok=True)
     subprocess.run([str(args.java_home / "bin/javac"), "-d", str(classes), *map(str, sources)], check=True)
-    inputs, operations = cases(args.cases, args.creative); (WORK / "inputs.txt").write_text(inputs)
+    inputs, operations = cases(args.cases, args.creative, args.tools); (WORK / "inputs.txt").write_text(inputs)
     reference = subprocess.run([str(args.java_home / "bin/java"), "-cp", str(classes), "Main"], input=inputs, text=True, capture_output=True, check=True).stdout
     example = "creative_oracle" if args.creative else "cells_oracle"
     subprocess.run(["cargo", "build", "--locked", "--example", example], cwd=ROOT, check=True)
@@ -174,6 +186,11 @@ def main():
             "appeng/items/contents/CellConfig.java", "appeng/items/storage/CreativeCellItem.java"]}
         report["scope"] = "unchanged CreativeCellInventory; exact configured keys, mixed key kinds, simulate/commit insert/extract, Integer.MAX_VALUE listing independent of requested amount, preferred/nested flags, status, zero idle drain and reopen; keys and configuration infrastructure stubbed"
         report["not_covered"] = ["actual Minecraft component/config codecs", "workbench and tooltip UI", "addon key types", "world lifecycle, capability API and NeoForge"]
+    elif args.tools:
+        report["profile_source_sha256"] = {name: hashlib.sha256((SOURCE / name).read_bytes()).hexdigest() for name in [
+            "appeng/items/tools/powered/MatterCannonItem.java", "appeng/items/tools/powered/ColorApplicatorItem.java"]}
+        report["scope"] = "unchanged BasicCellInventory/CellState; matter cannon/color applicator capacity/type profiles and actual restricted Rust backend, fake primary-item blacklist before void, simulated/committed operations, reload and exact counts/status/bytes per key"
+        report["not_covered"] = ["actual Java tool admission/recipe/tag implementations", "Minecraft component and upgrade validation", "handheld charging/use/painting/shooting", "world lifecycle and NeoForge"]
     report["not_covered"].append("Java hash/identity iteration and serialized list order")
     (WORK / "report.json").write_text(json.dumps(report, indent=2) + "\n"); print(json.dumps(report, indent=2))
     if failures:

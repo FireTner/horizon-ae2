@@ -1,0 +1,60 @@
+{
+  "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/drive-tools-yj8oapg3",
+  "scope": [
+    "original_inv_ten_slots",
+    "drive_and_cell_idle_drain",
+    "front_exclusion",
+    "offline_retention",
+    "save_restart",
+    "tool_inventory_persistence",
+    "tool_idle_cost_and_preserved_private_energy"
+  ],
+  "measurements": [
+    {
+      "before": {
+        "tick": 53,
+        "energy": 19917.359375
+      },
+      "after": {
+        "tick": 79,
+        "energy": 19864.953125
+      },
+      "expected_per_tick": 2.015625
+    },
+    {
+      "before": {
+        "tick": 103,
+        "energy": 19793.578125
+      },
+      "after": {
+        "tick": 129,
+        "energy": 19715.171875
+      },
+      "expected_per_tick": 3.015625
+    },
+    {
+      "before": {
+        "tick": 249,
+        "energy": 19785.890625
+      },
+      "after": {
+        "tick": 274,
+        "energy": 19710.5
+      },
+      "expected_per_tick": 3.015625
+    }
+  ],
+  "not_covered": [
+    "GUI",
+    "terminal transfers",
+    "dynamic chassis and LEDs",
+    "chunk/dimension/multiplayer",
+    "handheld tool charging/use/painting/shooting",
+    "world terminal admission; covered by core/native tests"
+  ],
+  "cells": [
+    "ae2:matter_cannon",
+    "ae2:color_applicator"
+  ]
+}

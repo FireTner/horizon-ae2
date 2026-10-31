@@ -58,6 +58,9 @@
 - Подготовка контента, source-only `.hnmod`, закреплённые исходники и
   проверяемый реестр **всех 1429 Java-файлов** оригинала. В реестре нет
   полностью закрытых классов; 57 отмечены как частично перенесённые.
+- Подготовка также переносит 461 исходный общий тег NeoForge из pinned source,
+  с лицензией/хэшами и порядком platform → AE2. World item predicates и restart
+  проверены. Три прежних ручных списка заменены исходными данными платформы.
 
 Полный объём и последовательность работ: [docs/PLAN.md](docs/PLAN.md).
 Текущие отличия: [docs/PARITY.md](docs/PARITY.md).
@@ -72,6 +75,7 @@ horizon-mixins. Инструменты не меняют исходный checko
 python3.12 tools/upstream.py fetch
 python3.12 tools/upstream.py fetch-jar
 python3.12 tools/upstream.py fetch-engines
+python3.12 tools/upstream.py fetch-platform
 python3.12 tools/upstream.py audit --check
 cargo fmt --all --check
 cargo clippy --all-targets --locked -- -D warnings
@@ -125,6 +129,8 @@ python3.12 tools/smoke_drive.py --portable --ctl /path/to/horizon-ctl \
   --resources /path/to/prepared/26.3
 python3.12 tools/smoke_drive.py --creative --ctl /path/to/horizon-ctl \
   --resources /path/to/prepared/26.3
+python3.12 tools/smoke_platform_tags.py --ctl /path/to/horizon-ctl \
+  --resources /path/to/prepared/26.3
 ```
 
 `target/ae2-0.1.0.hnmod` содержит исходники native-мода и лицензии, без
@@ -134,6 +140,8 @@ Minecraft/AE2 assets. Контент хранится отдельно в `targe
 `fetch-engines` создаёт независимые закреплённые checkout под `target/upstream`;
 существующие чужие репозитории не меняет. На этой машине пути к установленным
 инструментам и ресурсам также записаны в игнорируемый `target/local-env.sh`.
+`fetch-platform` закрепляет исходники generated c tags NeoForge 21.1.169;
+prepare_content.py требует этот чистый checkout (параметр `--platform`).
 
 ```text
 mixins/ae2/     правила, Horizon-адаптер, manifest и маленькие helpers

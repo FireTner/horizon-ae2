@@ -21,3 +21,13 @@ the pinned original jar; it is not a permission grant to redistribute assets.
 
 Sources: upstream README.md at the pinned tag, and its LICENSE. This project is
 not affiliated with or endorsed by Team Applied Energistics, Horizon, Mojang or Microsoft.
+
+Prepared content also carries generated common `c` tags from NeoForge 21.1.169,
+source revision 863802b6dfdb1d5e48c2fda093ed9d01df0f4cd9. The official
+[release changelog](https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.169/neoforge-21.1.169-changelog.txt)
+identifies [PR 2245](https://github.com/neoforged/NeoForge/pull/2245), whose merged
+commit is pinned in upstream.lock.json. Copyright NeoForged, MinecraftForge and
+their contributors; their LGPL-2.1 text is copied from that checkout into
+`data/ae2/licenses/neoforge-lgpl-2.1.txt` in prepared content. Tag source hashes
+and layer merges are recorded in `data/ae2/platform-tags.json`. These data files
+are separate from the source-only `.hnmod`; no NeoForge JVM runtime is included.

@@ -6,6 +6,18 @@
   "minecraft": "1.21.1",
   "loader": "NeoForge",
   "namespace": "ae2",
+  "platform_tags": {
+    "repository": "https://github.com/neoforged/NeoForge",
+    "revision": "863802b6dfdb1d5e48c2fda093ed9d01df0f4cd9",
+    "neoforge_version": "21.1.169",
+    "resources": "src/generated/resources",
+    "namespaces": ["c"],
+    "license": "LICENSE.txt",
+    "version_evidence": [
+      "https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.169/neoforge-21.1.169-changelog.txt",
+      "https://github.com/neoforged/NeoForge/pull/2245"
+    ]
+  },
   "jar": {
     "url": "https://cdn.modrinth.com/data/XxWD5pD3/versions/KDnFUmMm/appliedenergistics2-19.2.18.jar",
     "sha512": "39bc4cf733a4321631e2637a1a6dfd3527135fdac1b572534e6fd1f9eab7a6dd92d56c5fa066263c95149c9b20cabdd1fd3dff80bea515381b1d2d754cad26c3",

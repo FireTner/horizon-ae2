@@ -8832,6 +8832,20 @@
     "loader": "NeoForge",
     "minecraft": "1.21.1",
     "namespace": "ae2",
+    "platform_tags": {
+      "license": "LICENSE.txt",
+      "namespaces": [
+        "c"
+      ],
+      "neoforge_version": "21.1.169",
+      "repository": "https://github.com/neoforged/NeoForge",
+      "resources": "src/generated/resources",
+      "revision": "863802b6dfdb1d5e48c2fda093ed9d01df0f4cd9",
+      "version_evidence": [
+        "https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.169/neoforge-21.1.169-changelog.txt",
+        "https://github.com/neoforged/NeoForge/pull/2245"
+      ]
+    },
     "ref": "neoforge/v19.2.18",
     "repository": "https://github.com/AppliedEnergistics/Applied-Energistics-2",
     "revision": "db17504a86128fdf3dae31f5fb7a112a646e0b93",

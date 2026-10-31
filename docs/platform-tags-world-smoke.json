@@ -1,0 +1,43 @@
+{
+  "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/platform-tags-kwyjn5mu",
+  "platform_revision": "863802b6dfdb1d5e48c2fda093ed9d01df0f4cd9",
+  "checks": [
+    [
+      "c:ingots/iron",
+      "minecraft:iron_ingot"
+    ],
+    [
+      "c:ingots/copper",
+      "minecraft:copper_ingot"
+    ],
+    [
+      "c:rods/wooden",
+      "minecraft:stick"
+    ],
+    [
+      "c:nuggets/iron",
+      "minecraft:iron_nugget"
+    ],
+    [
+      "c:nuggets/gold",
+      "minecraft:gold_nugget"
+    ],
+    [
+      "c:dyes/red",
+      "minecraft:red_dye"
+    ],
+    [
+      "c:dusts/ender_pearl",
+      "ae2:ender_dust"
+    ]
+  ],
+  "positive_checks": 14,
+  "negative_checks": 14,
+  "scope": "real server item predicates and content tag layering, existing AE2 contribution, restart",
+  "not_covered": [
+    "membership of every carried tag",
+    "all non-item tag registries",
+    "all recipe conditions and survival crafting"
+  ]
+}

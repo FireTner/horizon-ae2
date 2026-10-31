@@ -8,6 +8,9 @@ Keep this repository separate from horizon-create, Horizon and horizon-mixins.
 Never edit their original sources, player resources, saves or launcher settings.
 Export only committed pinned engine sources into ignored target trees. Reference
 AE2 Java is the specification; do not approximate missing behaviour silently.
+NeoForge's generated common c tags come from the pinned read-only checkout in
+target/upstream/neoforge. Preserve its licence/provenance and resource layering;
+never replace missing platform tags with ad-hoc item lists.
 
 Rules live in mixins/ae2/*.rs and are exposed by src/lib.rs for standalone tests.
 glue.rs owns Horizon types. Only modules actually consumed by the adapter belong

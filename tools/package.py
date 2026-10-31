@@ -46,6 +46,7 @@ def package():
                  'tools/mounts_oracle.py', 'examples/mounts_oracle.rs',
                  'tools/cells_oracle.py', 'examples/cells_oracle.rs', 'docs/cells-oracle.json', 'docs/portable-world-smoke.json',
                  'examples/creative_oracle.rs', 'docs/creative-cell-oracle.json', 'docs/creative-world-smoke.json',
+                 'tools/smoke_platform_tags.py', 'docs/platform-tags-report.json', 'docs/platform-tags-world-smoke.json',
                  'examples/grid_oracle.rs', 'AGENTS.md', 'LICENSES/AE2-API-MIT',
                  'tools/upstream.py', 'tools/prepare_content.py', 'tools/package.py',
                  'docs/PARITY.md', 'docs/PLAN.md', 'docs/upstream-inventory.json',

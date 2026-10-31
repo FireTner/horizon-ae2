@@ -5,6 +5,7 @@ import hashlib
 import io
 import json
 from pathlib import Path
+import subprocess
 import tempfile
 import tomllib
 import unittest
@@ -22,6 +23,13 @@ class ContentTests(unittest.TestCase):
         self.root = Path(self.temp.name)
 
     def fixture(self):
+        self.platform = self.root / "platform"
+        base = self.platform / content.LOCK["platform_tags"]["resources"]
+        content.write_json(base / "data/c/tags/item/ingots/iron.json", {"values": [
+            "minecraft:iron_ingot", {"id": "#forge:ingots/iron", "required": False}
+        ]})
+        content.write_json(base / "data/c/tags/item/nuggets/iron.json", {"values": ["minecraft:iron_nugget"]})
+        (self.platform / content.LOCK["platform_tags"]["license"]).write_text("platform licence fixture")
         carried = self.root / "carry"
         content.write_json(carried / "assets/ae2/blockstates/charger.json", {
             "variants": {f"facing={face},spin=0": {"model": "ae2:block/charger"} for face in content.FACINGS}
@@ -58,19 +66,19 @@ class ContentTests(unittest.TestCase):
 
     def test_custom_recipes_kept_and_crafting_normalized_with_id_map(self):
         carried, jar = self.fixture()
-        remap = content.fit(carried, jar)
+        remap = content.fit(carried, jar, self.platform)
         self.assertEqual(remap["ae2:charger/a"], "ae2:charger.a")
         data = json.loads((carried / "data/ae2/recipe/charger.a.json").read_text())
         self.assertEqual(data["ingredient"], {"item": "ae2:certus_quartz_crystal"})
         restored = json.loads((carried / "data/ae2/recipe/network.blocks.crank.json").read_text())
         self.assertEqual(restored["key"]["a"], "#c:ingots/iron")
         tag = json.loads((carried / "data/c/tags/item/ingots/iron.json").read_text())
-        self.assertEqual(tag["values"], [{"id": "other:iron", "required": False}, "minecraft:iron_ingot"])
+        self.assertEqual(tag["values"], ["minecraft:iron_ingot", {"id": "#forge:ingots/iron", "required": False}, {"id": "other:iron", "required": False}])
         self.assertFalse(tag["replace"])
 
     def test_native_hosts_have_block_entities_and_valid_six_facing_models(self):
         carried, jar = self.fixture()
-        content.fit(carried, jar)
+        content.fit(carried, jar, self.platform)
         for name in ["charger", "crank", "drive", "energy_cell", "dense_energy_cell", "creative_energy_cell"]:
             block = json.loads((carried / f"data/ae2/horizon/block/{name}.json").read_text())
             self.assertEqual(block["template"], "minecraft:dispenser")
@@ -106,8 +114,39 @@ class ContentTests(unittest.TestCase):
         (out / "sentinel").write_text("keep")
         (carried / "assets/ae2/blockstates/charger.json").write_text('{"variants":{}}')
         lock = {**content.LOCK, "jar": {"sha512": hashlib.sha512(jar.read_bytes()).hexdigest()}}
-        with patch.object(content, "LOCK", lock), self.assertRaisesRegex(ValueError, "model missing"):
-            content.prepare(jar, carried, None, None, out)
+        with patch.object(content, "LOCK", lock), patch.object(content.upstream, "verify_platform"), self.assertRaisesRegex(ValueError, "model missing"):
+            content.prepare(jar, carried, None, None, out, self.platform)
+        self.assertEqual((out / "sentinel").read_text(), "keep")
+
+    def test_platform_tags_layer_before_mod_tags_and_preserve_replace_and_provenance(self):
+        carried, _ = self.fixture()
+        report = content.merge_platform_tags(carried, self.platform)
+        nugget = carried / "data/c/tags/item/nuggets/iron.json"
+        self.assertEqual(json.loads(nugget.read_text())["values"], ["minecraft:iron_nugget"])
+        self.assertEqual(report["tag_count"], 2)
+        self.assertEqual(report["by_registry"], {"item": 2})
+        self.assertEqual(report["merged_with_ae2"], ["data/c/tags/item/ingots/iron.json"])
+        self.assertEqual((carried / "data/ae2/licenses/neoforge-lgpl-2.1.txt").read_text(), "platform licence fixture")
+        self.assertEqual(len(report["source_sha256"]), 2)
+        # AE2's explicit replacement drops the lower NeoForge layer.
+        content.write_json(carried / "data/c/tags/item/ingots/iron.json", {"replace": True, "values": ["other:replacement"]})
+        content.merge_platform_tags(carried, self.platform)
+        self.assertEqual(json.loads((carried / "data/c/tags/item/ingots/iron.json").read_text()), {"replace": True, "values": ["other:replacement"]})
+
+    def test_changed_platform_checkout_does_not_replace_generated_output(self):
+        carried, jar = self.fixture()
+        git = lambda *args: subprocess.run(["git", "-C", str(self.platform), *args], check=True, capture_output=True)
+        git("init", "-q"); git("add", ".")
+        git("-c", "user.name=AE2 tooling test", "-c", "user.email=test@example.invalid", "-c", "commit.gpgsign=false", "-c", "core.hooksPath=/dev/null", "commit", "-qm", "fixture")
+        revision = git("rev-parse", "HEAD").stdout.decode().strip()
+        lock = {**content.LOCK, "jar": {"sha512": hashlib.sha512(jar.read_bytes()).hexdigest()},
+                "platform_tags": {**content.LOCK["platform_tags"], "revision": revision}}
+        out = self.root / "out"; out.mkdir()
+        (out / content.MARKER).write_text("{}"); (out / "sentinel").write_text("keep")
+        path = self.platform / lock["platform_tags"]["resources"] / "data/c/tags/item/nuggets/iron.json"
+        path.write_text('{"values":[]}')
+        with patch.object(content, "LOCK", lock), patch.object(content.upstream, "LOCK", lock), self.assertRaisesRegex(ValueError, "local changes"):
+            content.prepare(jar, carried, None, None, out, self.platform)
         self.assertEqual((out / "sentinel").read_text(), "keep")
 
 

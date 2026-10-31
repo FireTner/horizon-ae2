@@ -44,9 +44,13 @@
   offline tests PASS. World config/power/restart smoke:
   target/smoke/drive-creative-djhqrho5; portable regression drive-portable-fi8or0cv.
   Config parser теперь соблюдает 63 nullable slots и игнорирует trailing entries.
-- 81 core + 97 native binary + 5 native library + 8 Python тестов прошли.
+- Platform c tags: pinned NeoForge 21.1.169 / 863802b, 461 generated files,
+  layer/replace, licence/source hashes. Удалены прежние ручные три tag lists.
+  Content build/check и 14 positive + 14 negative world predicates/restart PASS:
+  target/smoke/platform-tags-kwyjn5mu. Остальные platform APIs/conditions pending.
+- 81 core + 97 native binary + 5 native library + 10 Python тестов прошли.
   Native build и Drive GUI smoke прошли; final check evidence — VALIDATION.md
-  и target/creative-native-check-final.json.
+  и target/platform-native-check.json.
   Новый power smoke: target/smoke/power-wkijuezf; повторный ручной Charger/Crank
   smoke: target/smoke/charger-1ta7ucsr. Все тестовые процессы завершены.
 - NetworkStorage: 2000 Java traces / 410882 операции PASS. Теперь используется
@@ -72,11 +76,11 @@
 ## Локальные команды и данные
 
 `source target/local-env.sh` задаёт инструменты на этой машине. Собственные
-pinned checkout: target/upstream/{ae2,horizon,horizon-mixins}. Original engine
+pinned checkout: target/upstream/{ae2,horizon,horizon-mixins,neoforge}. Original engine
 и horizon-create не менять. Ресурсы читать из HORIZON_RESOURCES, тестовые saves
 только под target. Все тестовые процессы последнего smoke завершены.
 
-- tools/check.py: fmt, clippy, 81 core tests, 8 tooling tests, inventory check.
+- tools/check.py: fmt, clippy, 81 core tests, 10 tooling tests, inventory check.
 - tools/horizon.py test: 97 native tests (Game + typed NBT); warnings об unused
   API остаются до подключения всех потребителей API, не скрыты.
 - tools/horizon.py test --library: 5 tests, в том числе три server-click теста.
@@ -91,6 +95,6 @@ pinned checkout: target/upstream/{ae2,horizon,horizon-mixins}. Original engine
 Пользователь явно велел проверять account limits примерно раз в пять минут
 и поставить goal на паузу при остатке <=10% в релевантном окне. Использовать
 Codex get_usage_limits, не token counter goal. Последний подтверждённый остаток
-19% (81% consumed), проверка 1 ноября 2026. Не использовать reset credit и не покупать quota.
+16% (84% consumed), проверка 1 ноября 2026. Не использовать reset credit и не покупать quota.
 При пороге зафиксировать текущую точку, вызвать update_goal(paused), сообщить
 возвращённый статус и прекратить работу. Сейчас условие не наступило.

@@ -3,7 +3,34 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## Creative storage backend — текущая проверка
+## Общие теги платформы — текущая проверка
+
+- Generated c tags берутся из чистого pinned NeoForge checkout 863802b6dfdb1d5e48c2fda093ed9d01df0f4cd9.
+  Version mapping: official 21.1.169 changelog → PR 2245 → merge commit;
+  ссылки и точный pin в upstream.lock.json/NOTICE.md. AE2/engine pins сохранены.
+- **461 tags**: 241 item, 115 block, 12 fluid, 82 worldgen, 6 enchantment,
+  5 entity_type. 15 совпадающих путей AE2 накладываются поверх platform layer;
+  explicit replace сохраняется. Старые три ручных списка удалены.
+  Source SHA-256 каждого файла и лицензия: docs/platform-tags-report.json;
+  LGPL-2.1 text присутствует в content/data/ae2/licenses/neoforge-lgpl-2.1.txt.
+- Standalone **81 PASS**, fmt/clippy и Python **10 PASS**. Новые tests проверяют
+  overlay/replace, optional entries/order, provenance/licence и отказ при dirty
+  platform checkout без замены предыдущего generated output.
+  Полный лог target/platform-checks-final.log.
+- Content prepare/build/check PASS: target/platform-content-final.log,
+  target/platform-content-build-final.log, target/platform-content-check-final.json.
+  File name лицензии приведено к lowercase для native package path contract.
+  Native check PASS: target/platform-native-check.json. Rust runtime не менялся;
+  прежние **97 native binary + 5 native library** tests относятся к тому же коду.
+- Real world smoke PASS: target/smoke/platform-tags-kwyjn5mu, копия отчёта
+  docs/platform-tags-world-smoke.json. Через настоящие `/execute if/unless items`
+  проверены семь item tags, включая original AE2 ender_dust: **14 positive /
+  14 negative** checks до/после restart. Свои процессы завершены.
+- Это проверка common tag data и native layering. Membership всех тегов/registry,
+  NeoForge API/events/recipe condition semantics и all survival crafting остаются
+  открытыми. Source inventory: 57 partial / 1372 pending, complete нет.
+
+## Creative storage backend — предыдущая проверка
 
 - Standalone **81 PASS**, fmt/rustfmt/clippy `-D warnings` и Python **8 PASS**,
   target/creative-checks-final.log. Native **97 PASS**,

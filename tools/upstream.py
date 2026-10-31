@@ -147,6 +147,30 @@ def fetch_engines():
         print(f"{name}: {revision}")
 
 
+def verify_platform(source):
+    spec = LOCK["platform_tags"]
+    if git(source, "rev-parse", "HEAD") != spec["revision"]:
+        raise ValueError("NeoForge tag source differs from upstream.lock.json")
+    if git(source, "status", "--porcelain", "--untracked-files=all"):
+        raise ValueError("NeoForge tag reference contains local changes")
+
+
+def fetch_platform():
+    source = ROOT / "target/upstream/neoforge"
+    spec = LOCK["platform_tags"]
+    if not source.exists():
+        source.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix=".platform-", dir=source.parent) as temporary:
+            stage = Path(temporary) / "neoforge"
+            subprocess.run(["git", "init", str(stage)], check=True)
+            subprocess.run(["git", "-C", str(stage), "remote", "add", "origin", spec["repository"]], check=True)
+            subprocess.run(["git", "-C", str(stage), "fetch", "--depth", "1", "origin", spec["revision"]], check=True)
+            subprocess.run(["git", "-C", str(stage), "checkout", "--detach", spec["revision"]], check=True)
+            stage.rename(source)
+    verify_platform(source)
+    return source
+
+
 def fetch_jar():
     spec = LOCK["jar"]
     target = ROOT / "target/jars" / spec["url"].rsplit("/", 1)[1]
@@ -197,7 +221,7 @@ def inventory(source):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["fetch", "fetch-jar", "fetch-engines", "audit"])
+    parser.add_argument("action", choices=["fetch", "fetch-jar", "fetch-engines", "fetch-platform", "audit"])
     parser.add_argument("--source", type=Path, default=SOURCE)
     parser.add_argument("--check", action="store_true", help="fail if docs/upstream-inventory.json is stale")
     args = parser.parse_args()
@@ -207,6 +231,8 @@ def main():
         print(fetch_jar())
     elif args.action == "fetch-engines":
         fetch_engines()
+    elif args.action == "fetch-platform":
+        print(fetch_platform())
     else:
         data = inventory(args.source)
         rendered = json.dumps(data, indent=2, sort_keys=True) + "\n"

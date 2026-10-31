@@ -18,6 +18,7 @@
 | EnergyCellBlockEntity | normal/dense/creative block entities, реальные сетевые хранилища, internalCurrentPower и proxy.e persistence | fullness drawing/sync, comparator, energy components у item/drop/placement, redstone/template side effects |
 | Charger recipes | таблица ae2:charger, local 1600 AE, threshold 1599, interval 10, random > 0.8, один предмет, сохранение энергии/слота; сеть пополняет private buffer до 800 AE/call | инструменты, config multiplier/rates, hopper фильтры, эффекты и рендер предмета |
 | Wooden Crank | rotation/hits/charge, 18 ticks/160 AE, busy window, 11 отказов ломают рукоятку, charger-side restriction | placement/survival, fake-player rule, статистика, анимация и sync |
+| Common platform tags | 461 generated c tags NeoForge 21.1.169, exact source hashes/licence, platform-before-AE2 layering/replace и real item predicate/restart checks | runtime membership всех registries/тегов, NeoForge API/events/recipe conditions и полная survival progression |
 
 ## Временные ограничения адаптера (не целевое поведение)
 
@@ -130,6 +131,13 @@
   с записью исходного → нового ID в `ae2-recipe-map.json` и отказывает при
   коллизии. Ссылки на исходные recipe IDs (advancements, UI, книги и прочее)
   требуют будущего engine fix/adapter; это временная несовместимость.
+- Common c tags теперь берутся из NeoForge source revision 863802b, соответствие
+  21.1.169 подтверждено official changelog/PR 2245. Исходники закреплены отдельно
+  в upstream.lock.json; native/AE2 pins не менялись. Копируются 241 item, 115 block,
+  12 fluid, 82 worldgen, 6 enchantment и 5 entity tags. World test проверяет только
+  семь item tags, 14 positive/14 negative predicates с restart, не все 461.
+  Source/merged metadata — docs/platform-tags-report.json; Java runtime платформы,
+  vanilla namespace overrides и остальные NeoForge services этим не перенесены.
 - Остальной carry — каталог данных, где часть блоков отсутствует или использует
   vanilla template. Нельзя считать каждый видимый предмет функциональным.
   Неподдержанные custom recipe types сохраняются как данные, но не выполняются.

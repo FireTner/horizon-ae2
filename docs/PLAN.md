@@ -97,5 +97,8 @@ oracle: 2000 traces/572000 операций PASS; handheld UI/charge/use/disasse
 остаются открытыми. Creative backend уже подключён к Drive, сверён с original
 Java и проверен native integration/world persistence. Следующие storage backends
 — Matter Cannon и Color Applicator с их source admission filters.
+Для их recipes/tag predicates уже восстановлены исходные c tags зависимости
+NeoForge 21.1.169. 461 файла с provenance/licence, overlay/replace тестами и
+world item-predicate/restart smoke; остальные API/conditions платформы ещё нужны.
 Рендер и сетевое
 состояние Charger/Crank остаются открытыми задачами первого этапа.

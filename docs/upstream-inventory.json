@@ -1,8 +1,8 @@
 {
   "families": {
     "api": {
-      "partial": 12,
-      "pending": 260
+      "partial": 14,
+      "pending": 258
     },
     "block": {
       "partial": 2,
@@ -57,8 +57,8 @@
       "pending": 3
     },
     "init": {
-      "partial": 0,
-      "pending": 25
+      "partial": 1,
+      "pending": 24
     },
     "integration": {
       "partial": 0,
@@ -1651,8 +1651,10 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/upgrades/ItemUpgradeInventory.java",
+      "port": "mixins/ae2/cells.rs",
+      "scope": "read original slot/item ItemContainerContents component for finite storage items, preserve on cell save; writer and changed callbacks pending",
       "sha256": "e4d05c09ede5fe6411bef19b791fe45478b379432c12ffe39453252f150ca3d9",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
@@ -1681,8 +1683,10 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/upgrades/UpgradeInventory.java",
+      "port": "mixins/ae2/upgrade_rules.rs",
+      "scope": "finite storage host slot/card tables and per-slot installed counts clamped to host maximum; mutation/cache/listener lifecycle and other hosts pending",
       "sha256": "4b98015403837fad8657176eafa885ef10c7d914faf7fdf33ed1600a856f351c",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
@@ -5107,8 +5111,10 @@
     {
       "family": "init",
       "path": "src/main/java/appeng/init/internal/InitUpgrades.java",
+      "port": "mixins/ae2/upgrade_rules.rs",
+      "scope": "built-in basic/portable/tool storage host card maxima only; other hosts and dynamic addon registration pending",
       "sha256": "e3fa76af77740ecede2da396473287b9faa909d191e79429ee295c2a0cb9d812",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "init",

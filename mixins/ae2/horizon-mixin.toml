@@ -7,6 +7,12 @@ priority = 100
 horizon_revision = "aa27eca326db26e999d4e59d7899576016764b1e"
 
 [[module]]
+id = "upgrade-rules"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_upgrade_rules"
+source = "upgrade_rules.rs"
+
+[[module]]
 id = "tool-filters"
 file = "crates/horizon-client/src/game.rs"
 name = "ae2_tool_filters"

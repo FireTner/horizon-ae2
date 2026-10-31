@@ -6,9 +6,11 @@
 use super::ae2_backend::{CellBackend, CreativeCell};
 use super::ae2_keys::{FuzzyMode, GenericStack, Key, KeyProperties, KeyType};
 use super::ae2_storage::{Cell, CellLayout, Tier};
+use super::ae2_upgrade_rules::{Host as UpgradeHost, Inventory as Upgrades};
 use horizon_client::{
     item_data,
     items::{ItemStack, Items},
+    save::item_from_nbt,
     text::{Style, Text},
 };
 use horizon_world::nbt::{self, Compound, JavaString, Limits, Tag};
@@ -203,15 +205,57 @@ pub fn generic_to_tag(stack: &GenericStack) -> Result<Tag, String> {
     Ok(Tag::Compound(map))
 }
 
-fn upgrades(stack: &ItemStack) -> BTreeSet<String> {
+pub(super) fn upgrades(stack: &ItemStack) -> Result<Upgrades, String> {
+    let (_, kind, _) = cell_type(&stack.item).ok_or("not a finite storage item")?;
+    let host = match &*stack.item {
+        "ae2:matter_cannon" => UpgradeHost::MatterCannon,
+        "ae2:color_applicator" => UpgradeHost::ColorApplicator,
+        id if id.starts_with("ae2:portable_") => {
+            if kind == KeyType::Item {
+                UpgradeHost::PortableItem
+            } else {
+                UpgradeHost::PortableFluid
+            }
+        }
+        _ => {
+            if kind == KeyType::Item {
+                UpgradeHost::ItemCell
+            } else {
+                UpgradeHost::FluidCell
+            }
+        }
+    };
+    let mut slots = vec![None; host.slots()];
+    let mut seen = BTreeSet::new();
     match component(stack, "ae2:upgrades") {
-        Some(Tag::List(list)) => list
-            .iter()
-            .filter(|entry| int(entry.get("count")).unwrap_or(1) > 0)
-            .filter_map(|entry| text(entry.get("id")))
-            .collect(),
-        _ => BTreeSet::new(),
+        None => {}
+        Some(Tag::List(list)) => {
+            for entry in list {
+                let slot = int(entry.get("slot"))
+                    .filter(|slot| (0..256).contains(slot))
+                    .ok_or("invalid upgrade component slot")? as usize;
+                if !seen.insert(slot) {
+                    return Err("duplicate upgrade component slot".into());
+                }
+                let item_tag = entry
+                    .get("item")
+                    .ok_or("upgrade component requires slot/item entries")?;
+                // Horizon's general decoder clamps zero/negative counts to one.
+                // Reject these before decoding rather than creating a live card.
+                if item_tag.get("count").is_some()
+                    && int(item_tag.get("count")).is_none_or(|count| count <= 0)
+                {
+                    return Err("invalid upgrade component item count".into());
+                }
+                let item = item_from_nbt(item_tag).ok_or("invalid upgrade component item")?;
+                if slot < slots.len() {
+                    slots[slot] = Some(item.item.to_string());
+                }
+            }
+        }
+        _ => return Err("invalid upgrade container component".into()),
     }
+    Ok(Upgrades::new(host, slots))
 }
 
 fn config_keys(
@@ -300,14 +344,14 @@ pub fn load_cell(
         .into_iter()
         .filter(|key| key.kind() == kind)
         .collect();
-    let cards = upgrades(stack);
+    let cards = upgrades(stack)?;
     cell.configure(
         partition,
-        cards.contains("ae2:inverter_card"),
-        cards.contains("ae2:equal_distribution_card"),
-        cards.contains("ae2:void_card"),
+        cards.is_installed("ae2:inverter_card"),
+        cards.is_installed("ae2:equal_distribution_card"),
+        cards.is_installed("ae2:void_card"),
     );
-    if cards.contains("ae2:fuzzy_card") {
+    if cards.is_installed("ae2:fuzzy_card") {
         let mode = text(component(stack, "ae2:storage_cell_fuzzy_mode"))
             .and_then(|name| FuzzyMode::from_name(&name))
             .unwrap_or_default();
@@ -424,6 +468,14 @@ pub(super) fn tooltip(game: &super::Game<'_>, stack: &ItemStack, lines: &mut Vec
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn upgrade(slot: i32, id: &str, count: u32) -> Tag {
+        let mut card = item(id);
+        card.count = count;
+        Tag::compound([
+            ("slot", Tag::Int(slot)),
+            ("item", horizon_client::save::item_to_nbt(&card)),
+        ])
+    }
     fn item(id: &str) -> ItemStack {
         ItemStack {
             item: id.into(),
@@ -670,10 +722,7 @@ mod tests {
         );
         stack.data_mut().set_other(
             "ae2:upgrades",
-            Some(Tag::List(vec![Tag::compound([
-                ("id", Tag::String("ae2:void_card".into())),
-                ("count", Tag::Int(1)),
-            ])])),
+            Some(Tag::List(vec![upgrade(0, "ae2:void_card", 1)])),
         );
         stack
             .data_mut()
@@ -692,6 +741,72 @@ mod tests {
         assert!(component(&stack, INVENTORY).is_none());
         assert!(stack.same_item_same_components(&original));
         assert_eq!(component(&stack, "test:custom"), Some(&Tag::Int(123)));
+    }
+    #[test]
+    fn canonical_sparse_upgrade_slots_respect_host_size_and_count_per_slot() {
+        let mut stack = item("ae2:portable_fluid_cell_1k");
+        stack.data_mut().set_other(
+            "ae2:upgrades",
+            Some(Tag::List(vec![
+                upgrade(2, "ae2:energy_card", 7),
+                upgrade(0, "ae2:fuzzy_card", 1),
+                upgrade(3, "ae2:void_card", 1),
+            ])),
+        );
+        let cards = upgrades(&stack).unwrap();
+        assert_eq!(cards.installed()["ae2:energy_card"], 1);
+        assert_eq!(cards.energy_multiplier(), 1);
+        assert!(!cards.is_installed("ae2:fuzzy_card"));
+        assert!(!cards.is_installed("ae2:void_card"));
+        stack.item = "ae2:portable_item_cell_1k".into();
+        let cards = upgrades(&stack).unwrap();
+        assert!(cards.is_installed("ae2:fuzzy_card"));
+        assert!(cards.is_installed("ae2:void_card"));
+        stack.item = "ae2:color_applicator".into();
+        let cards = upgrades(&stack).unwrap();
+        assert!(cards.installed().is_empty());
+        assert_eq!(cards.energy_multiplier(), 0);
+    }
+    #[test]
+    fn canonical_void_card_is_applied_without_losing_components_on_persist() {
+        let mut stack = item("ae2:item_storage_cell_1k");
+        stack.data_mut().set_other(
+            "ae2:upgrades",
+            Some(Tag::List(vec![upgrade(3, "ae2:void_card", 1)])),
+        );
+        let original = component(&stack, "ae2:upgrades").cloned();
+        let key = key_with_properties(&item("minecraft:stone"), Default::default()).unwrap();
+        let mut cell = load_cell(&stack, &resolve).unwrap();
+        assert_eq!(cell.insert(key.clone(), 10000, false), 10000);
+        assert_eq!(cell.stored_count(), 0);
+        assert_eq!(cell.insert(key, 10000, true), 10000);
+        assert_eq!(cell.stored_count(), 8128);
+        persist_cell(&mut stack, &cell).unwrap();
+        assert_eq!(component(&stack, "ae2:upgrades"), original.as_ref());
+        assert_eq!(load_cell(&stack, &resolve).unwrap().stored_count(), 8128);
+    }
+    #[test]
+    fn malformed_upgrade_containers_are_rejected_without_mutating_the_stack() {
+        for tag in [
+            Tag::Int(1),
+            Tag::List(vec![Tag::compound([(
+                "id",
+                Tag::String("ae2:void_card".into()),
+            )])]),
+            Tag::List(vec![upgrade(-1, "ae2:void_card", 1)]),
+            Tag::List(vec![upgrade(256, "ae2:void_card", 1)]),
+            Tag::List(vec![upgrade(0, "ae2:void_card", 0)]),
+            Tag::List(vec![
+                upgrade(1, "ae2:void_card", 1),
+                upgrade(1, "ae2:fuzzy_card", 1),
+            ]),
+        ] {
+            let mut stack = item("ae2:item_storage_cell_1k");
+            stack.data_mut().set_other("ae2:upgrades", Some(tag));
+            let original = stack.clone();
+            assert!(load_cell(&stack, &resolve).is_err());
+            assert_eq!(stack, original);
+        }
     }
     #[test]
     fn malformed_or_unknown_keys_never_replace_the_original_cell() {
@@ -778,9 +893,8 @@ mod tests {
             Some(Tag::List(
                 ["ae2:fuzzy_card", "ae2:equal_distribution_card"]
                     .into_iter()
-                    .map(|id| {
-                        Tag::compound([("id", Tag::String(id.into())), ("count", Tag::Int(1))])
-                    })
+                    .enumerate()
+                    .map(|(slot, id)| upgrade(slot as i32, id, 1))
                     .collect(),
             )),
         );

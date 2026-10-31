@@ -25,3 +25,5 @@ pub mod ae2_slot_rules;
 pub mod ae2_storage;
 #[path = "../mixins/ae2/tool_filters.rs"]
 pub mod ae2_tool_filters;
+#[path = "../mixins/ae2/upgrade_rules.rs"]
+pub mod ae2_upgrade_rules;

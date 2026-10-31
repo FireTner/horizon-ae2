@@ -3,7 +3,33 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## Storage backends двух инструментов — текущая проверка
+## Upgrade components — текущая проверка
+
+- Standalone **87 PASS**, fmt/rustfmt/clippy `-D warnings`, Python **10 PASS**:
+  target/upgrades-checks-final.log. Native **110 PASS**:
+  target/upgrades-native-tests.json, cargo_exit 0. Native compilation check PASS:
+  target/upgrades-native-check.json.
+- Canonical `slot/item` component, sparse slots, per-host inventory size,
+  unsupported card ignoring, per-slot count instead of item stack count,
+  clamped installed count versus raw energy-card iteration; void simulate/commit,
+  сохранение upgrades после записи contents и malformed component retention.
+  Старые flat upgrade fixtures исправлены; прежние тесты не доказывали этот codec.
+- Первый native regression test поймал count clamp общего Horizon decoder:
+  `count:0` становился одним предметом. Adapter теперь отклоняет nonpositive
+  count до декодирования; повторный полный native run прошёл.
+- Native build PASS, target/upgrades-native-build.json; unused API warnings и
+  прежний rust-objcopy/libLLVM warning не скрыты, cargo_exit 0.
+- Изолированный мир **drive-upgrades-o7q_ih7r PASS**, docs/upgrade-world-smoke.json:
+  оригинальные slot/item upgrades двух ячеек сохранены после offline/save/restart,
+  contents 123 iron/1000 water и точный drain 3.515625 AE/tick не изменились.
+  World test проверяет retention, не операции терминала/редактирование карт.
+- Источники сверки: pinned AEComponents.UPGRADES, ItemUpgradeInventory,
+  UpgradeInventory.updateUpgradeInfo, InitUpgrades и AppEngInternalInventory.
+  Java cell oracles используют stub upgrades и этим изменением не расширены.
+  Workbench/writer/listeners, addon registration и полная эквивалентность
+  Minecraft malformed/duplicate component recovery ещё не проверены.
+
+## Storage backends двух инструментов — предыдущее подтверждение
 
 - Standalone **85 PASS**, fmt/rustfmt/clippy `-D warnings` и Python **10 PASS**,
   target/tool-checks-final.log. Native **105 PASS**, target/tool-native-tests-final.json.

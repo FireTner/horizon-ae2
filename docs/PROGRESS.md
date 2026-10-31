@@ -2,9 +2,20 @@
 
 Цель активна: полностью перенести AE2 19.2.18 на Horizon, 1:1, без субагентов.
 Цель не уменьшена до текущего набора механик. Все 1429 исходных Java-файлов
-остаются в реестре; сейчас 59 partial, 1370 pending, полностью закрытых нет.
+остаются в реестре; сейчас 62 partial, 1367 pending, полностью закрытых нет.
 
 ## Последний результат
+
+- Исправлен оригинальный upgrade component reader: `slot/item`, разные
+  physical slot limits шести storage host families и совместимость карт из
+  InitUpgrades. Installed counts считаются по слотам и clamp-ятся; raw Energy
+  Card iteration отдельно. Старые плоские тестовые fixtures были неверными.
+  Nonpositive count проверяется до Horizon decoder (тот clamp-ит к одному).
+  Duplicate/malformed components пока строго отклоняются с сохранением stack.
+  Writer, Workbench, listeners/cache invalidation и addon registry остаются.
+  87 core / 110 native / 10 Python PASS; check/build PASS. Новый мир
+  target/smoke/drive-upgrades-o7q_ih7r подтвердил canonical component retention,
+  исходные contents/drain и restart; world terminal operations не покрыты.
 
 - Native component-aware item/fluid keys, GenericStack и codec компонентов ячеек
   хранения; прежний Java pathing oracle: 2000/2000 совпадений.
@@ -85,8 +96,8 @@ pinned checkout: target/upstream/{ae2,horizon,horizon-mixins,neoforge}. Original
 и horizon-create не менять. Ресурсы читать из HORIZON_RESOURCES, тестовые saves
 только под target. Все тестовые процессы последнего smoke завершены.
 
-- tools/check.py: fmt, clippy, 85 core tests, 10 tooling tests, inventory check.
-- tools/horizon.py test: 105 native tests (Game + typed NBT); warnings об unused
+- tools/check.py: fmt, clippy, 87 core tests, 10 tooling tests, inventory check.
+- tools/horizon.py test: 110 native tests (Game + typed NBT); warnings об unused
   API остаются до подключения всех потребителей API, не скрыты.
 - tools/horizon.py test --library: 5 tests, в том числе три server-click теста.
 - tools/pathing_oracle.py --cases 2000: JDK 21+, default local Homebrew JDK.
@@ -101,6 +112,22 @@ pinned checkout: target/upstream/{ae2,horizon,horizon-mixins,neoforge}. Original
 Пользователь явно велел проверять account limits примерно раз в пять минут
 и поставить goal на паузу при остатке <=10% в релевантном окне. Использовать
 Codex get_usage_limits, не token counter goal. Последний подтверждённый остаток
-13% (87% consumed), проверка 1 ноября 2026. Не использовать reset credit и не покупать quota.
+11% (89% consumed), проверка 1 ноября 2026. Не использовать reset credit и не покупать quota.
 При пороге зафиксировать текущую точку, вызвать update_goal(paused), сообщить
 возвращённый статус и прекратить работу. Сейчас условие не наступило.
+
+
+## Следующая механика: powered items в Charger
+
+До нового кода сверены pinned AEBasePoweredItem, PortableCellItem,
+MatterCannonItem, ColorApplicatorItem и ChargerBlockEntity.doWork:
+- stored_energy default 0, MIN_POWER 0.0001; energy_capacity — override.
+  Portable/Color default 20000, Cannon 200000 AE. Config ещё нужен.
+- charge rate portable/color 80 + 80 × raw energy-card multiplier,
+  cannon 800 + 800 × multiplier; Charger умножает на ticksSinceLastCall/config.
+- Charger сначала извлекает rate из собственного буфера; затем добирает из
+  grid min(missingRate, missingPower); overflow от item возвращает в буфер.
+  Затем действует обычное пополнение буфера <=800 AE, capacity 1600.
+- Сейчас разрешён только recipe branch; нужно разрешить known chargeable
+  stacks при insertion и подключить их energy adapter до recipe lookup.
+Это заметки сверки, не реализованная и не протестированная механика.

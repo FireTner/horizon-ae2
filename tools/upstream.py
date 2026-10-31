@@ -116,6 +116,13 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "api/upgrades/UpgradeInventory.java": ("mixins/ae2/upgrade_rules.rs", "finite storage host slot/card tables and per-slot installed counts clamped to host maximum; mutation/cache/listener lifecycle and other hosts pending"),
+    "api/upgrades/ItemUpgradeInventory.java": ("mixins/ae2/cells.rs", "read original slot/item ItemContainerContents component for finite storage items, preserve on cell save; writer and changed callbacks pending"),
+    "init/internal/InitUpgrades.java": ("mixins/ae2/upgrade_rules.rs", "built-in basic/portable/tool storage host card maxima only; other hosts and dynamic addon registration pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

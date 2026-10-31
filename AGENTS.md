@@ -27,7 +27,10 @@ before slot mutation; a general external capability API is still pending.
 slot_rules.rs is shared with native library menu policy; guest_slots.rs scopes
 server rules by authoritative player/window/block identity, never by chest size.
 backend.rs dispatches finite/creative inventory rules; cells.rs owns component
-codecs, including 63-slot nullable config limits. tool_filters.rs/tool_glue.rs
+codecs, including 63-slot nullable config limits. upgrade_rules.rs supplies finite
+host slot/card limits and per-slot counts; cells.rs reads canonical slot/item
+upgrade entries. Workbench/writer/callbacks and addon upgrades remain open.
+tool_filters.rs/tool_glue.rs
 expand recipe/tag admission into a restricted finite backend; never load a tool
 as an unrestricted basic cell. Live data reload and handheld tool actions remain open.
 Injected payloads cannot use inner attributes/comments, external mod files or

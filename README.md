@@ -59,9 +59,13 @@
   (2048 bytes/27 types), исходные recipe/tag admission rules, 0.5 idle drain,
   сохранение энергии и разрешённое nesting заполненных tools. Drive подключает
   все 23 встроенных storage handlers. Handheld charging/shooting/painting ещё нужны.
+- Исходные upgrade container components читаются как `slot/item`, с разными
+  slot/card limits обычных, portable и tool cells. Количество установленных
+  карт считается по слотам и ограничивается host. Workbench/upgrade writer,
+  callbacks и addon registry ещё не перенесены.
 - Подготовка контента, source-only `.hnmod`, закреплённые исходники и
   проверяемый реестр **всех 1429 Java-файлов** оригинала. В реестре нет
-  полностью закрытых классов; 59 отмечены как частично перенесённые.
+  полностью закрытых классов; 62 отмечены как частично перенесённые.
 - Подготовка также переносит 461 исходный общий тег NeoForge из pinned source,
   с лицензией/хэшами и порядком platform → AE2. World item predicates и restart
   проверены. Три прежних ручных списка заменены исходными данными платформы.

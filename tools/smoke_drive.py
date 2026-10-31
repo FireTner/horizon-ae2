@@ -26,9 +26,12 @@ def main():
     group.add_argument("--portable", action="store_true", help="verify portable 256k item + 1k fluid cell backends")
     group.add_argument("--creative", action="store_true", help="verify configured and empty creative-cell persistence/idle cost")
     group.add_argument("--tools", action="store_true", help="verify Matter Cannon and Color Applicator storage backends")
+    parser.add_argument("--upgrades", action="store_true", help="verify canonical slot/item upgrade components survive Drive save/restart")
     args = parser.parse_args()
+    if args.upgrades and args.creative:
+        parser.error("creative cells have no upgrade inventory")
     parent = ROOT / "target/smoke"; parent.mkdir(exist_ok=True)
-    prefix = "drive-tools-" if args.tools else "drive-creative-" if args.creative else "drive-portable-" if args.portable else "drive-"
+    prefix = "drive-upgrades-" if args.upgrades else "drive-tools-" if args.tools else "drive-creative-" if args.creative else "drive-portable-" if args.portable else "drive-"
     work = Path(tempfile.mkdtemp(prefix=prefix, dir=parent)); game_dir = work / "game"; game_dir.mkdir()
     socket = Path(tempfile.gettempdir()) / f"ae2-drive-{os.getpid()}.sock"
     env = {**os.environ, "HORIZON_HOME": str(work / "home"), "HORIZON_NO_AUDIO": "1"}
@@ -111,6 +114,11 @@ def main():
         else:
             assert re.search(r'"#"\s*:\s*123L', value), value
             assert re.search(r'"#"\s*:\s*1000L', value), value
+        if args.upgrades:
+            for card in ["ae2:fuzzy_card", "ae2:inverter_card", "ae2:void_card"]:
+                assert value.count(card) >= 2, (card, value)
+            assert re.search(r'(?:"slot"|slot)\s*:\s*2', value), value
+            assert re.search(r'(?:"item"|item)\s*:', value), value
         if args.portable or args.tools:
             energies = re.findall(r'"ae2:stored_energy":\s*([-+0-9.eE]+)d', value)
             assert len(energies) >= 2 and all(float(energy) == 1234.0 for energy in energies), value
@@ -128,6 +136,9 @@ def main():
             data = '''{inv:{item0:{id:"ae2:creative_storage_cell",count:1,components:{"ae2:storage_cell_config_inv":[{"#t":"ae2:i",id:"minecraft:iron_ingot","#":0L},{"#t":"ae2:f",id:"minecraft:water","#":0L}]}},item9:{id:"ae2:creative_storage_cell",count:1}}}'''
         if args.tools:
             data = '''{inv:{item0:{id:"ae2:matter_cannon",count:1,components:{"ae2:stored_energy":1234.0d,"ae2:storage_cell_inv":[{"#t":"ae2:i",id:"minecraft:iron_nugget","#":123L}]}},item9:{id:"ae2:color_applicator",count:1,components:{"ae2:stored_energy":1234.0d,"ae2:storage_cell_inv":[{"#t":"ae2:i",id:"minecraft:red_dye","#":1000L}]}}}}'''
+        if args.upgrades:
+            upgrades = '"ae2:upgrades":[{slot:0,item:{id:"ae2:fuzzy_card",count:1}},{slot:1,item:{id:"ae2:inverter_card",count:1}},{slot:2,item:{id:"ae2:void_card",count:1}}],'
+            data = data.replace('components:{', 'components:{' + upgrades)
         ctl("command", f"data merge block {' '.join(map(str, drive))} {data}"); ctl("wait", 20)
         contents(); rate(2.0 + disk_drain + 2.0 / 128.0)
         print("PASS: original inv.item0/item9 load item/fluid cells with their exact idle drain", flush=True)
@@ -142,6 +153,9 @@ def main():
             "drive_and_cell_idle_drain", "front_exclusion", "offline_retention", "save_restart"],
             "measurements": measurements, "not_covered": ["GUI", "terminal transfers", "dynamic chassis and LEDs", "chunk/dimension/multiplayer"]}
         report["cells"] = [item_id, fluid_id]
+        if args.upgrades:
+            report["scope"].append("canonical_slot_item_upgrade_component_persistence")
+            report["not_covered"].append("world terminal upgrade operations or workbench edits")
         if args.portable:
             report["scope"].append("portable_idle_cost_and_preserved_private_energy")
             report["not_covered"].append("portable handheld UI/charge/use actions")

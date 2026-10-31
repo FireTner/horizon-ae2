@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/drive-upgrades-o7q_ih7r",
+  "scope": [
+    "original_inv_ten_slots",
+    "item_fluid_cell_persistence",
+    "drive_and_cell_idle_drain",
+    "front_exclusion",
+    "offline_retention",
+    "save_restart",
+    "canonical_slot_item_upgrade_component_persistence"
+  ],
+  "measurements": [
+    {
+      "before": {
+        "tick": 54,
+        "energy": 19917.359375
+      },
+      "after": {
+        "tick": 80,
+        "energy": 19864.953125
+      },
+      "expected_per_tick": 2.015625
+    },
+    {
+      "before": {
+        "tick": 104,
+        "energy": 19782.078125
+      },
+      "after": {
+        "tick": 130,
+        "energy": 19690.671875
+      },
+      "expected_per_tick": 3.515625
+    },
+    {
+      "before": {
+        "tick": 252,
+        "energy": 19743.359375
+      },
+      "after": {
+        "tick": 278,
+        "energy": 19651.953125
+      },
+      "expected_per_tick": 3.515625
+    }
+  ],
+  "not_covered": [
+    "GUI",
+    "terminal transfers",
+    "dynamic chassis and LEDs",
+    "chunk/dimension/multiplayer",
+    "world terminal upgrade operations or workbench edits"
+  ],
+  "cells": [
+    "ae2:item_storage_cell_1k",
+    "ae2:fluid_storage_cell_4k"
+  ]
+}

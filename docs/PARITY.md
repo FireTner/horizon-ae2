@@ -5,7 +5,8 @@
 
 | Подсистема | Написано | Что остаётся |
 |---|---|---|
-| BasicCellInventory | basic/portable/tool layouts, байты/типы/округление, exact/fuzzy partitions, distribution/void, simulate/modulate/extract; native codec, nested restrictions и Drive mounts; original Java basic и tool profile traces | терминал, полное восстановление malformed/missing content, addon handlers и actual upgrade validation |
+| BasicCellInventory | basic/portable/tool layouts, байты/типы/округление, exact/fuzzy partitions, distribution/void, simulate/modulate/extract; native codec, nested restrictions и Drive mounts; original Java basic и tool profile traces | терминал, полное восстановление malformed/missing content, addon handlers и полный upgrades lifecycle |
+| ItemUpgradeInventory / UpgradeInventory | исходный `slot/item` container component, physical slot limits, supported cards и per-slot installed counts с host clamp для 22 finite storage items; исходный component сохраняется | writer/Workbench/callbacks/cache invalidation, addon upgrade registry и остальные hosts; полный Minecraft codec и malformed recovery |
 | AEKey / GenericStack / KeyCounter | компонентные ключи, typed NBT, signed long counts, fuzzyEquals и FuzzySearch, signed deficits/zero pruning | prototype normalization, wrapped items, packet codecs, missing-content placeholders, drop/display API |
 | ME topology/pathing | controller validation, BFS priorities, bottleneck ancestry, DFS counts, dense/normal/ad-hoc, P2P rules; 2000 Java differential cases; пять world full blocks, Drive require-channel | остальные block/part nodes, полная grid service identity/merge priorities, security/listeners/boot events |
 | StoredEnergyAmount / EnergyService | amount/capacity/simulation, storage events, приоритеты, per-node buffer, public power delay, averages/cache, overlay/passive rules; full-block world binding; 2000 Java traces | addon storage providers, полные watchers/event callbacks, QuartzFiber и passive-generator blocks, config integration, полные watcher/addon oracle scenarios |
@@ -166,3 +167,16 @@
 Считать feature завершённой только после механик, client state, persistence,
 краевых случаев и сетевой авторитетности. При API gap сначала оставить запись
 здесь, затем подготовить отдельный engine patch; исходный checkout не менять.
+
+- Upgrade component reader исправлен: прежняя плоская форма `[{id,count}]`
+  не соответствовала `ItemContainerContents.CODEC` у `AEComponents.UPGRADES`.
+  Нормальная форма — `[{slot:0,item:{id:"ae2:void_card",count:1}}]`.
+  Учитываются реальные слоты host и максимум поддерживаемых карт из InitUpgrades;
+  stack count не умножает installed count. Energy-card multiplier отдельно
+  считает raw physical cards, как Upgrades; зарядка ещё не подключена.
+  Повреждённые формы, nonpositive counts и duplicate slots сейчас дают строгий
+  отказ с сохранением исходного stack. Это временная политика, не доказанная
+  эквивалентность всем веткам Minecraft codec/recovery. Общий Horizon decoder
+  сам clamp-ит нулевые counts; adapter проверяет их до вызова decoder.
+  Java cell oracles используют stub upgrades и не доказывают этот новый reader;
+  здесь доказательства — сверка pinned source, Rust/native tests и world retention.

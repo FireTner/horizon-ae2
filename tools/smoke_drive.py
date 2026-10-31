@@ -22,9 +22,10 @@ def main():
     parser.add_argument("--ctl", type=Path, required=True)
     parser.add_argument("--resources", type=Path, required=True)
     parser.add_argument("--game", type=Path, default=ROOT / "target/horizon-cargo/fast/horizon-client")
+    parser.add_argument("--portable", action="store_true", help="verify portable 256k item + 1k fluid cell backends")
     args = parser.parse_args()
     parent = ROOT / "target/smoke"; parent.mkdir(exist_ok=True)
-    work = Path(tempfile.mkdtemp(prefix="drive-", dir=parent)); game_dir = work / "game"; game_dir.mkdir()
+    work = Path(tempfile.mkdtemp(prefix="drive-portable-" if args.portable else "drive-", dir=parent)); game_dir = work / "game"; game_dir.mkdir()
     socket = Path(tempfile.gettempdir()) / f"ae2-drive-{os.getpid()}.sock"
     env = {**os.environ, "HORIZON_HOME": str(work / "home"), "HORIZON_NO_AUDIO": "1"}
     transcript = []; processes = []; logs = []; measurements = []
@@ -56,6 +57,9 @@ def main():
         raise RuntimeError(f"game did not become ready: {log.name}")
 
     drive = (8, 73, 7); back = (8, 73, 8); front = (8, 73, 6)
+    item_id = "ae2:portable_item_cell_256k" if args.portable else "ae2:item_storage_cell_1k"
+    fluid_id = "ae2:portable_fluid_cell_1k" if args.portable else "ae2:fluid_storage_cell_4k"
+    disk_drain = 1.0 if args.portable else 1.5
 
     def nbt(pos):
         return "\n".join(ctl("command", f"data get block {' '.join(map(str, pos))}")["chat"])
@@ -87,12 +91,15 @@ def main():
     def contents():
         slots = ctl("container", *drive)["slots"]
         assert len(slots) in (10, 18) and all(slot is None for slot in slots[10:]), slots
-        assert slots[0] == {"item": "ae2:item_storage_cell_1k", "count": 1}, slots
-        assert slots[9] == {"item": "ae2:fluid_storage_cell_4k", "count": 1}, slots
+        assert slots[0] == {"item": item_id, "count": 1}, slots
+        assert slots[9] == {"item": fluid_id, "count": 1}, slots
         value = nbt(drive)
         assert "minecraft:iron_ingot" in value and "minecraft:water" in value, value
         assert re.search(r'"#"\s*:\s*123L', value), value
         assert re.search(r'"#"\s*:\s*1000L', value), value
+        if args.portable:
+            energies = re.findall(r'"ae2:stored_energy":\s*([-+0-9.eE]+)d', value)
+            assert len(energies) >= 2 and all(float(energy) == 1234.0 for energy in energies), value
 
     try:
         first = launch(1)
@@ -100,20 +107,26 @@ def main():
         ctl("tp", 8.5, 73, 4.5); ctl("setblock", *drive, "ae2:drive[facing=north]"); finite(back); ctl("wait", 40)
         rate(2.0 + 2.0 / 128.0)
         print("PASS: empty Drive consumes 2 AE/tick plus actual ad-hoc channel cost", flush=True)
-        data = '''{inv:{item0:{id:"ae2:item_storage_cell_1k",count:1,components:{"ae2:storage_cell_inv":[{"#t":"ae2:i",id:"minecraft:iron_ingot","#":123L}]}},item9:{id:"ae2:fluid_storage_cell_4k",count:1,components:{"ae2:storage_cell_inv":[{"#t":"ae2:f",id:"minecraft:water","#":1000L}]}}}}'''
+        data = '''{inv:{item0:{id:"$ITEM",count:1,components:{"ae2:storage_cell_inv":[{"#t":"ae2:i",id:"minecraft:iron_ingot","#":123L}]}},item9:{id:"$FLUID",count:1,components:{"ae2:storage_cell_inv":[{"#t":"ae2:f",id:"minecraft:water","#":1000L}]}}}}'''.replace("$ITEM", item_id).replace("$FLUID", fluid_id)
+        if args.portable:
+            data = data.replace('components:{', 'components:{"ae2:stored_energy":1234.0d,')
         ctl("command", f"data merge block {' '.join(map(str, drive))} {data}"); ctl("wait", 20)
-        contents(); rate(2.0 + .5 + 1.0 + 2.0 / 128.0)
+        contents(); rate(2.0 + disk_drain + 2.0 / 128.0)
         print("PASS: original inv.item0/item9 load item/fluid cells with their exact idle drain", flush=True)
         ctl("setblock", *back, "air"); finite(front); ctl("wait", 40)
         assert power(front) == 20000.0
         contents(); print("PASS: front face is excluded; offline disks retain contents", flush=True)
         ctl("setblock", *front, "air"); finite(back); ctl("wait", 40)
         ctl("save"); ctl("quit"); first.wait(timeout=20); launch(2); ctl("wait", 20)
-        contents(); rate(2.0 + .5 + 1.0 + 2.0 / 128.0)
+        contents(); rate(2.0 + disk_drain + 2.0 / 128.0)
         ctl("look-at", 8.5, 73.5, 7.5); ctl("screenshot", str(work / "drive-backend.png")); ctl("quit")
         report = {"passed": True, "logs": str(work), "scope": ["original_inv_ten_slots", "item_fluid_cell_persistence",
             "drive_and_cell_idle_drain", "front_exclusion", "offline_retention", "save_restart"],
             "measurements": measurements, "not_covered": ["GUI", "terminal transfers", "dynamic chassis and LEDs", "chunk/dimension/multiplayer"]}
+        report["cells"] = [item_id, fluid_id]
+        if args.portable:
+            report["scope"].append("portable_idle_cost_and_preserved_private_energy")
+            report["not_covered"].append("portable handheld UI/charge/use actions")
         (work / "result.json").write_text(json.dumps(report, indent=2) + "\n")
         print(f"PASS: Drive backend survives restart; logs: {work}", flush=True)
     finally:

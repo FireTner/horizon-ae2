@@ -44,6 +44,7 @@ def package():
                  'tools/test_tooling.py', 'tools/smoke.py', 'tools/smoke_power.py', 'tools/smoke_drive.py', 'tools/smoke_drive_gui.py', 'tools/smoke_drive_automation.py', 'tools/pathing_oracle.py',
                  'tools/energy_oracle.py', 'examples/energy_oracle.rs',
                  'tools/mounts_oracle.py', 'examples/mounts_oracle.rs',
+                 'tools/cells_oracle.py', 'examples/cells_oracle.rs', 'docs/cells-oracle.json', 'docs/portable-world-smoke.json',
                  'examples/grid_oracle.rs', 'AGENTS.md', 'LICENSES/AE2-API-MIT',
                  'tools/upstream.py', 'tools/prepare_content.py', 'tools/package.py',
                  'docs/PARITY.md', 'docs/PLAN.md', 'docs/upstream-inventory.json',

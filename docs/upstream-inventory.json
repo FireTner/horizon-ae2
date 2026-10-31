@@ -17,8 +17,8 @@
       "pending": 216
     },
     "core": {
-      "partial": 1,
-      "pending": 68
+      "partial": 2,
+      "pending": 67
     },
     "crafting": {
       "partial": 0,
@@ -65,8 +65,8 @@
       "pending": 97
     },
     "items": {
-      "partial": 3,
-      "pending": 54
+      "partial": 4,
+      "pending": 53
     },
     "me": {
       "partial": 19,
@@ -2392,7 +2392,7 @@
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/storage/DriveBlockEntity.java",
       "port": "mixins/ae2/drive_glue.rs",
-      "scope": "ten basic cell mounts, priority/online/channel/idle state and inv persistence; filtered GUI, native hopper/dropper filters and pre-extraction flush; dynamic render, external capability/full lifecycle and other cell backends pending",
+      "scope": "ten slots mounting twenty basic/portable cell types, priority/online/channel/idle state, inv persistence, filtered GUI/native automation; dynamic render, external capability/full lifecycle and creative/tool backends pending",
       "sha256": "1cd6e904a76eba014f8ba11d23a603815784b1e0c7558cc9c835bdf1ebcc0d27",
       "status": "partial"
     },
@@ -3805,8 +3805,10 @@
     {
       "family": "core",
       "path": "src/main/java/appeng/core/definitions/AEItems.java",
+      "port": "mixins/ae2/storage.rs",
+      "scope": "portable cell factory capacity/type constants only; full programmatic item registration/properties and remaining definitions pending",
       "sha256": "ae048b09d5327b746af086616b9a3420a00e59a3b1eecc81d28bee723a575ca1",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "core",
@@ -5825,8 +5827,8 @@
     {
       "family": "items",
       "path": "src/main/java/appeng/items/storage/BasicStorageCell.java",
-      "port": "mixins/ae2/storage.rs",
-      "scope": "tier parameters only; no game item or tooltip adapter",
+      "port": "mixins/ae2/cells.rs",
+      "scope": "native storage layout, capacity/type/drain parameters and usage tooltip; use/disassembly and full item color/LED behaviour pending",
       "sha256": "b985c083086cf6af361466a4b8ec8cca4c9b87606e4eec34aa6f5734425c8283",
       "status": "partial"
     },
@@ -5973,8 +5975,10 @@
     {
       "family": "items",
       "path": "src/main/java/appeng/items/tools/powered/PortableCellItem.java",
+      "port": "mixins/ae2/cells.rs",
+      "scope": "half-byte inventory layout, tier-dependent item type limit, 18 fluid types, 0.5 idle drain, component-preserving Drive backend and capacity tooltip; handheld menus, charge/use/disassembly and complete item rendering pending",
       "sha256": "2447a2bcc87e96047be7f00d7fc2e811e623529f496393273d33b811bf6166e0",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "items",
@@ -6120,7 +6124,7 @@
       "family": "me",
       "path": "src/main/java/appeng/me/cells/BasicCellInventory.java",
       "port": "mixins/ae2/storage.rs",
-      "scope": "capacity, exact/fuzzy partitions, distribution/void, native persistence and Drive mounts; terminal and malformed/missing-content recovery pending",
+      "scope": "basic/portable layouts, capacity, exact/fuzzy partitions, distribution/void and native persistence; 2000 unchanged-Java traces; actual fuzzy matcher/codecs/world not covered by that oracle; malformed/missing recovery pending",
       "sha256": "86471cf7a482c96903192883d9f93dc71840ef0a052461c0ede95e7968bfaa3e",
       "status": "partial"
     },

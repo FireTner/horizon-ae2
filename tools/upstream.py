@@ -89,6 +89,14 @@ PARTIAL.update({
     "blockentity/inventory/AppEngCellInventory.java": ("mixins/ae2/automation.rs", "native Drive one-cell insertion, component retention, flush before slot mutation and provider refresh; general inventory API, simulate capability and remaining persistence paths pending"),
 })
 
+PARTIAL.update({
+    "items/tools/powered/PortableCellItem.java": ("mixins/ae2/cells.rs", "half-byte inventory layout, tier-dependent item type limit, 18 fluid types, 0.5 idle drain, component-preserving Drive backend and capacity tooltip; handheld menus, charge/use/disassembly and complete item rendering pending"),
+    "items/storage/BasicStorageCell.java": ("mixins/ae2/cells.rs", "native storage layout, capacity/type/drain parameters and usage tooltip; use/disassembly and full item color/LED behaviour pending"),
+    "core/definitions/AEItems.java": ("mixins/ae2/storage.rs", "portable cell factory capacity/type constants only; full programmatic item registration/properties and remaining definitions pending"),
+    "me/cells/BasicCellInventory.java": ("mixins/ae2/storage.rs", "basic/portable layouts, capacity, exact/fuzzy partitions, distribution/void and native persistence; 2000 unchanged-Java traces; actual fuzzy matcher/codecs/world not covered by that oracle; malformed/missing recovery pending"),
+    "blockentity/storage/DriveBlockEntity.java": ("mixins/ae2/drive_glue.rs", "ten slots mounting twenty basic/portable cell types, priority/online/channel/idle state, inv persistence, filtered GUI/native automation; dynamic render, external capability/full lifecycle and creative/tool backends pending"),
+})
+
 
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()

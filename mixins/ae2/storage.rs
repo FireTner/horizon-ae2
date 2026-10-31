@@ -70,6 +70,57 @@ impl Tier {
     }
 }
 
+/// IBasicCellItem's capacity/type/drain rules. Portable cells use the same
+/// inventory algorithm with a smaller capacity and a tier-specific type limit.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct CellLayout {
+    bytes: u64,
+    bytes_per_type: u64,
+    total_types: usize,
+    idle_drain: f64,
+}
+impl CellLayout {
+    pub fn basic(tier: Tier, kind: KeyType) -> Self {
+        Self {
+            bytes: tier.bytes(),
+            bytes_per_type: tier.bytes_per_type(),
+            total_types: kind.total_types(),
+            idle_drain: tier.idle_drain(),
+        }
+    }
+    pub fn portable(tier: Tier, kind: KeyType) -> Self {
+        let index = match tier {
+            Tier::K1 => 1,
+            Tier::K4 => 2,
+            Tier::K16 => 3,
+            Tier::K64 => 4,
+            Tier::K256 => 5,
+        };
+        Self {
+            bytes: tier.bytes() / 2,
+            bytes_per_type: tier.bytes_per_type(),
+            total_types: if kind == KeyType::Item {
+                63 - index * 9
+            } else {
+                18
+            },
+            idle_drain: 0.5,
+        }
+    }
+    pub fn bytes(self) -> u64 {
+        self.bytes
+    }
+    pub fn total_types(self) -> usize {
+        self.total_types
+    }
+    pub fn bytes_per_type(self) -> u64 {
+        self.bytes_per_type
+    }
+    pub fn idle_drain(self) -> f64 {
+        self.idle_drain
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum CellState {
     Empty,
@@ -82,6 +133,7 @@ pub enum CellState {
 pub struct Cell<K> {
     tier: Tier,
     kind: KeyType,
+    layout: CellLayout,
     stored: BTreeMap<K, u64>,
     partition: BTreeSet<K>,
     inverted: bool,
@@ -92,9 +144,13 @@ pub struct Cell<K> {
 
 impl<K: CellKey> Cell<K> {
     pub fn new(tier: Tier, kind: KeyType) -> Self {
+        Self::new_with_layout(tier, kind, CellLayout::basic(tier, kind))
+    }
+    pub fn new_with_layout(tier: Tier, kind: KeyType, layout: CellLayout) -> Self {
         Self {
             tier,
             kind,
+            layout,
             stored: BTreeMap::new(),
             partition: BTreeSet::new(),
             inverted: false,
@@ -130,7 +186,15 @@ impl<K: CellKey> Cell<K> {
         kind: KeyType,
         stacks: BTreeMap<K, u64>,
     ) -> Result<Self, &'static str> {
-        if stacks.len() > kind.total_types() {
+        Self::restore_with_layout(tier, kind, CellLayout::basic(tier, kind), stacks)
+    }
+    pub fn restore_with_layout(
+        tier: Tier,
+        kind: KeyType,
+        layout: CellLayout,
+        stacks: BTreeMap<K, u64>,
+    ) -> Result<Self, &'static str> {
+        if stacks.len() > layout.total_types {
             return Err("cell type limit exceeded");
         }
         let mut total = 0u64;
@@ -141,13 +205,13 @@ impl<K: CellKey> Cell<K> {
             total = total.checked_add(*count).ok_or("cell count overflow")?;
         }
         let used = (stacks.len() as u64)
-            .checked_mul(tier.bytes_per_type())
+            .checked_mul(layout.bytes_per_type)
             .and_then(|v| v.checked_add(total.div_ceil(kind.amount_per_byte())))
             .ok_or("cell bytes overflow")?;
-        if used > tier.bytes() {
+        if used > layout.bytes {
             return Err("cell capacity exceeded");
         }
-        let mut result = Self::new(tier, kind);
+        let mut result = Self::new_with_layout(tier, kind, layout);
         result.stored = stacks;
         Ok(result)
     }
@@ -160,6 +224,9 @@ impl<K: CellKey> Cell<K> {
     }
     pub fn kind(&self) -> KeyType {
         self.kind
+    }
+    pub fn layout(&self) -> CellLayout {
+        self.layout
     }
     pub fn is_preformatted(&self) -> bool {
         !self.partition.is_empty()
@@ -181,20 +248,20 @@ impl<K: CellKey> Cell<K> {
         (per - self.stored_count() % per) % per
     }
     pub fn used_bytes(&self) -> u64 {
-        self.stored_types() as u64 * self.tier.bytes_per_type()
+        self.stored_types() as u64 * self.layout.bytes_per_type
             + (self.stored_count() + self.unused_count()) / self.kind.amount_per_byte()
     }
     pub fn free_bytes(&self) -> u64 {
-        self.tier.bytes() - self.used_bytes()
+        self.layout.bytes - self.used_bytes()
     }
     pub fn remaining_types(&self) -> u64 {
-        (self.free_bytes() / self.tier.bytes_per_type())
-            .min((self.kind.total_types() - self.stored_types()) as u64)
+        (self.free_bytes() / self.layout.bytes_per_type)
+            .min((self.layout.total_types - self.stored_types()) as u64)
     }
     pub fn can_hold_new_type(&self) -> bool {
         let free = self.free_bytes();
-        (free > self.tier.bytes_per_type()
-            || free == self.tier.bytes_per_type() && self.unused_count() > 0)
+        (free > self.layout.bytes_per_type
+            || free == self.layout.bytes_per_type && self.unused_count() > 0)
             && self.remaining_types() > 0
     }
     pub fn remaining_count(&self) -> u64 {
@@ -216,11 +283,11 @@ impl<K: CellKey> Cell<K> {
             return u64::MAX;
         }
         let max_types = if self.fuzzy.is_none() && !self.inverted && !self.partition.is_empty() {
-            self.partition.len().min(self.kind.total_types())
+            self.partition.len().min(self.layout.total_types)
         } else {
-            self.kind.total_types()
+            self.layout.total_types
         } as u64;
-        let total = (self.tier.bytes() - self.tier.bytes_per_type() * max_types)
+        let total = (self.layout.bytes - self.layout.bytes_per_type * max_types)
             * self.kind.amount_per_byte();
         total.div_ceil(max_types)
     }
@@ -267,7 +334,7 @@ impl<K: CellKey> Cell<K> {
                 return 0;
             }
             remaining =
-                remaining.saturating_sub(self.tier.bytes_per_type() * self.kind.amount_per_byte());
+                remaining.saturating_sub(self.layout.bytes_per_type * self.kind.amount_per_byte());
             if remaining == 0 {
                 return 0;
             }
@@ -318,6 +385,57 @@ mod tests {
 
     fn cell() -> Cell<Key> {
         Cell::new(Tier::K1, KeyType::Item)
+    }
+
+    #[test]
+    fn portable_layout_uses_half_bytes_original_overhead_and_decreasing_item_types() {
+        for (tier, types) in Tier::ALL.into_iter().zip([54, 45, 36, 27, 18]) {
+            let layout = CellLayout::portable(tier, KeyType::Item);
+            assert_eq!(layout.bytes(), tier.bytes() / 2);
+            assert_eq!(layout.bytes_per_type(), tier.bytes() / 128);
+            assert_eq!(layout.total_types(), types);
+            assert_eq!(layout.idle_drain(), 0.5);
+            let mut cell = Cell::new_with_layout(tier, KeyType::Item, layout);
+            for id in 0..types as u32 {
+                assert_eq!(cell.insert(Key(id, 0), 1, true), 1);
+            }
+            assert_eq!(cell.insert(Key(100, 0), 1, true), 0);
+            assert_eq!(cell.state(), CellState::TypesFull);
+            let fluid = CellLayout::portable(tier, KeyType::Fluid);
+            assert_eq!(fluid.total_types(), 18);
+            let mut fluid = Cell::new_with_layout(tier, KeyType::Fluid, fluid);
+            assert_eq!(
+                fluid.insert(Key(999, 0), u64::MAX, true),
+                (layout.bytes() - layout.bytes_per_type()) * 8000
+            );
+            assert_eq!(fluid.state(), CellState::Full);
+        }
+    }
+
+    #[test]
+    fn portable_restore_enforces_its_own_capacity_and_type_limit() {
+        let layout = CellLayout::portable(Tier::K1, KeyType::Item);
+        assert!(
+            Cell::restore_with_layout(
+                Tier::K1,
+                KeyType::Item,
+                layout,
+                BTreeMap::from([(Key(1, 0), 4032)])
+            )
+            .is_ok()
+        );
+        assert!(
+            Cell::restore_with_layout(
+                Tier::K1,
+                KeyType::Item,
+                layout,
+                BTreeMap::from([(Key(1, 0), 4033)])
+            )
+            .is_err()
+        );
+        let layout = CellLayout::portable(Tier::K256, KeyType::Item);
+        let stacks = (0..19).map(|id| (Key(id, 0), 1)).collect();
+        assert!(Cell::restore_with_layout(Tier::K256, KeyType::Item, layout, stacks).is_err());
     }
 
     #[test]

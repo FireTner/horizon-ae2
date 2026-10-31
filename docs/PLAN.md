@@ -91,5 +91,9 @@ priority UI, special bulk actions, внешний capability API и полный
 ME Chest, затем terminal UI; CableBus и полные ownership/events остаются открытыми.
 Native hoppers/droppers уже соблюдают cell filters/лимит 1 и pre-extraction flush;
 all-face, failed transfer, full Drive и restart smoke прошли.
+Portable item/fluid cells уже используют отдельные half-byte/type/drain профили
+в Drive, исходные компоненты и capacity tooltip. Original BasicCellInventory
+oracle: 2000 traces/572000 операций PASS; handheld UI/charge/use/disassembly
+остаются открытыми. Следующие storage backends — creative и tool cells.
 Рендер и сетевое
 состояние Charger/Crank остаются открытыми задачами первого этапа.

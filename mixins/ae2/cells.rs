@@ -4,7 +4,7 @@
 // Unsupported/corrupt entries fail atomically; their original component is kept.
 
 use super::ae2_keys::{FuzzyMode, GenericStack, Key, KeyProperties, KeyType};
-use super::ae2_storage::{Cell, Tier};
+use super::ae2_storage::{Cell, CellLayout, Tier};
 use horizon_client::{
     item_data,
     items::{ItemStack, Items},
@@ -16,12 +16,20 @@ use std::collections::{BTreeMap, BTreeSet};
 pub const INVENTORY: &str = "ae2:storage_cell_inv";
 const CONFIG: &str = "ae2:storage_cell_config_inv";
 
-pub fn cell_type(id: &str) -> Option<(Tier, KeyType)> {
+pub fn cell_type(id: &str) -> Option<(Tier, KeyType, CellLayout)> {
     let rest = id.strip_prefix("ae2:")?;
-    let (kind, tier) = if let Some(t) = rest.strip_prefix("item_storage_cell_") {
-        (KeyType::Item, t)
+    let (kind, tier, portable) = if let Some(t) = rest.strip_prefix("item_storage_cell_") {
+        (KeyType::Item, t, false)
+    } else if let Some(t) = rest.strip_prefix("fluid_storage_cell_") {
+        (KeyType::Fluid, t, false)
+    } else if let Some(t) = rest.strip_prefix("portable_item_cell_") {
+        (KeyType::Item, t, true)
     } else {
-        (KeyType::Fluid, rest.strip_prefix("fluid_storage_cell_")?)
+        (
+            KeyType::Fluid,
+            rest.strip_prefix("portable_fluid_cell_")?,
+            true,
+        )
     };
     let tier = match tier {
         "1k" => Tier::K1,
@@ -31,7 +39,12 @@ pub fn cell_type(id: &str) -> Option<(Tier, KeyType)> {
         "256k" => Tier::K256,
         _ => return None,
     };
-    Some((tier, kind))
+    let layout = if portable {
+        CellLayout::portable(tier, kind)
+    } else {
+        CellLayout::basic(tier, kind)
+    };
+    Some((tier, kind, layout))
 }
 
 fn int(tag: Option<&Tag>) -> Option<i64> {
@@ -192,7 +205,7 @@ pub fn load_cell(
     stack: &ItemStack,
     resolve: &impl Fn(KeyType, &str) -> Option<KeyProperties>,
 ) -> Result<Cell<Key>, String> {
-    let (tier, kind) = cell_type(&stack.item).ok_or("not a basic cell")?;
+    let (tier, kind, layout) = cell_type(&stack.item).ok_or("not a basic cell")?;
     let mut contents = BTreeMap::new();
     match component(stack, INVENTORY) {
         None => {}
@@ -206,7 +219,8 @@ pub fn load_cell(
         }
         _ => return Err("invalid cell inventory component".into()),
     }
-    let mut cell = Cell::restore(tier, kind, contents).map_err(str::to_owned)?;
+    let mut cell =
+        Cell::restore_with_layout(tier, kind, layout, contents).map_err(str::to_owned)?;
     let mut partition = BTreeSet::new();
     match component(stack, CONFIG) {
         None => {}
@@ -242,8 +256,8 @@ pub fn load_cell(
 /// Only commit the contents component. Name, upgrades, partition, wire metadata
 /// and all unrelated components stay on the same ItemStack.
 pub fn persist_cell(stack: &mut ItemStack, cell: &Cell<Key>) -> Result<(), String> {
-    let (tier, kind) = cell_type(&stack.item).ok_or("not a basic cell")?;
-    if cell.tier() != tier || cell.kind() != kind {
+    let (tier, kind, layout) = cell_type(&stack.item).ok_or("not a basic cell")?;
+    if cell.tier() != tier || cell.kind() != kind || cell.layout() != layout {
         return Err("cell identity changed during operation".into());
     }
     let values = cell
@@ -277,9 +291,9 @@ pub fn resolve_key(items: &Items, kind: KeyType, id: &str) -> Option<KeyProperti
 }
 
 pub(super) fn tooltip(game: &super::Game<'_>, stack: &ItemStack, lines: &mut Vec<(Text, u32)>) {
-    let Some((tier, kind)) = cell_type(&stack.item) else {
+    if cell_type(&stack.item).is_none() {
         return;
-    };
+    }
     let items = game.items();
     if item_key(stack, items).is_err() {
         return;
@@ -308,14 +322,17 @@ pub(super) fn tooltip(game: &super::Game<'_>, stack: &ItemStack, lines: &mut Vec
         lines.push((
             Text::translate(
                 "gui.ae2.BytesUsed",
-                &[ratio(cell.used_bytes(), tier.bytes())],
+                &[ratio(cell.used_bytes(), cell.layout().bytes())],
             ),
             u32::MAX,
         ));
         lines.push((
-            ratio(cell.stored_types() as u64, kind.total_types() as u64)
-                .append(" ")
-                .append(Text::translate("gui.ae2.Types", &[])),
+            ratio(
+                cell.stored_types() as u64,
+                cell.layout().total_types() as u64,
+            )
+            .append(" ")
+            .append(Text::translate("gui.ae2.Types", &[])),
             u32::MAX,
         ));
         if cell.is_preformatted() {
@@ -354,6 +371,55 @@ mod tests {
     }
     fn resolve(_: KeyType, id: &str) -> Option<KeyProperties> {
         (!id.starts_with("missing:")).then_some(KeyProperties::default())
+    }
+    #[test]
+    fn portable_cell_codec_uses_its_layout_and_preserves_energy_components() {
+        for (prefix, kind) in [
+            ("portable_item_cell_", KeyType::Item),
+            ("portable_fluid_cell_", KeyType::Fluid),
+        ] {
+            for (name, tier) in ["1k", "4k", "16k", "64k", "256k"]
+                .into_iter()
+                .zip(Tier::ALL)
+            {
+                let mut stack = item(&format!("ae2:{prefix}{name}"));
+                stack
+                    .data_mut()
+                    .set_other("ae2:stored_energy", Some(Tag::Double(123.0f64.to_bits())));
+                stack.data_mut().set_other(
+                    "ae2:energy_capacity",
+                    Some(Tag::Double(20000.0f64.to_bits())),
+                );
+                let original = stack.clone();
+                let mut cell = load_cell(&stack, &resolve).unwrap();
+                assert_eq!(cell.layout(), CellLayout::portable(tier, kind));
+                let key = Key::new(
+                    kind,
+                    if kind == KeyType::Item {
+                        "minecraft:iron_ingot"
+                    } else {
+                        "minecraft:water"
+                    }
+                    .to_owned(),
+                    vec![],
+                    Default::default(),
+                )
+                .unwrap();
+                assert_eq!(cell.insert(key.clone(), 1000, true), 1000);
+                persist_cell(&mut stack, &cell).unwrap();
+                let mut loaded = load_cell(&stack, &resolve).unwrap();
+                assert_eq!(loaded.extract(&key, 1000, true), 1000);
+                persist_cell(&mut stack, &loaded).unwrap();
+                assert!(stack.same_item_same_components(&original));
+            }
+        }
+    }
+    #[test]
+    fn swapping_basic_and_portable_identity_cannot_persist_under_wrong_capacity() {
+        let mut stack = item("ae2:portable_item_cell_1k");
+        let portable = load_cell(&stack, &resolve).unwrap();
+        stack.item = "ae2:item_storage_cell_1k".into();
+        assert!(persist_cell(&mut stack, &portable).is_err());
     }
     #[test]
     fn typed_unknown_components_and_nested_data_survive_roundtrip() {

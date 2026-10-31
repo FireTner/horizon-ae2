@@ -15,7 +15,8 @@ in horizon-mixin.toml. keys.rs, storage.rs and cells.rs feed the native cell
 tooltip/codec adapter. energy.rs/grid.rs/power.rs feed network.rs and the
 grid_glue.rs world adapter (currently Charger + three energy-cell kinds + Drive).
 mounts.rs/service.rs/drive.rs are consumed by drive_glue.rs and belong in the
-native manifest. Drive currently has ten real cell slots/providers, original
+native manifest. Drive currently has ten real cell slots/providers, supports
+twenty basic/portable cell types with separate CellLayout limits, original
 inv persistence and power/channel gating; its filtered ten-slot screen works,
 while priority UI and special bulk actions remain open. automation*.rs enforces
 the same ten-slot limits/filters for native hoppers/droppers and flushes cells

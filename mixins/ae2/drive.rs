@@ -81,7 +81,7 @@ impl<K: CellKey> Drive<K> {
             .slots
             .iter()
             .flatten()
-            .map(|cell| cell.lock().unwrap().cell.tier().idle_drain())
+            .map(|cell| cell.lock().unwrap().cell.layout().idle_drain())
             .sum::<f64>()
     }
     pub fn packed_state(&self) -> u32 {

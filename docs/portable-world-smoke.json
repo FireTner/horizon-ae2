@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/drive-portable-6xwx3vus",
+  "scope": [
+    "original_inv_ten_slots",
+    "item_fluid_cell_persistence",
+    "drive_and_cell_idle_drain",
+    "front_exclusion",
+    "offline_retention",
+    "save_restart",
+    "portable_idle_cost_and_preserved_private_energy"
+  ],
+  "measurements": [
+    {
+      "before": {
+        "tick": 53,
+        "energy": 19917.359375
+      },
+      "after": {
+        "tick": 78,
+        "energy": 19866.96875
+      },
+      "expected_per_tick": 2.015625
+    },
+    {
+      "before": {
+        "tick": 101,
+        "energy": 19798.609375
+      },
+      "after": {
+        "tick": 126,
+        "energy": 19723.21875
+      },
+      "expected_per_tick": 3.015625
+    },
+    {
+      "before": {
+        "tick": 246,
+        "energy": 19782.875
+      },
+      "after": {
+        "tick": 272,
+        "energy": 19704.46875
+      },
+      "expected_per_tick": 3.015625
+    }
+  ],
+  "not_covered": [
+    "GUI",
+    "terminal transfers",
+    "dynamic chassis and LEDs",
+    "chunk/dimension/multiplayer",
+    "portable handheld UI/charge/use actions"
+  ],
+  "cells": [
+    "ae2:portable_item_cell_256k",
+    "ae2:portable_fluid_cell_1k"
+  ]
+}

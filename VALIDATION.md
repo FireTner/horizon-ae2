@@ -3,7 +3,35 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## Drive automation — текущая проверка
+## Portable storage backend и original cell oracle — текущая проверка
+
+- Standalone **78 PASS**, fmt/rustfmt/clippy `-D warnings` и Python **8 PASS**;
+  target/portable-checks-final.log. Native **91 PASS**, target/portable-native-tests.json.
+  Новые тесты покрывают все десять portable profiles, половину bytes, сохранённый
+  overhead, item limits 54/45/36/27/18, fluid 18 и 0.5 AE/tick; codec сохраняет
+  stored_energy/energy_capacity и отклоняет подмену basic/portable identity.
+- **2000 Java traces / 572000 операций PASS**, zero mismatches:
+  docs/cells-oracle.json. BasicCellInventory.java копируется и компилируется
+  неизменённым; infrastructure, exact partition matcher и cell descriptors stubbed.
+  Сверяются insert/extract simulate/commit, byte/type metadata, every-key counts,
+  exact whitelist/inverter/distribution/void, nested/blacklist callbacks и reopen.
+  Actual fuzzy matcher, Minecraft component/upgrade validation и world/NeoForge
+  этим oracle не проверяются. Profile source hashes включены отдельно.
+- Native build PASS: target/portable-native-build.json; native check:
+  target/portable-native-check-final.json. Engine pin сохранён.
+- World smoke PASS: target/smoke/drive-portable-6xwx3vus, копия отчёта
+  docs/portable-world-smoke.json. Portable item 256k + fluid 1k в slots 0/9
+  потребляют вместе с Drive/channel ровно **3.015625 AE/tick**; проверены front
+  isolation, offline/restart и содержимое 123 iron/1000 water. После restart тот
+  же расход. Все значения stored_energy у обоих дисков (inv и Items mirror)
+  во всех трёх записанных состояниях проверены отдельно: ровно 1234 AE.
+- Перенесён storage backend и capacity tooltip. Handheld terminal/menu,
+  зарядка/применение/разборка, energy tooltip и color/LED не объявляются готовыми.
+  Source inventory: **54 partial / 1375 pending**, complete нет.
+- Basic-cell regression на новом клиенте: PASS, target/smoke/drive-317pf1x_.
+  Exact basic idle costs, original inv, front/offline и restart сохранены.
+
+## Drive automation — предыдущая проверка
 
 - Native **87 PASS**: два новых теста проверяют настоящий используемый insert
   helper, component identity, stacked remainder, occupied/rejected/zero inputs.

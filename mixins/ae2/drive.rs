@@ -3,20 +3,22 @@
 // Copyright AlgorithmX2 / TeamAppliedEnergistics; 2026 Horizon port contributors.
 // ItemStack slots, persistence, node lifecycle and GUI belong to the adapter.
 
+use super::ae2_backend::CellBackend;
 use super::ae2_mounts::{Counts, Storage, add_count};
 use super::ae2_service::{StorageMounts, StorageProvider};
-use super::ae2_storage::{Cell, CellKey, CellState};
+use super::ae2_storage::{CellKey, CellState};
 use std::sync::{Arc, Mutex};
 pub const SLOTS: usize = 10;
 
 pub struct DriveCell<K> {
-    pub cell: Cell<K>,
+    pub cell: CellBackend<K>,
     pub dirty: bool,
     pub status_changed: bool,
     old_status: CellState,
 }
 impl<K: CellKey> DriveCell<K> {
-    pub fn new(cell: Cell<K>) -> Self {
+    pub fn new(cell: impl Into<CellBackend<K>>) -> Self {
+        let cell = cell.into();
         let old_status = cell.state();
         Self {
             cell,
@@ -81,7 +83,7 @@ impl<K: CellKey> Drive<K> {
             .slots
             .iter()
             .flatten()
-            .map(|cell| cell.lock().unwrap().cell.layout().idle_drain())
+            .map(|cell| cell.lock().unwrap().cell.idle_drain())
             .sum::<f64>()
     }
     pub fn packed_state(&self) -> u32 {
@@ -116,7 +118,7 @@ mod tests {
     use super::super::{
         ae2_keys::{Key, KeyType},
         ae2_service::StorageService,
-        ae2_storage::Tier,
+        ae2_storage::{Cell, Tier},
     };
     use super::*;
     fn key(id: &str) -> Key {
@@ -124,6 +126,41 @@ mod tests {
     }
     fn cell(tier: Tier) -> Arc<Mutex<DriveCell<Key>>> {
         Arc::new(Mutex::new(DriveCell::new(Cell::new(tier, KeyType::Item))))
+    }
+    #[test]
+    fn creative_drive_mount_has_zero_disk_drain_and_unlimited_configured_extraction() {
+        let iron = key("minecraft:iron_ingot");
+        let disk = Arc::new(Mutex::new(DriveCell::new(
+            super::super::ae2_backend::CreativeCell::new(std::collections::BTreeSet::from([
+                iron.clone()
+            ])),
+        )));
+        let mut drive = Drive::<Key> {
+            online: true,
+            ..Default::default()
+        };
+        drive.slots[0] = Some(disk.clone());
+        assert_eq!(drive.idle_drain(), 2.0);
+        assert_eq!(drive.packed_state() & 7, 3);
+        let drive = Arc::new(Mutex::new(drive));
+        let mut service = StorageService::<Key, ()>::default();
+        service.add_node(1, drive).unwrap();
+        let inventory = service.inventory();
+        for _ in 0..2 {
+            assert_eq!(
+                inventory.extract(&iron, 1_000_000_000_000, true, &()),
+                1_000_000_000_000
+            );
+        }
+        assert_eq!(
+            inventory.insert(&iron, 1_000_000_000_000, true, &()),
+            1_000_000_000_000
+        );
+        assert_eq!(
+            inventory.extract(&key("minecraft:gold_ingot"), 1, true, &()),
+            0
+        );
+        assert_eq!(disk.lock().unwrap().cell.stacks()[&iron], i32::MAX as u64);
     }
     #[test]
     fn only_online_drives_mount_and_disks_keep_their_contents_when_unmounted() {

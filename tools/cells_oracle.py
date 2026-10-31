@@ -20,9 +20,10 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "target/upstream/ae2/src/main/java"
 WORK = ROOT / "target/cells-oracle"
 ORIGINAL = "appeng/me/cells/BasicCellInventory.java"
+CREATIVE_ORIGINAL = "appeng/me/cells/CreativeCellInventory.java"
 
 
-def generate():
+def generate(creative=False):
     files = {ORIGINAL: (SOURCE / ORIGINAL).read_text(),
         "org/jetbrains/annotations/Nullable.java": "package org.jetbrains.annotations;public @interface Nullable {}",
         "net/minecraft/network/chat/Component.java": "package net.minecraft.network.chat;public class Component {}",
@@ -60,7 +61,7 @@ class Builder {java.util.Set<AEKey> keys=new java.util.HashSet<>();public Builde
 public IPartitionList build(){return new IPartitionList(){public boolean isEmpty(){return keys.isEmpty();}public boolean matchesFilter(AEKey k,IncludeExclude m){return keys.isEmpty()||keys.contains(k)==(m==IncludeExclude.WHITELIST);}};}}}
 """,
         "appeng/util/prioritylist/FuzzyPriorityList.java": "package appeng.util.prioritylist;public abstract class FuzzyPriorityList implements IPartitionList {}",
-        "appeng/api/storage/cells/CellState.java": "package appeng.api.storage.cells;public enum CellState {EMPTY,NOT_EMPTY,TYPES_FULL,FULL}",
+        "appeng/api/storage/cells/CellState.java": (SOURCE / "appeng/api/storage/cells/CellState.java").read_text(),
         "appeng/api/storage/cells/ISaveProvider.java": "package appeng.api.storage.cells;public interface ISaveProvider {void saveChanges();}",
         "appeng/api/storage/cells/StorageCell.java": """package appeng.api.storage.cells;import appeng.api.stacks.*;import appeng.api.config.*;import appeng.api.networking.security.*;
 public interface StorageCell {default boolean canFitInsideCell(){return true;}default void persist(){}default void getAvailableStacks(KeyCounter out){}default KeyCounter getAvailableStacks(){var out=new KeyCounter();getAvailableStacks(out);return out;}
@@ -95,18 +96,34 @@ switch(op){case 0->result=inv.insert(key(kind,id),amount,mode,null);case 1->resu
 out.print(result+" "+inv.getStoredItemCount()+" "+inv.getStoredItemTypes()+" "+inv.getUsedBytes()+" "+inv.getFreeBytes()+" "+inv.getRemainingItemTypes()+" "+inv.getRemainingItemCount()+" "+inv.getStatus().ordinal());var counts=inv.getAvailableStacks();for(int k=0;k<82;k++)out.print(" "+counts.get(key(kind,k)));out.println();}}
 out.flush();}}
 """}
+    if creative:
+        files[CREATIVE_ORIGINAL] = (SOURCE / CREATIVE_ORIGINAL).read_text()
+        storage = "appeng/api/storage/cells/StorageCell.java"
+        files[storage] = files[storage].replace("public interface StorageCell {", "public interface StorageCell {default boolean isPreferredStorageFor(AEKey k,IActionSource s){return false;}")
+        files["appeng/items/contents/CellConfig.java"] = """package appeng.items.contents;public class CellConfig {public static appeng.util.ConfigInventory create(net.minecraft.world.item.ItemStack s){return s.getOrDefault("config",new appeng.util.ConfigInventory(java.util.Set.of()));}}"""
+        files["appeng/me/cells/CreativeFactory.java"] = """package appeng.me.cells;public class CreativeFactory {public static appeng.api.storage.cells.StorageCell create(net.minecraft.world.item.ItemStack s){return new CreativeCellInventory(s);}}"""
+        files["Main.java"] = """import java.util.*;import java.io.*;import appeng.api.stacks.*;import appeng.api.config.*;import appeng.api.storage.cells.*;import appeng.me.cells.*;import appeng.util.*;import net.minecraft.world.item.*;
+public class Main {
+static AEKey key(AEKeyType kind,int id){if(id==81)kind=kind==AEKeyType.ITEMS?AEKeyType.FLUIDS:AEKeyType.ITEMS;return kind==AEKeyType.ITEMS?new AEItemKey(id):new AEKey(id,kind);}
+public static void main(String[] args) throws Exception {var in=new Scanner(new BufferedInputStream(System.in));var out=new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));int cases=in.nextInt();
+for(int c=0;c<cases;c++){in.nextInt();AEKeyType kind=in.nextInt()==0?AEKeyType.ITEMS:AEKeyType.FLUIDS;in.nextInt();in.nextInt();int n=in.nextInt();var keys=new HashSet<AEKey>();for(int k=0;k<n;k++)keys.add(key(kind,in.nextInt()));var stack=new ItemStack(null);stack.set("config",new ConfigInventory(keys));StorageCell inv=CreativeFactory.create(stack);int operations=in.nextInt();
+for(int step=0;step<operations;step++){int op=in.nextInt(),id=in.nextInt();long amount=in.nextLong();Actionable mode=in.nextInt()==0?Actionable.SIMULATE:Actionable.MODULATE;long result=0;
+switch(op){case 0->result=inv.insert(key(kind,id),amount,mode,null);case 1->result=inv.extract(key(kind,id),amount,mode,null);case 2->{inv.persist();inv=CreativeFactory.create(stack);}default->throw new IllegalArgumentException();}
+out.print(result+" "+inv.getStatus().ordinal()+" "+Double.doubleToRawLongBits(inv.getIdleDrain())+" "+(inv.canFitInsideCell()?1:0)+" "+(inv.isPreferredStorageFor(key(kind,id),null)?1:0));var counts=inv.getAvailableStacks();for(int k=0;k<82;k++)out.print(" "+counts.get(key(kind,k)));out.println();}}
+out.flush();}}
+"""
     root = WORK / "java"
     for name, content in files.items():
         path = root / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_text(content)
     return [root / name for name in sorted(files)]
 
 
-def cases(count):
+def cases(count, creative=False):
     rng = random.Random(0xAE219218CE)
     lines = [str(count)]; operations = 0
     for case in range(count):
         tier = case % 5; kind = case // 5 % 2; portable = case // 10 % 2; flags = case // 20 % 8
-        filters = rng.sample(range(82 - 1), rng.choice([0, 1, 3, 20, 70]))
+        filters = rng.sample(range(82), rng.choice([0, 1, 3, 20, 63])) if creative else rng.sample(range(82 - 1), rng.choice([0, 1, 3, 20, 70]))
         lines.append(f"{tier} {kind} {portable} {flags} {len(filters)} " + " ".join(map(str, filters)))
         ops = [[0, key, 1, 1] for key in range(82)]
         # Fill, reject, extract and reopen at byte/type boundaries, then mix
@@ -120,19 +137,25 @@ def cases(count):
 
 
 def main():
+    global WORK
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--java-home", type=Path, default=Path(os.environ.get("JAVA_HOME", "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home")))
     parser.add_argument("--cases", type=int, default=200)
+    parser.add_argument("--creative", action="store_true", help="compare original CreativeCellInventory instead")
     args = parser.parse_args()
     if args.cases < 1:
         parser.error("--cases must be positive")
     upstream.verify(ROOT / "target/upstream/ae2")
-    sources = generate(); classes = WORK / "classes"; classes.mkdir(exist_ok=True)
+    if args.creative:
+        WORK = ROOT / "target/creative-cell-oracle"
+    original = CREATIVE_ORIGINAL if args.creative else ORIGINAL
+    sources = generate(args.creative); classes = WORK / "classes"; classes.mkdir(exist_ok=True)
     subprocess.run([str(args.java_home / "bin/javac"), "-d", str(classes), *map(str, sources)], check=True)
-    inputs, operations = cases(args.cases); (WORK / "inputs.txt").write_text(inputs)
+    inputs, operations = cases(args.cases, args.creative); (WORK / "inputs.txt").write_text(inputs)
     reference = subprocess.run([str(args.java_home / "bin/java"), "-cp", str(classes), "Main"], input=inputs, text=True, capture_output=True, check=True).stdout
-    subprocess.run(["cargo", "build", "--locked", "--example", "cells_oracle"], cwd=ROOT, check=True)
-    actual = subprocess.run([str(ROOT / "target/debug/examples/cells_oracle")], input=inputs, text=True, capture_output=True, check=True).stdout
+    example = "creative_oracle" if args.creative else "cells_oracle"
+    subprocess.run(["cargo", "build", "--locked", "--example", example], cwd=ROOT, check=True)
+    actual = subprocess.run([str(ROOT / "target/debug/examples" / example)], input=inputs, text=True, capture_output=True, check=True).stdout
     (WORK / "java.txt").write_text(reference); (WORK / "rust.txt").write_text(actual)
     java = reference.splitlines(); rust = actual.splitlines()
     if len(java) != operations or len(rust) != operations:
@@ -141,11 +164,17 @@ def main():
     report = {"passed": not failures, "cases": args.cases, "operations": operations,
               "failed_operations": len(failures), "first_failures": failures[:20],
               "upstream": upstream.LOCK["revision"], "input_sha256": hashlib.sha256(inputs.encode()).hexdigest(),
-              "source_sha256": {ORIGINAL: hashlib.sha256((SOURCE / ORIGINAL).read_bytes()).hexdigest()},
+              "source_sha256": {name: hashlib.sha256((SOURCE / name).read_bytes()).hexdigest() for name in [original, "appeng/api/storage/cells/CellState.java"]},
               "profile_source_sha256": {name: hashlib.sha256((SOURCE / name).read_bytes()).hexdigest() for name in [
                   "appeng/items/tools/powered/PortableCellItem.java", "appeng/core/definitions/AEItems.java", "appeng/items/storage/StorageTier.java"]},
               "scope": "unchanged BasicCellInventory; independently specified basic/portable profiles, all tiers/key kinds, exact partitions, inverter/distribution/void, simulated/committed insertion/extraction, reload, byte/type limits, fake blacklist/nested-cell callbacks; exact per-key and metadata integer outputs",
               "not_covered": ["actual Minecraft AEKey/component codecs", "actual fuzzy matcher and upgrade validation", "missing/malformed components", "creative/tool cells", "world lifecycle, native capability API and NeoForge"]}
+    if args.creative:
+        report["profile_source_sha256"] = {name: hashlib.sha256((SOURCE / name).read_bytes()).hexdigest() for name in [
+            "appeng/items/contents/CellConfig.java", "appeng/items/storage/CreativeCellItem.java"]}
+        report["scope"] = "unchanged CreativeCellInventory; exact configured keys, mixed key kinds, simulate/commit insert/extract, Integer.MAX_VALUE listing independent of requested amount, preferred/nested flags, status, zero idle drain and reopen; keys and configuration infrastructure stubbed"
+        report["not_covered"] = ["actual Minecraft component/config codecs", "workbench and tooltip UI", "addon key types", "world lifecycle, capability API and NeoForge"]
+    report["not_covered"].append("Java hash/identity iteration and serialized list order")
     (WORK / "report.json").write_text(json.dumps(report, indent=2) + "\n"); print(json.dumps(report, indent=2))
     if failures:
         raise SystemExit(1)

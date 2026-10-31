@@ -98,6 +98,15 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "me/cells/CreativeCellInventory.java": ("mixins/ae2/backend.rs", "exact configured-key insert/extract, Integer.MAX_VALUE listing, status/idle/nested/preferred and no-op persistence; 2000 original-Java traces; native description and source hash iteration order pending"),
+    "me/cells/CreativeCellHandler.java": ("mixins/ae2/cells.rs", "native creative id dispatch and configured inventory construction with original component fields; tooltip image/settings and extensible handler registry pending"),
+    "api/storage/cells/StorageCell.java": ("mixins/ae2/backend.rs", "basic/portable/creative backend dispatch for operations, status/drain/listing and creative nested/preferred rules; descriptions and complete native handler/addon surface pending"),
+    "items/contents/CellConfig.java": ("mixins/ae2/cells.rs", "read original component, 63-slot/null/trailing limits, basic type filter and creative mixed-type configuration; workbench inventory API and config writer pending"),
+    "blockentity/storage/DriveBlockEntity.java": ("mixins/ae2/drive_glue.rs", "ten slots mounting basic/portable/creative cells, priority/online/channel/idle state, inv persistence, filtered GUI/native automation; dynamic render, external capability/full lifecycle and tool backends pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

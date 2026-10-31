@@ -1,4 +1,6 @@
 // The same rule modules are injected under crate::game by horizon-mixins.
+#[path = "../mixins/ae2/backend.rs"]
+pub mod ae2_backend;
 #[path = "../mixins/ae2/charger.rs"]
 pub mod ae2_charger;
 #[path = "../mixins/ae2/drive.rs"]

@@ -158,7 +158,7 @@ impl Drives {
                                 drive.slots[slot] = items[slot]
                                     .as_ref()
                                     .and_then(|stack| {
-                                        codec::load_cell(stack, &|kind, id| {
+                                        codec::load_backend(stack, &|kind, id| {
                                             codec::resolve_key(game.items(), kind, id)
                                         })
                                         .ok()
@@ -259,7 +259,7 @@ impl Drives {
                     if cell.dirty
                         && let Some(stack) = items[slot].as_mut()
                     {
-                        if codec::persist_cell(stack, &cell.cell).is_err() {
+                        if codec::persist_backend(stack, &cell.cell).is_err() {
                             failed = true;
                             break;
                         }
@@ -352,6 +352,48 @@ mod tests {
             KeyProperties::default(),
         )
         .unwrap()
+    }
+    #[test]
+    fn creative_component_backend_mounts_on_real_native_network_and_unmounts_offline() {
+        let mut stack = ItemStack::new("ae2:creative_storage_cell", 1);
+        stack.data_mut().set_other(
+            "ae2:storage_cell_config_inv",
+            Some(Tag::List(vec![
+                codec::generic_to_tag(&super::super::ae2_keys::GenericStack {
+                    what: iron(),
+                    amount: 0,
+                })
+                .unwrap(),
+            ])),
+        );
+        let original = stack.clone();
+        let backend = codec::load_backend(&stack, &|_, _| Some(KeyProperties::default())).unwrap();
+        let cell = Arc::new(Mutex::new(DriveCell::new(backend)));
+        let host = Host::default();
+        host.drive.lock().unwrap().slots[0] = Some(cell.clone());
+        let pos = [0, 0, 0];
+        let mut drives = Drives::default();
+        drives.hosts.insert(pos, host);
+        let mut network = Network::default();
+        let drive = node(pos, Kind::Drive);
+        network.sync(vec![drive, node([0, 0, 1], Kind::CreativeEnergyCell)]);
+        run(&mut network, &mut drives);
+        let service = network.node_service(pos).unwrap().0;
+        let inventory = drives.services[&service].inventory().clone();
+        assert_eq!(
+            inventory.extract(&iron(), 1_000_000_000_000, true, &Source::default()),
+            1_000_000_000_000
+        );
+        assert_eq!(drives.hosts[&pos].drive.lock().unwrap().idle_drain(), 2.0);
+        assert_eq!(
+            drives.hosts[&pos].drive.lock().unwrap().packed_state() & 7,
+            3
+        );
+        codec::persist_backend(&mut stack, &cell.lock().unwrap().cell).unwrap();
+        assert_eq!(stack, original);
+        network.sync(vec![drive]);
+        run(&mut network, &mut drives);
+        assert_eq!(inventory.extract(&iron(), 1, true, &Source::default()), 0);
     }
     #[test]
     fn native_drive_binding_unmounts_on_power_loss_and_remounts_same_cell() {

@@ -7,7 +7,8 @@
   "upstream": "db17504a86128fdf3dae31f5fb7a112a646e0b93",
   "input_sha256": "b3c1feb34c56f46a8ea0184d442f3ec275299055eeca179aa9ca859d38c4098d",
   "source_sha256": {
-    "appeng/me/cells/BasicCellInventory.java": "86471cf7a482c96903192883d9f93dc71840ef0a052461c0ede95e7968bfaa3e"
+    "appeng/me/cells/BasicCellInventory.java": "86471cf7a482c96903192883d9f93dc71840ef0a052461c0ede95e7968bfaa3e",
+    "appeng/api/storage/cells/CellState.java": "32cd3a6780afedc66ae597fe0beaf27eef314d854c79f1465e28d5f9f572a78b"
   },
   "profile_source_sha256": {
     "appeng/items/tools/powered/PortableCellItem.java": "2447a2bcc87e96047be7f00d7fc2e811e623529f496393273d33b811bf6166e0",
@@ -20,6 +21,7 @@
     "actual fuzzy matcher and upgrade validation",
     "missing/malformed components",
     "creative/tool cells",
-    "world lifecycle, native capability API and NeoForge"
+    "world lifecycle, native capability API and NeoForge",
+    "Java hash/identity iteration and serialized list order"
   ]
 }

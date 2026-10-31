@@ -1,0 +1,60 @@
+{
+  "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/drive-creative-djhqrho5",
+  "scope": [
+    "original_inv_ten_slots",
+    "drive_and_cell_idle_drain",
+    "front_exclusion",
+    "offline_retention",
+    "save_restart",
+    "creative_mixed_config_keys",
+    "empty_creative_cell",
+    "zero_disk_idle_drain"
+  ],
+  "measurements": [
+    {
+      "before": {
+        "tick": 54,
+        "energy": 19917.359375
+      },
+      "after": {
+        "tick": 80,
+        "energy": 19864.953125
+      },
+      "expected_per_tick": 2.015625
+    },
+    {
+      "before": {
+        "tick": 104,
+        "energy": 19816.578125
+      },
+      "after": {
+        "tick": 130,
+        "energy": 19764.171875
+      },
+      "expected_per_tick": 2.015625
+    },
+    {
+      "before": {
+        "tick": 252,
+        "energy": 19852.859375
+      },
+      "after": {
+        "tick": 277,
+        "energy": 19802.46875
+      },
+      "expected_per_tick": 2.015625
+    }
+  ],
+  "not_covered": [
+    "GUI",
+    "terminal transfers",
+    "dynamic chassis and LEDs",
+    "chunk/dimension/multiplayer",
+    "world extraction through terminal; mounting/extraction checked in native integration test"
+  ],
+  "cells": [
+    "ae2:creative_storage_cell",
+    "ae2:creative_storage_cell"
+  ]
+}

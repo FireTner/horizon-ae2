@@ -3,7 +3,36 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## Portable storage backend и original cell oracle — текущая проверка
+## Creative storage backend — текущая проверка
+
+- Standalone **81 PASS**, fmt/rustfmt/clippy `-D warnings` и Python **8 PASS**,
+  target/creative-checks-final.log. Native **97 PASS**,
+  target/creative-native-tests-final.json. Общий backend enum сохраняет прежние
+  finite правила и добавляет creative configured-key storage.
+- CreativeCellInventory.java и CellState.java компилируются неизменёнными:
+  **2000 traces / 572000 операций PASS**, docs/creative-cell-oracle.json.
+  Проверяются simulate/commit insert/extract, per-key listing cap Integer.MAX_VALUE,
+  preferred, nested/empty rules, TYPES_FULL, zero drain и reopen. Key/config
+  infrastructure stubbed; hash iteration, actual component codecs и UI не проверены.
+- BasicCellInventory повторно сверён с исходным CellState: ещё **572000 PASS**,
+  docs/cells-oracle.json. Native тесты также проверяют component codec, первые
+  63 nullable config slots/лишние entries, empty nesting, реальный Network/StorageService
+  mount, извлечение 10^12, zero disk drain, packed status и offline unmount.
+- Native build и check PASS: target/creative-native-build.json,
+  target/creative-native-check-final.json. Warnings про unused API и strip toolchain
+  остаются; engine/source pins сохранены.
+- World smoke PASS: target/smoke/drive-creative-djhqrho5, отчёт
+  docs/creative-world-smoke.json. В slot 0 — mixed iron/water config, в slot 9 —
+  пустая creative cell; общий Drive/channel drain **2.015625 AE/tick**, без disk
+  overhead. Config, offline и restart сохранены. Этот smoke не извлекает ресурсы
+  через ещё отсутствующий terminal; mount/extract подтверждает native test выше.
+- Portable regression на новом enum: PASS, target/smoke/drive-portable-fi8or0cv.
+  Exact drain, содержимое, private energy и restart сохранились.
+- Source inventory: **57 partial / 1372 pending**, complete нет. Creative tooltip
+  image/shift list, Workbench/config writer, descriptions и полный handler/item API
+  остаются открытыми. Тестовые клиенты завершены.
+
+## Portable storage backend и original cell oracle — предыдущая проверка
 
 - Standalone **78 PASS**, fmt/rustfmt/clippy `-D warnings` и Python **8 PASS**;
   target/portable-checks-final.log. Native **91 PASS**, target/portable-native-tests.json.

@@ -94,10 +94,10 @@ fn main() {
                 _ => panic!("unknown operation"),
             };
             let state = match cell.state() {
-                CellState::Empty => 0,
-                CellState::NotEmpty => 1,
-                CellState::TypesFull => 2,
-                CellState::Full => 3,
+                CellState::Empty => 1,
+                CellState::NotEmpty => 2,
+                CellState::TypesFull => 3,
+                CellState::Full => 4,
             };
             print!(
                 "{result} {} {} {} {} {} {} {state}",

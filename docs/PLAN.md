@@ -94,6 +94,8 @@ all-face, failed transfer, full Drive и restart smoke прошли.
 Portable item/fluid cells уже используют отдельные half-byte/type/drain профили
 в Drive, исходные компоненты и capacity tooltip. Original BasicCellInventory
 oracle: 2000 traces/572000 операций PASS; handheld UI/charge/use/disassembly
-остаются открытыми. Следующие storage backends — creative и tool cells.
+остаются открытыми. Creative backend уже подключён к Drive, сверён с original
+Java и проверен native integration/world persistence. Следующие storage backends
+— Matter Cannon и Color Applicator с их source admission filters.
 Рендер и сетевое
 состояние Charger/Crank остаются открытыми задачами первого этапа.

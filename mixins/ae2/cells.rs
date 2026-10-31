@@ -3,6 +3,7 @@
 // Uses AE2's actual id/components/#t/# and ae2:storage_cell_* layout.
 // Unsupported/corrupt entries fail atomically; their original component is kept.
 
+use super::ae2_backend::{CellBackend, CreativeCell};
 use super::ae2_keys::{FuzzyMode, GenericStack, Key, KeyProperties, KeyType};
 use super::ae2_storage::{Cell, CellLayout, Tier};
 use horizon_client::{
@@ -103,7 +104,7 @@ fn key_with_properties(stack: &ItemStack, mut properties: KeyProperties) -> Resu
             .is_none_or(|tag| matches!(tag,Tag::List(values) if values.is_empty()));
     } else if &*stack.item == "ae2:creative_storage_cell" {
         properties.can_fit_inside_cell = component(stack, CONFIG)
-            .is_none_or(|tag| matches!(tag,Tag::List(values) if values.is_empty()));
+            .is_none_or(|tag| matches!(tag,Tag::List(values) if values.iter().take(63).all(|entry| matches!(entry,Tag::Compound(map) if map.is_empty()))));
     }
     Key::new(
         KeyType::Item,
@@ -201,6 +202,46 @@ fn upgrades(stack: &ItemStack) -> BTreeSet<String> {
     }
 }
 
+fn config_keys(
+    stack: &ItemStack,
+    resolve: &impl Fn(KeyType, &str) -> Option<KeyProperties>,
+) -> Result<BTreeSet<Key>, String> {
+    let mut keys = BTreeSet::new();
+    match component(stack, CONFIG) {
+        None => {}
+        Some(Tag::List(list)) => {
+            // CellConfig uses a 63-slot ConfigInventory. Empty compounds are
+            // nullable GenericStack slots; trailing entries are not loaded.
+            for entry in list.iter().take(63) {
+                if matches!(entry,Tag::Compound(map) if map.is_empty()) {
+                    continue;
+                }
+                keys.insert(generic_from_tag(entry, resolve)?.what);
+            }
+        }
+        _ => return Err("invalid cell partition".into()),
+    }
+    Ok(keys)
+}
+
+pub fn load_backend(
+    stack: &ItemStack,
+    resolve: &impl Fn(KeyType, &str) -> Option<KeyProperties>,
+) -> Result<CellBackend<Key>, String> {
+    if &*stack.item == "ae2:creative_storage_cell" {
+        Ok(CreativeCell::new(config_keys(stack, resolve)?).into())
+    } else {
+        load_cell(stack, resolve).map(Into::into)
+    }
+}
+pub fn persist_backend(stack: &mut ItemStack, cell: &CellBackend<Key>) -> Result<(), String> {
+    match cell {
+        CellBackend::Basic(cell) => persist_cell(stack, cell),
+        CellBackend::Creative(_) if &*stack.item == "ae2:creative_storage_cell" => Ok(()),
+        _ => Err("creative cell identity changed during operation".into()),
+    }
+}
+
 pub fn load_cell(
     stack: &ItemStack,
     resolve: &impl Fn(KeyType, &str) -> Option<KeyProperties>,
@@ -221,22 +262,10 @@ pub fn load_cell(
     }
     let mut cell =
         Cell::restore_with_layout(tier, kind, layout, contents).map_err(str::to_owned)?;
-    let mut partition = BTreeSet::new();
-    match component(stack, CONFIG) {
-        None => {}
-        Some(Tag::List(list)) => {
-            for entry in list {
-                if matches!(entry,Tag::Compound(map) if map.is_empty()) {
-                    continue;
-                }
-                let entry = generic_from_tag(entry, resolve)?;
-                if entry.what.kind() == kind {
-                    partition.insert(entry.what);
-                }
-            }
-        }
-        _ => return Err("invalid cell partition".into()),
-    }
+    let partition = config_keys(stack, resolve)?
+        .into_iter()
+        .filter(|key| key.kind() == kind)
+        .collect();
     let cards = upgrades(stack);
     cell.configure(
         partition,
@@ -371,6 +400,98 @@ mod tests {
     }
     fn resolve(_: KeyType, id: &str) -> Option<KeyProperties> {
         (!id.starts_with("missing:")).then_some(KeyProperties::default())
+    }
+    #[test]
+    fn creative_backend_uses_configured_item_and_fluid_keys_and_persists_nothing() {
+        let mut stack = item("ae2:creative_storage_cell");
+        let iron = Key::new(
+            KeyType::Item,
+            "minecraft:iron_ingot".to_owned(),
+            vec![],
+            Default::default(),
+        )
+        .unwrap();
+        let water = Key::new(
+            KeyType::Fluid,
+            "minecraft:water".to_owned(),
+            vec![],
+            Default::default(),
+        )
+        .unwrap();
+        stack.data_mut().set_other(
+            CONFIG,
+            Some(Tag::List(vec![
+                generic_to_tag(&GenericStack {
+                    what: iron.clone(),
+                    amount: 0,
+                })
+                .unwrap(),
+                Tag::Compound(Compound::new()),
+                generic_to_tag(&GenericStack {
+                    what: water.clone(),
+                    amount: 0,
+                })
+                .unwrap(),
+                generic_to_tag(&GenericStack {
+                    what: iron.clone(),
+                    amount: 0,
+                })
+                .unwrap(),
+            ])),
+        );
+        stack
+            .data_mut()
+            .set_other("test:opaque", Some(Tag::Byte(9)));
+        let original = stack.clone();
+        let mut cell = load_backend(&stack, &resolve).unwrap();
+        assert_eq!(cell.stacks().len(), 2);
+        assert_eq!(cell.stacks()[&iron], i32::MAX as u64);
+        for key in [iron, water] {
+            assert_eq!(
+                cell.extract(&key, 1_000_000_000_000, false),
+                1_000_000_000_000
+            );
+            assert_eq!(
+                cell.extract(&key, 1_000_000_000_000, true),
+                1_000_000_000_000
+            );
+            assert_eq!(cell.insert(key, 1_000_000_000_000, true), 1_000_000_000_000);
+        }
+        persist_backend(&mut stack, &cell).unwrap();
+        assert_eq!(stack, original);
+        assert!(
+            !key_with_properties(&stack, Default::default())
+                .unwrap()
+                .properties()
+                .can_fit_inside_cell
+        );
+        stack.item = "ae2:item_storage_cell_1k".into();
+        assert!(persist_backend(&mut stack, &cell).is_err());
+    }
+    #[test]
+    fn config_inventory_ignores_trailing_slots_and_empty_placeholders_can_be_nested() {
+        let mut stack = item("ae2:creative_storage_cell");
+        let mut entries = vec![Tag::Compound(Compound::new()); 63];
+        entries.push(Tag::compound([
+            ("#t", Tag::String("ae2:i".into())),
+            ("id", Tag::String("missing:ignored_after_slot_63".into())),
+            ("#", Tag::Long(0)),
+        ]));
+        stack.data_mut().set_other(CONFIG, Some(Tag::List(entries)));
+        let cell = load_backend(&stack, &resolve).unwrap();
+        assert!(cell.stacks().is_empty());
+        assert_eq!(
+            cell.state(),
+            super::super::ae2_storage::CellState::TypesFull
+        );
+        assert!(
+            key_with_properties(&stack, Default::default())
+                .unwrap()
+                .properties()
+                .can_fit_inside_cell
+        );
+        stack.item = "ae2:item_storage_cell_1k".into();
+        assert!(!load_cell(&stack, &resolve).unwrap().is_preformatted());
     }
     #[test]
     fn portable_cell_codec_uses_its_layout_and_preserves_energy_components() {

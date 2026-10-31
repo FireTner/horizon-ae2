@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "cases": 2000,
+  "operations": 572000,
+  "failed_operations": 0,
+  "first_failures": [],
+  "upstream": "db17504a86128fdf3dae31f5fb7a112a646e0b93",
+  "input_sha256": "c39e5e9b200aee88d296437dd3900cafe18228517912c9c70fab792284ed2af5",
+  "source_sha256": {
+    "appeng/me/cells/CreativeCellInventory.java": "359451e81060adf9cf22c69996ede9fbc301a3f23ec23a043bb257ab06d08a2b",
+    "appeng/api/storage/cells/CellState.java": "32cd3a6780afedc66ae597fe0beaf27eef314d854c79f1465e28d5f9f572a78b"
+  },
+  "profile_source_sha256": {
+    "appeng/items/contents/CellConfig.java": "1bc3a86d5b0a5a21482549fbb506f8c3526d15ec48886689b16bb78cca761235",
+    "appeng/items/storage/CreativeCellItem.java": "3feba1a796cb531e44de0f002a48b9b442c52d48b7008f210b216b427c94146f"
+  },
+  "scope": "unchanged CreativeCellInventory; exact configured keys, mixed key kinds, simulate/commit insert/extract, Integer.MAX_VALUE listing independent of requested amount, preferred/nested flags, status, zero idle drain and reopen; keys and configuration infrastructure stubbed",
+  "not_covered": [
+    "actual Minecraft component/config codecs",
+    "workbench and tooltip UI",
+    "addon key types",
+    "world lifecycle, capability API and NeoForge",
+    "Java hash/identity iteration and serialized list order"
+  ]
+}

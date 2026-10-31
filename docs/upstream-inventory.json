@@ -1,8 +1,8 @@
 {
   "families": {
     "api": {
-      "partial": 11,
-      "pending": 261
+      "partial": 12,
+      "pending": 260
     },
     "block": {
       "partial": 2,
@@ -69,8 +69,8 @@
       "pending": 53
     },
     "me": {
-      "partial": 19,
-      "pending": 45
+      "partial": 21,
+      "pending": 43
     },
     "menu": {
       "partial": 3,
@@ -1619,8 +1619,10 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/storage/cells/StorageCell.java",
+      "port": "mixins/ae2/backend.rs",
+      "scope": "basic/portable/creative backend dispatch for operations, status/drain/listing and creative nested/preferred rules; descriptions and complete native handler/addon surface pending",
       "sha256": "1faa8d82689db52cfdaa6ef295c8fb03d8b13966acc4876a52412bc3eb3c5668",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
@@ -2392,7 +2394,7 @@
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/storage/DriveBlockEntity.java",
       "port": "mixins/ae2/drive_glue.rs",
-      "scope": "ten slots mounting twenty basic/portable cell types, priority/online/channel/idle state, inv persistence, filtered GUI/native automation; dynamic render, external capability/full lifecycle and creative/tool backends pending",
+      "scope": "ten slots mounting basic/portable/creative cells, priority/online/channel/idle state, inv persistence, filtered GUI/native automation; dynamic render, external capability/full lifecycle and tool backends pending",
       "sha256": "1cd6e904a76eba014f8ba11d23a603815784b1e0c7558cc9c835bdf1ebcc0d27",
       "status": "partial"
     },
@@ -5718,7 +5720,7 @@
       "family": "items",
       "path": "src/main/java/appeng/items/contents/CellConfig.java",
       "port": "mixins/ae2/cells.rs",
-      "scope": "read storage_cell_config_inv; workbench UI and config writer pending",
+      "scope": "read original component, 63-slot/null/trailing limits, basic type filter and creative mixed-type configuration; workbench inventory API and config writer pending",
       "sha256": "1bc3a86d5b0a5a21482549fbb506f8c3526d15ec48886689b16bb78cca761235",
       "status": "partial"
     },
@@ -6131,14 +6133,18 @@
     {
       "family": "me",
       "path": "src/main/java/appeng/me/cells/CreativeCellHandler.java",
+      "port": "mixins/ae2/cells.rs",
+      "scope": "native creative id dispatch and configured inventory construction with original component fields; tooltip image/settings and extensible handler registry pending",
       "sha256": "eaad19173535a7fa75087fb012c82f18c44c4211a5b2572a3019ebff0309a701",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "me",
       "path": "src/main/java/appeng/me/cells/CreativeCellInventory.java",
+      "port": "mixins/ae2/backend.rs",
+      "scope": "exact configured-key insert/extract, Integer.MAX_VALUE listing, status/idle/nested/preferred and no-op persistence; 2000 original-Java traces; native description and source hash iteration order pending",
       "sha256": "359451e81060adf9cf22c69996ede9fbc301a3f23ec23a043bb257ab06d08a2b",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "me",

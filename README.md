@@ -51,9 +51,13 @@
   type limits и 0.5 AE/tick на диск, codec/tooltip и mounts Drive. Обычные и
   переносные профили сверены с исходным BasicCellInventory: 2000 сценариев,
   572000 операций без расхождений. Handheld UI/зарядка/применение ещё не перенесены.
+- Creative cell backend: configured keys, unlimited insert/extract, исходный
+  listing cap, статус и нулевой расход диска; Drive online/offline mounts,
+  codec и restart. Ещё 2000 Java сценариев/572000 операций PASS. Tooltip image,
+  Workbench и полный item API пока не перенесены. Всего в Drive подключён 21 тип.
 - Подготовка контента, source-only `.hnmod`, закреплённые исходники и
   проверяемый реестр **всех 1429 Java-файлов** оригинала. В реестре нет
-  полностью закрытых классов; 54 отмечены как частично перенесённые.
+  полностью закрытых классов; 57 отмечены как частично перенесённые.
 
 Полный объём и последовательность работ: [docs/PLAN.md](docs/PLAN.md).
 Текущие отличия: [docs/PARITY.md](docs/PARITY.md).
@@ -80,6 +84,7 @@ python3.12 tools/energy_oracle.py --java-home /path/to/jdk21 --cases 1000
 python3.12 tools/energy_oracle.py --java-home /path/to/jdk21 --overlay --cases 1000
 python3.12 tools/mounts_oracle.py --java-home /path/to/jdk21 --cases 2000
 python3.12 tools/cells_oracle.py --java-home /path/to/jdk21 --cases 2000
+python3.12 tools/cells_oracle.py --java-home /path/to/jdk21 --creative --cases 2000
 
 python3.12 tools/horizon.py check
 python3.12 tools/horizon.py build
@@ -117,6 +122,8 @@ python3.12 tools/smoke_drive_gui.py --ctl /path/to/horizon-ctl \
 python3.12 tools/smoke_drive_automation.py --ctl /path/to/horizon-ctl \
   --resources /path/to/prepared/26.3
 python3.12 tools/smoke_drive.py --portable --ctl /path/to/horizon-ctl \
+  --resources /path/to/prepared/26.3
+python3.12 tools/smoke_drive.py --creative --ctl /path/to/horizon-ctl \
   --resources /path/to/prepared/26.3
 ```
 

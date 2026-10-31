@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "cases": 2000,
+  "failures": [],
+  "upstream": "db17504a86128fdf3dae31f5fb7a112a646e0b93",
+  "scope": "original PathingCalculation and extracted GridNode/GridConnection path methods; runtime services stubbed; controller-online graphs only",
+  "input_sha256": "05fd06d81e4ac6ffb3867de2ead5812202276df19efe50a655a5e0a817f1f841",
+  "java_sources_sha256": {
+    "appeng/me/pathfinding/PathingCalculation.java": "523716b8e199140cccfdcf18f1b174efb8a3617ff4a0810a798aa64f07f5caee",
+    "appeng/me/GridNode.java": "ce0551535436b4a02bab281d6e407b8804f6bf609628f151fda9a4e23001e050",
+    "appeng/me/GridConnection.java": "3bac93df54c2f30faffe8ef5aa7e34b6230608d56b52e0977a148b76f38141a2"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "repository": "https://github.com/AppliedEnergistics/Applied-Energistics-2",
+  "revision": "db17504a86128fdf3dae31f5fb7a112a646e0b93",
+  "ref": "neoforge/v19.2.18",
+  "version": "19.2.18",
+  "minecraft": "1.21.1",
+  "loader": "NeoForge",
+  "namespace": "ae2",
+  "jar": {
+    "url": "https://cdn.modrinth.com/data/XxWD5pD3/versions/KDnFUmMm/appliedenergistics2-19.2.18.jar",
+    "sha512": "39bc4cf733a4321631e2637a1a6dfd3527135fdac1b572534e6fd1f9eab7a6dd92d56c5fa066263c95149c9b20cabdd1fd3dff80bea515381b1d2d754cad26c3",
+    "size": 8236552,
+    "modrinth_version": "KDnFUmMm"
+  }
+}

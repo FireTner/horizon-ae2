@@ -1,0 +1,17 @@
+// The same rule modules are injected under crate::game by horizon-mixins.
+#[path = "../mixins/ae2/charger.rs"]
+pub mod ae2_charger;
+#[path = "../mixins/ae2/energy.rs"]
+pub mod ae2_energy;
+#[path = "../mixins/ae2/grid.rs"]
+pub mod ae2_grid;
+#[path = "../mixins/ae2/keys.rs"]
+pub mod ae2_keys;
+#[path = "../mixins/ae2/mounts.rs"]
+pub mod ae2_mounts;
+#[path = "../mixins/ae2/network.rs"]
+pub mod ae2_network;
+#[path = "../mixins/ae2/power.rs"]
+pub mod ae2_power;
+#[path = "../mixins/ae2/storage.rs"]
+pub mod ae2_storage;

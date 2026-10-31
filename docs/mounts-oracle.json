@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "cases": 2000,
+  "operations": 410882,
+  "failed_operations": 0,
+  "first_failures": [],
+  "upstream": "db17504a86128fdf3dae31f5fb7a112a646e0b93",
+  "input_sha256": "4c19b337ce16562233d020c320e75df719342791d25a8bf09829dcbac7b55116",
+  "source_sha256": {
+    "appeng/me/storage/NetworkStorage.java": "53ad52bc6a4cc167d429672a53b27398ef40371426f7b2b36d2f35ec17c954b5"
+  },
+  "scope": "unmodified NetworkStorage; bounded host bins, mount/unmount, duplicate mounts, high/low priorities, preferred two-pass insertion, simulate/commit, recursive self-mounts, queued mutations in all provider operations, deferred listing queues; exact integer outputs",
+  "not_covered": [
+    "cell internals/codecs",
+    "StorageService and provider lifecycle",
+    "security/energy charging",
+    "world Drive, terminal UI, NeoForge"
+  ]
+}

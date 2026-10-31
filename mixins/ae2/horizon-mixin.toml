@@ -1,0 +1,156 @@
+[mod]
+id = "ae2"
+version = "0.1.0"
+priority = 100
+
+[compatibility]
+horizon_revision = "aa27eca326db26e999d4e59d7899576016764b1e"
+
+[[module]]
+id = "keys"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_keys"
+source = "keys.rs"
+
+[[module]]
+id = "storage"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_storage"
+source = "storage.rs"
+
+[[module]]
+id = "cells"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_cells"
+source = "cells.rs"
+
+[[module]]
+id = "charger"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_charger"
+source = "charger.rs"
+
+[[module]]
+id = "glue"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_glue"
+source = "glue.rs"
+
+[[injection]]
+id = "tooltip"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_tooltip"
+helper = "tooltip.rs"
+bindings = [
+  { name = "game", ty = "&crate::game::Game<'_>", value = "&*self" },
+  { name = "stack", ty = "&horizon_client::items::ItemStack", value = "stack" },
+  { name = "lines", ty = "&mut Vec<(horizon_client::text::Text, u32)>", value = "&mut *lines" },
+]
+
+[[injection]]
+id = "block-entity"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_block_entity"
+helper = "block_entity.rs"
+bindings = [
+  { name = "block", ty = "&str", value = "block" },
+  { name = "entity", ty = "&mut Option<(String, horizon_world::nbt::Compound)>", value = "&mut *entity" },
+]
+
+[[injection]]
+id = "block-entity-ticks"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_block_entity_ticks"
+helper = "block_entity_ticks.rs"
+bindings = [
+  { name = "block", ty = "&str", value = "block" },
+  { name = "ticks", ty = "&mut bool", value = "&mut *ticks" },
+]
+
+[[injection]]
+id = "block-entity-container"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_block_entity_container"
+helper = "block_entity_container.rs"
+bindings = [
+  { name = "block", ty = "&str", value = "block" },
+  { name = "container", ty = "&mut Option<horizon_client::containers::ModContainer>", value = "&mut *container" },
+]
+
+[[injection]]
+id = "block-entity-tick"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_block_entity_tick"
+helper = "block_entity_tick.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "pos", ty = "[i32; 3]", value = "pos" },
+  { name = "entity", ty = "&mut horizon_client::containers::ModBlockEntity", value = "&mut *entity" },
+]
+
+[[injection]]
+id = "right-click"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_right_click_block"
+helper = "right_click.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "pos", ty = "[i32; 3]", value = "pos" },
+  { name = "canceled", ty = "&mut bool", value = "&mut *canceled" },
+]
+
+[[module]]
+id = "energy"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_energy"
+source = "energy.rs"
+
+[[module]]
+id = "grid"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_grid"
+source = "grid.rs"
+
+[[module]]
+id = "power"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_power"
+source = "power.rs"
+
+[[module]]
+id = "network"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_network"
+source = "network.rs"
+
+[[module]]
+id = "grid_glue"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_grid_glue"
+source = "grid_glue.rs"
+
+[[injection]]
+id = "level-pre"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_level_tick_pre"
+helper = "level_pre.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "dimension", ty = "&str", value = "dimension" },
+]
+
+[[injection]]
+id = "level-post"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_level_tick_post"
+helper = "level_post.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "dimension", ty = "&str", value = "dimension" },
+]
+
+[[injection]]
+id = "world-phase"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_world_lifecycle"
+helper = "world_phase.rs"

@@ -11,7 +11,7 @@
 | StoredEnergyAmount / EnergyService | amount/capacity/simulation, storage events, приоритеты, per-node buffer, public power delay, averages/cache, overlay/passive rules; full-block world binding; 2000 Java traces | addon storage providers, полные watchers/event callbacks, QuartzFiber и passive-generator blocks, config integration, полные watcher/addon oracle scenarios |
 | NetworkStorage | mount priorities, preferred passes, mutation queues, recursion guard, weak links; 2000 Java traces/410882 операций; native StorageService/Drive consumers | MEStorage handler filters, ME Chest/terminal и остальные providers |
 | StorageService | node/global provider identity, refresh/unmount, lazy public cache/private counts, key/watch-all changes и permanent watcher destroy | Java service oracle, world watcher hosts, full callback/hash iteration/exception fidelity, debug dump |
-| DriveBlockEntity / DriveWatcher | десять basic cells, реальные mounts по online/priority, REQUIRE_CHANNEL, 2 AE + disk drain, front exclusion, original inv.itemN + Horizon Items mirror, packed status; world restart | automation, dynamic cell chassis/LEDs/sync, creative/other cells, all inventory/drop/chunk/capability paths |
+| DriveBlockEntity / DriveWatcher | десять basic cells, реальные mounts по online/priority, REQUIRE_CHANNEL, 2 AE + disk drain, front exclusion, original inv.itemN + Horizon Items mirror, packed status; native hopper/dropper filter/limit/flush и world restart | external capability API, dynamic cell chassis/LEDs/sync, creative/other cells, all inventory/drop/chunk paths |
 | DriveMenu / DriveScreen | original texture/layout, десять cell slots с лимитом 1, authoritative filters, pickup/shift/drag/hotbar rules, main-before-hotbar shift order и isolation; game restart | priority button/subscreen, ghost icons, AEBaseMenu bulk actions, external multiplayer и addon cell registry |
 | EnergyCellBlockEntity | normal/dense/creative block entities, реальные сетевые хранилища, internalCurrentPower и proxy.e persistence | fullness drawing/sync, comparator, energy components у item/drop/placement, redstone/template side effects |
 | Charger recipes | таблица ae2:charger, local 1600 AE, threshold 1599, interval 10, random > 0.8, один предмет, сохранение энергии/слота; сеть пополняет private buffer до 800 AE/call | инструменты, config multiplier/rates, hopper фильтры, эффекты и рендер предмета |
@@ -72,13 +72,16 @@
   regression PASS. Из 23 допустимых upstream built-in cell families backend пока
   подключает только десять basic item/fluid cells; остальные сохраняются как items.
   Addon registry, priority UI, ghost slot icons и AEBaseMenu special bulk actions
-  ещё не перенесены. Hopper access пока отключён. Housing — исходный drive_base,
+  ещё не перенесены. Hopper/dropper access со всех шести сторон проверен,
+  включая offline, full Drive и failed pull с возвратом компонентов; внешнего
+  native capability API и совместного Create smoke ещё нет. Housing — исходный drive_base,
   runtime cell models/LED renderer ещё не подключены.
 - Native Drive отражает inv.item0..item9 в Horizon Items для сохранения/слотов;
   это одни и те же ItemStacks, не два набора содержимого. Неизменённый echo
   не перезагружает изменённый backend; malformed inv сохраняется и unmount-ится.
   Это более строгий отказ, чем source recovery, и не доказательство всех ошибок
-  codecs. Перед menu packets и player destroy добавлен flush; полные inventory extraction,
+  codecs. Перед menu packets, hopper slot mutation и player destroy добавлен flush;
+  native container changed немедленно обновляет providers. Полные inventory extraction,
   explosion/drop и chunk unload/save paths ещё нужно закрыть до терминалов.
 - StorageService пока не имеет Java oracle. Cache/watchers проверены Rust,
   world Drive и native merge/split tests. Уведомления в core синхронные;

@@ -32,9 +32,9 @@ pub(super) fn container(block: &str, out: &mut Option<ModContainer>) {
         // 10..18. Only the original ten slots are mounted as storage cells.
         *out = Some(ModContainer {
             slots: 18,
-            faces: std::array::from_fn(|_| vec![]),
-            inputs: vec![],
-            outputs: vec![],
+            faces: std::array::from_fn(|_| (0..10).collect()),
+            inputs: (0..10).collect(),
+            outputs: (0..10).collect(),
             menu: Some("minecraft:generic_9x2".to_owned()),
         });
     }

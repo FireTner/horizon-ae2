@@ -2,7 +2,7 @@
 
 Цель активна: полностью перенести AE2 19.2.18 на Horizon, 1:1, без субагентов.
 Цель не уменьшена до текущего набора механик. Все 1429 исходных Java-файлов
-остаются в реестре; сейчас 51 partial, 1378 pending, полностью закрытых нет.
+остаются в реестре; сейчас 52 partial, 1377 pending, полностью закрытых нет.
 
 ## Последний результат
 
@@ -22,14 +22,18 @@
   key/watch-all interests и permanent watcher destroy, 6 новых core tests.
 - Drive: десять basic cell providers, 2 AE + disk idle draw, front exclusion,
   REQUIRE_CHANNEL, priority/online mounts, packed state, original inv.itemN и
-  Items mirror. Filtered automation и dynamic chassis/LEDs ещё открыты.
+  Items mirror. External capabilities и dynamic chassis/LEDs ещё открыты.
 - Drive GUI: original PNG/layout, десять visible slots, filter + cap1,
   authoritative pickup/shift/drag/hotbar policy, main-before-hotbar order,
   изоляция от vanilla menu. Game smoke и restart PASS:
   target/smoke/drive-gui-4o68o5bf. Priority UI, ghost icons и bulk actions pending.
-- 76 core + 85 native binary + 5 native library + 8 Python тестов прошли.
+- Drive automation: реальные hoppers/droppers, all six insertion faces,
+  filter/cap1, offline, failed pull + component retention, full Drive/remainder,
+  restart PASS: target/smoke/drive-automation-0pywd8ek. Slot mutation flush и
+  container changed provider refresh подключены; general capability API pending.
+- 76 core + 87 native binary + 5 native library + 8 Python тестов прошли.
   Native build и Drive GUI smoke прошли; final check evidence — VALIDATION.md
-  и target/drive-gui-native-check-final.json.
+  и target/drive-automation-native-check-final.json.
   Новый power smoke: target/smoke/power-wkijuezf; повторный ручной Charger/Crank
   smoke: target/smoke/charger-1ta7ucsr. Все тестовые процессы завершены.
 - NetworkStorage: 2000 Java traces / 410882 операции PASS. Теперь используется
@@ -43,7 +47,7 @@
 
 1. Продолжить source/oracle verification энергосервиса (watchers/addons), закрыть известные
    lifecycle/overlay/events gaps и реальную передачу состояния клиенту.
-2. Закрыть priority UI/bulk actions Drive, filtered automation, sync/рендер и все persistence
+2. Закрыть priority UI/bulk actions Drive, external capabilities, sync/рендер и все persistence
    paths до терминалов. Перенести ME Chest, terminal UI и CableBus/parts,
    ownership/readiness и полную модель событий/приоритетов GridConnection.
 3. Для energy cells остаются fullness/sync/comparator, item/drop/placement
@@ -58,7 +62,7 @@ pinned checkout: target/upstream/{ae2,horizon,horizon-mixins}. Original engine
 только под target. Все тестовые процессы последнего smoke завершены.
 
 - tools/check.py: fmt, clippy, 76 core tests, 8 tooling tests, inventory check.
-- tools/horizon.py test: 85 native tests (Game + typed NBT); warnings об unused
+- tools/horizon.py test: 87 native tests (Game + typed NBT); warnings об unused
   API остаются до подключения всех потребителей API, не скрыты.
 - tools/horizon.py test --library: 5 tests, в том числе три server-click теста.
 - tools/pathing_oracle.py --cases 2000: JDK 21+, default local Homebrew JDK.
@@ -70,6 +74,6 @@ pinned checkout: target/upstream/{ae2,horizon,horizon-mixins}. Original engine
 Пользователь явно велел проверять account limits примерно раз в пять минут
 и поставить goal на паузу при остатке <=10% в релевантном окне. Использовать
 Codex get_usage_limits, не token counter goal. Последний подтверждённый остаток
-26% (74% consumed), проверка 1 ноября 2026. Не использовать reset credit и не покупать quota.
+25% (75% consumed), проверка 1 ноября 2026. Не использовать reset credit и не покупать quota.
 При пороге зафиксировать текущую точку, вызвать update_goal(paused), сообщить
 возвращённый статус и прекратить работу. Сейчас условие не наступило.

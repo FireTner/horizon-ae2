@@ -17,7 +17,9 @@ grid_glue.rs world adapter (currently Charger + three energy-cell kinds + Drive)
 mounts.rs/service.rs/drive.rs are consumed by drive_glue.rs and belong in the
 native manifest. Drive currently has ten real cell slots/providers, original
 inv persistence and power/channel gating; its filtered ten-slot screen works,
-while priority UI, special bulk actions and filtered automation remain open.
+while priority UI and special bulk actions remain open. automation*.rs enforces
+the same ten-slot limits/filters for native hoppers/droppers and flushes cells
+before slot mutation; a general external capability API is still pending.
 slot_rules.rs is shared with native library menu policy; guest_slots.rs scopes
 server rules by authoritative player/window/block identity, never by chest size.
 Injected payloads cannot use inner attributes/comments, external mod files or

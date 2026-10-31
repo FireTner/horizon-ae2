@@ -43,9 +43,13 @@
   исходную текстуру и десять filtered slots: pickup/shift, drag/hotbar rules,
   сохранение и изоляция от обычных контейнеров проверены. Priority UI,
   динамический рендер и терминалы ещё не перенесены.
+- Drive automation: native hoppers/droppers вставляют ячейки со всех шести
+  сторон, соблюдают фильтр/лимит и сохраняют компоненты при извлечении и отказе.
+  Полный Drive оставляет лишнюю ячейку в источнике; offline и restart проверены.
+  Внешний capability API и совместимость с Create ещё не проверены.
 - Подготовка контента, source-only `.hnmod`, закреплённые исходники и
   проверяемый реестр **всех 1429 Java-файлов** оригинала. В реестре нет
-  полностью закрытых классов; 51 отмечен как частично перенесённый.
+  полностью закрытых классов; 52 отмечены как частично перенесённые.
 
 Полный объём и последовательность работ: [docs/PLAN.md](docs/PLAN.md).
 Текущие отличия: [docs/PARITY.md](docs/PARITY.md).
@@ -104,6 +108,8 @@ python3.12 tools/smoke_power.py --ctl /path/to/horizon-ctl \
 python3.12 tools/smoke_drive.py --ctl /path/to/horizon-ctl \
   --resources /path/to/prepared/26.3
 python3.12 tools/smoke_drive_gui.py --ctl /path/to/horizon-ctl \
+  --resources /path/to/prepared/26.3
+python3.12 tools/smoke_drive_automation.py --ctl /path/to/horizon-ctl \
   --resources /path/to/prepared/26.3
 ```
 

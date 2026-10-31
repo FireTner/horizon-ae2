@@ -149,6 +149,7 @@ pub(super) fn flush_drives(game: &mut Game<'_>) {
     let mut networks = NETWORKS.lock().unwrap_or_else(|e| e.into_inner());
     if let Some(state) = networks.get_mut(game.dim.id()) {
         state.drives.read(game);
+        state.drives.reconcile(&mut state.network);
         state.drives.persist(game);
     }
 }

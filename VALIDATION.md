@@ -3,7 +3,30 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## Drive GUI — текущая проверка
+## Drive automation — текущая проверка
+
+- Native **87 PASS**: два новых теста проверяют настоящий используемый insert
+  helper, component identity, stacked remainder, occupied/rejected/zero inputs.
+  Отчёт target/drive-automation-native-tests.json. Standalone **76 + 8 Python** PASS.
+- Native build PASS: target/drive-automation-native-build.json. Final native
+  check — target/drive-automation-native-check-final.json.
+- Game smoke PASS: target/smoke/drive-automation-0pywd8ek, копия отчёта
+  docs/drive-automation-smoke.json. Настоящие hoppers покрывают up + четыре
+  горизонтальные стороны, dropper — нижнюю сторону. Front ME исключён только
+  для сети: item insertion там разрешён, как в AEBaseInvBlockEntity.
+- Stone отвергается; offline insert/extract сохраняет cell component с 123 iron.
+  Неудачный pull в hopper с пятью несовместимыми стеками возвращает тот же диск.
+  Стек из шести cells заполняет пять свободных слотов по одной штуке и оставляет
+  одну в источнике: десять физических slots и скрытый transport padding соблюдены.
+  Full Drive и remainder пережили restart. Свои процессы smoke закрывает.
+- Повторный GUI smoke после automation hooks: PASS,
+  target/smoke/drive-gui-jb_ak94l; Drive shift/filter, vanilla barrel и restart.
+- Перед slot mutation — flush живых ячеек, container changed сразу обновляет
+  mounts. World mutation через terminal и dirty backend ещё не проверяется этим
+  smoke: терминал не реализован. General external capability/симуляция и Create
+  integration, all chunk/drop paths остаются открытыми.
+
+## Drive GUI — предыдущая проверка
 
 - Standalone: **76 PASS**, fmt/rustfmt/clippy `-D warnings` PASS, Python **8 PASS**,
   inventory **51 partial / 1378 pending**, complete нет. Лог target/drive-gui-final-checks.log.

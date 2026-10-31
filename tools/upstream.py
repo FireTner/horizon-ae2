@@ -85,7 +85,8 @@ PARTIAL.update({
     "menu/slot/RestrictedInputSlot.java": ("mixins/ae2/slot_rules.rs", "STORAGE_CELLS built-in family predicate and Drive slot limit only; addon registry and other slot kinds pending"),
     "menu/AEBaseMenu.java": ("mixins/ae2/guest_quick.rs", "Drive-only forward quick-move order and remote client prediction suppression; bulk actions/security/other menus pending"),
     "api/storage/StorageCells.java": ("mixins/ae2/slot_rules.rs", "isCellHandled built-in cell families for Drive menu only; extensible registry and non-basic native cell inventories pending"),
-    "blockentity/storage/DriveBlockEntity.java": ("mixins/ae2/drive_glue.rs", "ten basic cell mounts, priority/online/channel/idle state and inv persistence; filtered GUI with pre-extraction flush; dynamic render, automation/full lifecycle and other cell backends pending"),
+    "blockentity/storage/DriveBlockEntity.java": ("mixins/ae2/drive_glue.rs", "ten basic cell mounts, priority/online/channel/idle state and inv persistence; filtered GUI, native hopper/dropper filters and pre-extraction flush; dynamic render, external capability/full lifecycle and other cell backends pending"),
+    "blockentity/inventory/AppEngCellInventory.java": ("mixins/ae2/automation.rs", "native Drive one-cell insertion, component retention, flush before slot mutation and provider refresh; general inventory API, simulate capability and remaining persistence paths pending"),
 })
 
 

@@ -41,7 +41,7 @@ def package():
     for name in ['LICENSE', 'NOTICE.md', 'README.md', 'Cargo.toml', 'Cargo.lock',
                  'rust-toolchain.toml', 'compatibility.json', 'upstream.lock.json',
                  'src/lib.rs', 'tools/LICENSE-MIT', 'tools/horizon.py', 'tools/check.py',
-                 'tools/test_tooling.py', 'tools/smoke.py', 'tools/smoke_power.py', 'tools/smoke_drive.py', 'tools/smoke_drive_gui.py', 'tools/pathing_oracle.py',
+                 'tools/test_tooling.py', 'tools/smoke.py', 'tools/smoke_power.py', 'tools/smoke_drive.py', 'tools/smoke_drive_gui.py', 'tools/smoke_drive_automation.py', 'tools/pathing_oracle.py',
                  'tools/energy_oracle.py', 'examples/energy_oracle.rs',
                  'tools/mounts_oracle.py', 'examples/mounts_oracle.rs',
                  'examples/grid_oracle.rs', 'AGENTS.md', 'LICENSES/AE2-API-MIT',
@@ -49,7 +49,7 @@ def package():
                  'docs/PARITY.md', 'docs/PLAN.md', 'docs/upstream-inventory.json',
                  'docs/baseline-port-pack.json', 'docs/pathing-oracle.json',
                  'docs/energy-oracle.json', 'docs/energy-overlay-oracle.json',
-                 'docs/mounts-oracle.json', 'docs/drive-world-smoke.json', 'docs/drive-gui-smoke.json', 'docs/PROGRESS.md', 'VALIDATION.md']:
+                 'docs/mounts-oracle.json', 'docs/drive-world-smoke.json', 'docs/drive-gui-smoke.json', 'docs/drive-automation-smoke.json', 'docs/PROGRESS.md', 'VALIDATION.md']:
         # Horizon only accepts extra non-Rust files below the bundle's data/.
         files[f'mixins/{mod["id"]}/data/source/{name}'] = (ROOT / name).read_bytes()
     out = ROOT / 'target' / f"{mod['id']}-{mod['version']}.hnmod"

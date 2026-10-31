@@ -7,6 +7,59 @@ priority = 100
 horizon_revision = "aa27eca326db26e999d4e59d7899576016764b1e"
 
 [[module]]
+id = "automation"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_automation"
+source = "automation.rs"
+
+[[injection]]
+id = "automation-place"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::machines::Containers<'_>::can_place"
+helper = "automation_place.rs"
+bindings = [
+  { name = "containers", ty = "&crate::game::machines::Containers<'_>", value = "&*self" },
+  { name = "view", ty = "&crate::game::machines::View", value = "view" },
+  { name = "slot", ty = "usize", value = "slot" },
+  { name = "stack", ty = "&horizon_client::items::ItemStack", value = "stack" },
+]
+
+[[injection]]
+id = "automation-insert"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::machines::Game<'_>::try_move_in_item"
+helper = "automation_insert.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "view", ty = "&crate::game::machines::View", value = "view" },
+  { name = "slot", ty = "usize", value = "slot" },
+  { name = "stack", ty = "&horizon_client::items::ItemStack", value = "&stack" },
+]
+
+[[injection]]
+id = "automation-flush"
+kind = "HEAD"
+target = "horizon_client::game::machines::Game<'_>::slot_mut_at"
+helper = "automation_flush.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "view", ty = "&crate::game::machines::View", value = "view" },
+  { name = "slot", ty = "usize", value = "slot" },
+]
+
+[[injection]]
+id = "automation-changed"
+kind = "HEAD"
+target = "horizon_client::game::machines::Game<'_>::container_changed"
+helper = "automation_changed.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "pos", ty = "(i32, i32, i32)", value = "pos" },
+]
+
+[[module]]
 id = "slot-rules"
 file = "crates/horizon-client/src/lan/menu.rs"
 name = "ae2_slot_rules"

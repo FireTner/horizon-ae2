@@ -87,7 +87,9 @@ StorageService и Drive basic-cell backend уже подключены: online/p
 idle/channel costs и исходный inv persistence проверены, в том числе restart.
 Drive GUI уже показывает original layout и десять filtered cell slots; серверные
 pickup/drag/hotbar/shift правила и игровой restart проверены. Следующий слой —
-priority UI, special bulk actions, automation и полный lifecycle сохранения,
+priority UI, special bulk actions, внешний capability API и полный lifecycle сохранения,
 ME Chest, затем terminal UI; CableBus и полные ownership/events остаются открытыми.
+Native hoppers/droppers уже соблюдают cell filters/лимит 1 и pre-extraction flush;
+all-face, failed transfer, full Drive и restart smoke прошли.
 Рендер и сетевое
 состояние Charger/Crank остаются открытыми задачами первого этапа.

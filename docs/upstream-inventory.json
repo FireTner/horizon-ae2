@@ -9,8 +9,8 @@
       "pending": 52
     },
     "blockentity": {
-      "partial": 9,
-      "pending": 41
+      "partial": 10,
+      "pending": 40
     },
     "client": {
       "partial": 1,
@@ -2199,8 +2199,10 @@
     {
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/inventory/AppEngCellInventory.java",
+      "port": "mixins/ae2/automation.rs",
+      "scope": "native Drive one-cell insertion, component retention, flush before slot mutation and provider refresh; general inventory API, simulate capability and remaining persistence paths pending",
       "sha256": "788253ee79c1bb40b5378883e6ea4d5efc3ad4d579dfa97ef74f6e15357f41c8",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "blockentity",
@@ -2390,7 +2392,7 @@
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/storage/DriveBlockEntity.java",
       "port": "mixins/ae2/drive_glue.rs",
-      "scope": "ten basic cell mounts, priority/online/channel/idle state and inv persistence; filtered GUI with pre-extraction flush; dynamic render, automation/full lifecycle and other cell backends pending",
+      "scope": "ten basic cell mounts, priority/online/channel/idle state and inv persistence; filtered GUI, native hopper/dropper filters and pre-extraction flush; dynamic render, external capability/full lifecycle and other cell backends pending",
       "sha256": "1cd6e904a76eba014f8ba11d23a603815784b1e0c7558cc9c835bdf1ebcc0d27",
       "status": "partial"
     },

@@ -3,7 +3,34 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## Энергосервис и full-block world adapter — текущая проверка
+## StorageService и Drive backend — текущая проверка
+
+- Standalone: **74 PASS**, fmt/clippy с `-D warnings` и Python **8 PASS**.
+- Native: **85 PASS**, в том числе полное подключение mounts/service/drive,
+  original inv codec, offline/online remount, network merge/split и отсутствие
+  mounts в отброшенном сервисе при сохранённом external capability handle.
+  Отчёт `target/drive-native-tests-integration.json`.
+- Native build PASS: `target/drive-native-build.json`. Check актуального дерева:
+  `target/drive-native-check-final.json`; лог standalone: target/drive-final-checks.log.
+- Drive world smoke PASS: `target/smoke/drive-5dq1vz2t/result.json`, копия
+  отчёта docs/drive-world-smoke.json. Точный расход за 26 тиков:
+  empty — 52.40625 AE (2 + 2/128 за тик); item 1k + fluid 4k — 91.40625 AE
+  (2 + 0.5 + 1 + 2/128). После restart повторяется тот же расход.
+- Исходный inv.item0/item9 загружен и сохранён, количества 123 iron и 1000
+  water сохранены. Front не подключается, отключение не стирает диски.
+  Первый smoke ошибочно был запущен до окончания build и закономерно не увидел
+  новый backend; он завершился, повторный запуск выполнен после cargo_exit=0.
+- Видимая housing использует исходный drive_base. Screenshot осмотрен:
+  runtime chassis/LEDs ещё отсутствуют. Меню не открывается; GUI, terminal
+  transfers, filtered automation, полный chunk/drop/multiplayer ещё не проверены.
+- StorageService cache/watchers имеют Rust-проверки, но пока не Java oracle.
+  Java storage oracle ниже относится только к NetworkStorage.
+- Source inventory: 1429 файлов, **46 partial / 1383 pending**, complete нет.
+- Charger power regression после новой Dimension/Drive интеграции: PASS,
+  `target/smoke/power-wkijuezf`; finite/creative/front/restart снова проверены.
+  Content build: target/drive-content-build.log. Все тестовые клиенты завершены.
+
+## Энергосервис и full-block world adapter — предыдущая проверка
 
 - Standalone: **63 PASS**, clippy с `-D warnings` PASS, fmt PASS.
 - Native: **64 PASS**, check/build PASS. Отчёты:

@@ -12,7 +12,12 @@ use horizon_world::nbt::{Compound, JavaString, Tag};
 use std::collections::BTreeMap;
 use std::sync::Mutex;
 
-static NETWORKS: Mutex<BTreeMap<String, Network>> = Mutex::new(BTreeMap::new());
+#[derive(Default)]
+struct Dimension {
+    network: Network,
+    drives: super::ae2_drive_glue::Drives,
+}
+static NETWORKS: Mutex<BTreeMap<String, Dimension>> = Mutex::new(BTreeMap::new());
 
 pub(super) fn owns(block: &str) -> bool {
     Kind::from_block(block).is_some()
@@ -60,24 +65,30 @@ fn snapshots(game: &Game<'_>) -> Vec<Snapshot> {
     snapshots
 }
 pub(super) fn pre_tick(game: &mut Game<'_>, dimension: &str) {
-    let snapshots = snapshots(game);
     let mut networks = NETWORKS.lock().unwrap_or_else(|e| e.into_inner());
-    let net = networks.entry(dimension.to_owned()).or_default();
-    net.sync(snapshots);
-    net.begin_tick();
+    let state = networks.entry(dimension.to_owned()).or_default();
+    state.drives.read(game);
+    state.network.sync(snapshots(game));
+    state.drives.reconcile(&mut state.network);
+    state.network.begin_tick();
 }
 pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
     // Block placement, removal and /data may run inside the level tick. Notice
     // those changes before persisting; unchanged NBT is not an external refill
     // and must never restore energy already extracted during this tick.
-    let snapshots = snapshots(game);
     let states = {
         let mut networks = NETWORKS.lock().unwrap_or_else(|e| e.into_inner());
-        let Some(net) = networks.get_mut(dimension) else {
+        let Some(state) = networks.get_mut(dimension) else {
             return;
         };
-        net.sync(snapshots);
-        net.end_tick()
+        state.drives.read(game);
+        state.network.sync(snapshots(game));
+        state.drives.reconcile(&mut state.network);
+        let states = state.network.end_tick();
+        state.drives.reconcile(&mut state.network);
+        state.drives.end_tick();
+        state.drives.persist(game);
+        states
     };
     for state in states {
         let [x, y, z] = state.pos;
@@ -126,8 +137,15 @@ pub(super) fn extract(
     let mut networks = NETWORKS.lock().unwrap_or_else(|e| e.into_inner());
     networks
         .get_mut(dimension)
-        .map_or(0.0, |n| n.extract(pos, amount, multiplier, commit))
+        .map_or(0.0, |n| n.network.extract(pos, amount, multiplier, commit))
 }
 pub(super) fn reset() {
     NETWORKS.lock().unwrap_or_else(|e| e.into_inner()).clear();
+}
+pub(super) fn flush_drives(game: &mut Game<'_>) {
+    let mut networks = NETWORKS.lock().unwrap_or_else(|e| e.into_inner());
+    if let Some(state) = networks.get_mut(game.dim.id()) {
+        state.drives.read(game);
+        state.drives.persist(game);
+    }
 }

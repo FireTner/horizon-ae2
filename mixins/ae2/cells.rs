@@ -263,15 +263,8 @@ pub fn persist_cell(stack: &mut ItemStack, cell: &Cell<Key>) -> Result<(), Strin
     Ok(())
 }
 
-pub(super) fn tooltip(game: &super::Game<'_>, stack: &ItemStack, lines: &mut Vec<(Text, u32)>) {
-    let Some((tier, kind)) = cell_type(&stack.item) else {
-        return;
-    };
-    let items = game.items();
-    if item_key(stack, items).is_err() {
-        return;
-    }
-    let resolve = |kind, id: &str| match kind {
+pub fn resolve_key(items: &Items, kind: KeyType, id: &str) -> Option<KeyProperties> {
+    match kind {
         KeyType::Item => items.get(id).map(|i| KeyProperties {
             max_damage: i.max_damage as i32,
             max_stack: i.max_stack,
@@ -280,7 +273,18 @@ pub(super) fn tooltip(game: &super::Game<'_>, stack: &ItemStack, lines: &mut Vec
         KeyType::Fluid => {
             matches!(id, "minecraft:water" | "minecraft:lava").then_some(KeyProperties::default())
         }
+    }
+}
+
+pub(super) fn tooltip(game: &super::Game<'_>, stack: &ItemStack, lines: &mut Vec<(Text, u32)>) {
+    let Some((tier, kind)) = cell_type(&stack.item) else {
+        return;
     };
+    let items = game.items();
+    if item_key(stack, items).is_err() {
+        return;
+    }
+    let resolve = |kind, id: &str| resolve_key(items, kind, id);
     if let Ok(cell) = load_cell(stack, &resolve) {
         let ratio = |used: u64, max: u64| {
             let p = 1.0 - used as f64 / max as f64;

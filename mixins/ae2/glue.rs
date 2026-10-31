@@ -27,6 +27,18 @@ pub(super) fn ticks(block: &str, ticks: &mut bool) {
 }
 
 pub(super) fn container(block: &str, out: &mut Option<ModContainer>) {
+    if block == "ae2:drive" {
+        // The real ten cell slots are backed by Drive providers. Opening the
+        // exact GUI and all filtered menu/automation paths is separate work;
+        // do not expose an unfiltered vanilla container as an ME Drive menu.
+        *out = Some(ModContainer {
+            slots: 10,
+            faces: std::array::from_fn(|_| vec![]),
+            inputs: vec![],
+            outputs: vec![],
+            menu: None,
+        });
+    }
     if block == CHARGER {
         // Dynamic per-stack hopper filters do not exist at API 40. Disable
         // automation until the engine can enforce ChargerInvFilter correctly.

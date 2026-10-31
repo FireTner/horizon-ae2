@@ -82,8 +82,10 @@ SHA-256, подсистема и фактический объём начато�
 AEKey/GenericStack/component persistence и GridNode/Connection/Pathing уже
 начаты: native codec проверен в Horizon, pathing сверён на 2000 входах с
 оригинальным Java. Энергетический сервис и первый world adapter уже подключают Charger и три
-energy cells; finite/creative power и restart проверены в игре. Следующий слой —
-StorageService/provider lifecycle, Drive/ME Chest (NetworkStorage core уже
-сверён с Java), CableBus и полные lifecycle/ownership/events,
-затем terminal UI. Рендер и сетевое
+energy cells; finite/creative power и restart проверены в игре.
+StorageService и Drive basic-cell backend уже подключены: online/priority mounts,
+idle/channel costs и исходный inv persistence проверены, в том числе restart.
+Следующий слой — полный Drive GUI/filters/синхронизация и lifecycle сохранения,
+ME Chest, затем terminal UI; CableBus и полные ownership/events остаются открытыми.
+Рендер и сетевое
 состояние Charger/Crank остаются открытыми задачами первого этапа.

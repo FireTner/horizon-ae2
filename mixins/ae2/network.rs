@@ -3,7 +3,7 @@
 // This grows alongside the complete port; CableBus parts and other services are
 // not approximated by these four currently implemented node kinds.
 
-use super::ae2_grid::{ChannelMode, ConnectionId, Direction, Graph, NodeId, NodeSpec};
+use super::ae2_grid::{ChannelMode, ConnectionId, Direction, Flags, Graph, NodeId, NodeSpec};
 use super::ae2_power::{EnergyNode, EnergyService, EnergySystem, ServiceId, Store};
 use std::collections::{BTreeMap, BTreeSet};
 pub type Pos = [i32; 3];
@@ -14,6 +14,7 @@ pub enum Kind {
     EnergyCell,
     DenseEnergyCell,
     CreativeEnergyCell,
+    Drive,
 }
 impl Kind {
     pub fn from_block(id: &str) -> Option<Self> {
@@ -22,6 +23,7 @@ impl Kind {
             "ae2:energy_cell" => Some(Self::EnergyCell),
             "ae2:dense_energy_cell" => Some(Self::DenseEnergyCell),
             "ae2:creative_energy_cell" => Some(Self::CreativeEnergyCell),
+            "ae2:drive" => Some(Self::Drive),
             _ => None,
         }
     }
@@ -31,6 +33,7 @@ impl Kind {
             Self::EnergyCell => "ae2:energy_cell",
             Self::DenseEnergyCell => "ae2:dense_energy_cell",
             Self::CreativeEnergyCell => "ae2:creative_energy_cell",
+            Self::Drive => "ae2:drive",
         }
     }
     pub fn capacity(self) -> f64 {
@@ -39,11 +42,12 @@ impl Kind {
             Self::EnergyCell => 200000.0,
             Self::DenseEnergyCell => 1600000.0,
             Self::CreativeEnergyCell => super::ae2_energy::MAX_MAXIMUM,
+            Self::Drive => 0.0,
         }
     }
     fn energy_node(self, amount: f64) -> EnergyNode {
         let store = match self {
-            Self::Charger => None,
+            Self::Charger | Self::Drive => None,
             Self::EnergyCell => Some(Store::finite(
                 amount.clamp(0.0, self.capacity()),
                 self.capacity(),
@@ -57,7 +61,7 @@ impl Kind {
             Self::CreativeEnergyCell => Some(Store::creative()),
         };
         EnergyNode {
-            idle: 0.0,
+            idle: if self == Self::Drive { 2.0 } else { 0.0 },
             store,
             passive_rate: None,
         }
@@ -73,7 +77,7 @@ pub struct Snapshot {
 }
 impl Snapshot {
     fn exposes(self, direction: Direction) -> bool {
-        self.kind != Kind::Charger || self.front != direction
+        !matches!(self.kind, Kind::Charger | Kind::Drive) || self.front != direction
     }
 }
 #[derive(Clone, Copy, Debug)]
@@ -151,7 +155,14 @@ impl Network {
                     node.snapshot = snapshot;
                 }
                 None => {
-                    let id = self.graph.add_node(NodeSpec::default());
+                    let id = self.graph.add_node(NodeSpec {
+                        flags: if snapshot.kind == Kind::Drive {
+                            Flags::REQUIRE_CHANNEL
+                        } else {
+                            Flags::default()
+                        },
+                        ..Default::default()
+                    });
                     self.nodes.insert(
                         pos,
                         Node {
@@ -340,6 +351,25 @@ impl Network {
             .and_then(|s| self.energy.service(s))
             .is_some_and(EnergyService::is_powered)
     }
+    pub fn node_service(&self, pos: Pos) -> Option<(ServiceId, NodeId)> {
+        let node = self.nodes.get(&pos)?;
+        Some((node.service?, node.id))
+    }
+    pub fn set_idle(&mut self, pos: Pos, idle: f64) -> Result<(), &'static str> {
+        let (service, node) = self.node_service(pos).ok_or("unknown network node")?;
+        self.energy
+            .service_mut(service)
+            .unwrap()
+            .set_idle(node, idle)
+    }
+    pub fn is_online(&self, pos: Pos) -> bool {
+        self.is_powered(pos)
+            && self
+                .nodes
+                .get(&pos)
+                .and_then(|n| self.graph.node(n.id))
+                .is_some_and(|n| n.meets_channel_requirements())
+    }
 }
 
 #[cfg(test)]
@@ -433,5 +463,39 @@ mod tests {
         assert_eq!(n.extract(a.pos, 1e6, 1.0, true), 1e6);
         n.sync(vec![snapshot(a.pos, Kind::EnergyCell, 10.0)]);
         assert_eq!(n.extract(a.pos, 100.0, 1.0, true), 10.0);
+    }
+    #[test]
+    fn drives_consume_real_idle_energy_and_require_channels() {
+        let mut n = Network::default();
+        let a = snapshot([0, 0, 0], Kind::Drive, 0.0);
+        let source = snapshot([0, 0, 1], Kind::EnergyCell, 1000.0);
+        n.sync(vec![a, source]);
+        n.set_idle(a.pos, 2.5).unwrap();
+        for _ in 0..40 {
+            n.begin_tick();
+            n.end_tick();
+        }
+        assert!(n.is_online(a.pos));
+        // One ad-hoc channel across two nodes costs another 2/128 AE/tick.
+        assert_eq!(
+            n.extract(a.pos, 1000.0, 1.0, false),
+            1000.0 - 40.0 * (2.5 + 2.0 / 128.0)
+        );
+        let mut drives = vec![snapshot([0, 0, 1], Kind::CreativeEnergyCell, 0.0)];
+        for x in 0..9 {
+            drives.push(snapshot([x, 0, 0], Kind::Drive, 0.0));
+        }
+        n.sync(drives.clone());
+        for _ in 0..40 {
+            n.begin_tick();
+            n.end_tick();
+        }
+        assert!(n.is_powered(a.pos));
+        assert!(!n.is_online(a.pos));
+        drives.pop();
+        n.sync(drives);
+        n.begin_tick();
+        n.end_tick();
+        assert!(n.is_online(a.pos));
     }
 }

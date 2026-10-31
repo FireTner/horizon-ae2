@@ -16,7 +16,8 @@ MARKER = ".horizon-ae2-generated.json"
 FACINGS = {"down": (0, -1, 0), "up": (0, 1, 0), "north": (0, 0, -1),
            "south": (0, 0, 1), "west": (-1, 0, 0), "east": (1, 0, 0)}
 CRAFTING = ["network/blocks/crystal_processing_charger.json", "network/blocks/crank.json",
-            "network/blocks/energy_energy_cell.json", "network/blocks/energy_dense_energy_cell.json"]
+            "network/blocks/energy_energy_cell.json", "network/blocks/energy_dense_energy_cell.json",
+            "network/blocks/storage_drive.json"]
 
 
 def write_json(path, data):
@@ -63,7 +64,7 @@ def fit(content, jar):
     states = content / "assets/ae2/blockstates"
     # A dispenser supplies six-facing placement and a block entity. Its menu
     # and inventory are intercepted; template redstone remains a parity gap.
-    for name in ["charger", "crank"]:
+    for name in ["charger", "crank", "drive"]:
         write_json(blocks / f"{name}.json", {
             "template": "minecraft:dispenser",
             "properties": {"light": 0, "hardness": 2.2},
@@ -78,14 +79,20 @@ def fit(content, jar):
             # draw/sync adapter will select fullness; this stage uses level 0.
             write_json(states / f"{name}.json", {"variants": {"": {"model": f"ae2:block/{name}_0"}}})
 
-    original = json.loads((states / "charger.json").read_text())
-    variants = {}
-    for face in FACINGS:
-        selected = original.get("variants", {}).get(f"facing={face},spin=0")
-        if selected is None:
-            raise ValueError(f"charger model missing facing={face},spin=0")
-        variants[f"facing={face}"] = selected
-    write_json(states / "charger.json", {"variants": variants})
+    for name in ["charger", "drive"]:
+        original = json.loads((states / f"{name}.json").read_text())
+        variants = {}
+        for face in FACINGS:
+            selected = original.get("variants", {}).get(f"facing={face},spin=0")
+            if selected is None:
+                raise ValueError(f"{name} model missing facing={face},spin=0")
+            if name == "drive":
+                # Upstream's generated drive.json is empty: DriveBakedModel
+                # composes the base, cell chassis and LEDs at runtime. Carry
+                # the actual base housing now; dynamic cells/LEDs remain open.
+                selected = {**selected, "model": "ae2:block/drive/drive_base"}
+            variants[f"facing={face}"] = selected
+        write_json(states / f"{name}.json", {"variants": variants})
     # CrankBlockEntityRenderer uses a separate handle model. Static preview only
     # for this milestone; the exact animation needs render/sync work.
 

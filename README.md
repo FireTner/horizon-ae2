@@ -19,7 +19,8 @@
   симуляция, извлечение, точные/fuzzy фильтры, inverter/equal distribution/void.
   Добавлены компонентные item/fluid keys, GenericStack, signed KeyCounter и
   native codec исходных компонентов ячеек. Tooltip использует реальные значения,
-  локализацию и цвета оригинала. **Drive и терминал ещё не подключены.**
+  локализацию и цвета оригинала. **Drive backend подключён; меню Drive и
+  терминал ещё не перенесены.**
 - `StoredEnergyAmount`, EnergyService и per-node buffer: приоритеты хранилищ,
   симуляция, события, power delay, overlay/passive rules. В мире подключены
   обычная/плотная/творческая energy cell и Charger. CableBus/QuartzFiber parts
@@ -32,14 +33,17 @@
 - Ядро ME-графа: топология, controller validation, ad-hoc, три очереди
   pathfinding, bottlenecks, multiblock и compressed channels. На **2000 схемах**
   значения всех узлов/соединений совпали с исполняемым оригинальным Java-кодом
-  при одинаковом порядке входных узлов/связей. World/power adapter пока подключает четыре типа full blocks; CableBus,
+  при одинаковом порядке входных узлов/связей. World/power adapter пока подключает пять типов full blocks; CableBus,
   controllers и channel consumers в мире ещё не подключены.
 - Ядро `NetworkStorage`: приоритеты, два прохода вставки, очереди mount/unmount
   и защита от рекурсии; 2000 сценариев / 410882 операции совпали с Java.
-  К Drive и терминалам в мире этот слой пока не подключён.
+  StorageService подключает десять дисков Drive, priority/online mounts,
+  ленивый кэш и подписки; диски сохраняются в исходном `inv.itemN`. В игре
+  проверены точный расход энергии, item/fluid cells и restart. GUI Drive,
+  его динамический рендер и терминалы ещё не перенесены.
 - Подготовка контента, source-only `.hnmod`, закреплённые исходники и
   проверяемый реестр **всех 1429 Java-файлов** оригинала. В реестре нет
-  полностью закрытых классов; 40 отмечены как частично перенесённые.
+  полностью закрытых классов; 46 отмечены как частично перенесённые.
 
 Полный объём и последовательность работ: [docs/PLAN.md](docs/PLAN.md).
 Текущие отличия: [docs/PARITY.md](docs/PARITY.md).
@@ -94,6 +98,8 @@ python3.12 tools/smoke.py --ctl /path/to/horizon-ctl \
   --resources /path/to/prepared/26.3
 python3.12 tools/smoke_power.py --ctl /path/to/horizon-ctl \
   --resources /path/to/prepared/26.3
+python3.12 tools/smoke_drive.py --ctl /path/to/horizon-ctl \
+  --resources /path/to/prepared/26.3
 ```
 
 `target/ae2-0.1.0.hnmod` содержит исходники native-мода и лицензии, без
@@ -112,6 +118,9 @@ mixins/ae2/     правила, Horizon-адаптер, manifest и малень
   grid.rs      ME topology/pathing
   power.rs     EnergyService / per-node buffer / overlay rules
   mounts.rs    NetworkStorage priorities, queues и recursion guard
+  service.rs   StorageService providers/cache/watchers
+  drive.rs     ten-cell provider, idle drain, status
+  drive_glue.rs native Drive slots, mounts, original inv persistence
   network.rs   full-block connections, split/merge и перенос энергии
   grid_glue.rs server level hooks, NBT и per-dimension state
 src/lib.rs     те же правила как тестируемая библиотека

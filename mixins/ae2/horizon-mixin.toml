@@ -7,6 +7,30 @@ priority = 100
 horizon_revision = "aa27eca326db26e999d4e59d7899576016764b1e"
 
 [[module]]
+id = "mounts"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_mounts"
+source = "mounts.rs"
+
+[[module]]
+id = "service"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_service"
+source = "service.rs"
+
+[[module]]
+id = "drive"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_drive"
+source = "drive.rs"
+
+[[module]]
+id = "drive_glue"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_drive_glue"
+source = "drive_glue.rs"
+
+[[module]]
 id = "keys"
 file = "crates/horizon-client/src/game.rs"
 name = "ae2_keys"
@@ -154,3 +178,13 @@ id = "world-phase"
 kind = "HEAD"
 target = "horizon_client::game::native_hooks::Game<'_>::native_world_lifecycle"
 helper = "world_phase.rs"
+
+[[injection]]
+id = "drive-before-destroy"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_destroy_block"
+helper = "destroy_block.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "pos", ty = "[i32; 3]", value = "pos" },
+]

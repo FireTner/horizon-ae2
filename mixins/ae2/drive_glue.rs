@@ -1,0 +1,476 @@
+// SPDX-License-Identifier: LGPL-3.0-or-later
+// Loaded Drive nodes, basic-cell mounts and original inv.itemN persistence.
+// The adapter also mirrors item slots into Horizon's Items transport. There is
+// one authoritative cell per slot, never a second inventory of stored contents.
+
+use super::{
+    Game, ae2_cells as codec,
+    ae2_drive::{Drive, DriveCell, SLOTS},
+    ae2_keys::Key,
+    ae2_network::{Kind, Network, Pos},
+    ae2_service::StorageService,
+};
+use horizon_client::{
+    containers::BlockEntity,
+    items::ItemStack,
+    save::{item_from_nbt, item_to_nbt},
+};
+use horizon_world::nbt::{Compound, JavaString, Tag};
+use std::collections::{BTreeMap, BTreeSet};
+use std::sync::{Arc, Mutex};
+
+#[derive(Clone, Debug, Default)]
+pub struct Source {
+    pub player: Option<u128>,
+    pub machine_node: Option<u64>,
+}
+type Service = StorageService<Key, Source>;
+struct Host {
+    drive: Arc<Mutex<Drive<Key>>>,
+    items: Vec<Option<ItemStack>>,
+    inv: Option<Tag>,
+    observed: bool,
+    blocked: bool,
+    refresh: bool,
+    registration: Option<(u64, u64)>,
+}
+impl Default for Host {
+    fn default() -> Self {
+        Self {
+            drive: Arc::new(Mutex::new(Drive::default())),
+            items: vec![None; SLOTS],
+            inv: None,
+            observed: false,
+            blocked: false,
+            refresh: true,
+            registration: None,
+        }
+    }
+}
+
+fn decode_inv(tag: &Tag) -> Result<Vec<Option<ItemStack>>, &'static str> {
+    let Tag::Compound(map) = tag else {
+        return Err("Drive inv is not a compound");
+    };
+    (0..SLOTS)
+        .map(
+            |slot| match map.get(&JavaString::from(format!("item{slot}").as_str())) {
+                None => Ok(None),
+                Some(Tag::Compound(map)) if map.is_empty() => Ok(None),
+                Some(tag) => {
+                    let stack = item_from_nbt(tag).ok_or("invalid Drive item stack")?;
+                    if stack.count != 1 {
+                        return Err("Drive cell slot count must be one");
+                    }
+                    Ok(Some(stack))
+                }
+            },
+        )
+        .collect()
+}
+fn encode_inv(items: &[Option<ItemStack>], previous: Option<&Tag>) -> Tag {
+    let mut map = match previous {
+        Some(Tag::Compound(map)) => map.clone(),
+        _ => Compound::new(),
+    };
+    for slot in 0..SLOTS {
+        map.insert(
+            JavaString::from(format!("item{slot}").as_str()),
+            items
+                .get(slot)
+                .and_then(Option::as_ref)
+                .map_or_else(|| Tag::Compound(Compound::new()), item_to_nbt),
+        );
+    }
+    Tag::Compound(map)
+}
+
+#[derive(Default)]
+pub(super) struct Drives {
+    hosts: BTreeMap<Pos, Host>,
+    services: BTreeMap<u64, Service>,
+}
+impl Drives {
+    /// Observe commands/slot changes before topology reconciliation. Unchanged
+    /// slot echoes must never overwrite a cell modified during the level tick.
+    pub(super) fn read(&mut self, game: &mut Game<'_>) {
+        let rows: Vec<_> = game
+            .world
+            .block_entities
+            .iter()
+            .filter_map(|(&(x, y, z), entity)| {
+                let BlockEntity::Mod(be) = entity else {
+                    return None;
+                };
+                if be.id != Kind::Drive.block()
+                    || !game.world.loaded(x, z)
+                    || game.native_block([x, y, z]) != Kind::Drive.block()
+                {
+                    return None;
+                }
+                let mut items = be.items.iter().take(SLOTS).cloned().collect::<Vec<_>>();
+                items.resize(SLOTS, None);
+                let priority = match be.nbt.get(&JavaString::from("priority")) {
+                    Some(Tag::Int(p)) => *p,
+                    _ => 0,
+                };
+                Some((
+                    [x, y, z],
+                    items,
+                    be.nbt.get(&JavaString::from("inv")).cloned(),
+                    priority,
+                ))
+            })
+            .collect();
+        let present: BTreeSet<_> = rows.iter().map(|row| row.0).collect();
+        let gone: Vec<_> = self
+            .hosts
+            .keys()
+            .filter(|p| !present.contains(*p))
+            .copied()
+            .collect();
+        for pos in gone {
+            let host = self.hosts.remove(&pos).unwrap();
+            if let Some((service, node)) = host.registration
+                && let Some(service) = self.services.get_mut(&service)
+            {
+                service.remove_node(node);
+            }
+        }
+        for (pos, source_items, inv, priority) in rows {
+            let host = self.hosts.entry(pos).or_default();
+            let mut drive = host.drive.lock().unwrap();
+            if drive.priority != priority {
+                drive.priority = priority;
+                host.refresh = true;
+            }
+            if !host.observed || host.items != source_items || host.inv != inv {
+                let source_echo = source_items.clone();
+                let chosen = if (!host.observed || host.inv != inv) && inv.is_some() {
+                    decode_inv(inv.as_ref().unwrap())
+                } else {
+                    Ok(source_items)
+                };
+                match chosen {
+                    Ok(items) => {
+                        for slot in 0..SLOTS {
+                            if !host.observed || host.blocked || host.items[slot] != items[slot] {
+                                drive.slots[slot] = items[slot]
+                                    .as_ref()
+                                    .and_then(|stack| {
+                                        codec::load_cell(stack, &|kind, id| {
+                                            codec::resolve_key(game.items(), kind, id)
+                                        })
+                                        .ok()
+                                    })
+                                    .map(|cell| Arc::new(Mutex::new(DriveCell::new(cell))));
+                                host.refresh = true;
+                            }
+                        }
+                        if let Some(BlockEntity::Mod(be)) =
+                            game.world.block_entities.get_mut(&(pos[0], pos[1], pos[2]))
+                        {
+                            be.items.resize(be.items.len().max(SLOTS), None);
+                            if be.items[..SLOTS] != items {
+                                be.items[..SLOTS].clone_from_slice(&items);
+                                game.world.modified.insert((pos[0] >> 4, pos[2] >> 4));
+                            }
+                        }
+                        host.items = items;
+                        host.blocked = false;
+                    }
+                    Err(error) => {
+                        // Preserve the rejected original NBT, unmount it and
+                        // wait for an explicit valid update. Never truncate it.
+                        eprintln!("AE2 Drive {pos:?}: {error}");
+                        drive.slots = std::array::from_fn(|_| None);
+                        host.blocked = true;
+                        host.refresh = true;
+                        host.items = source_echo;
+                    }
+                }
+                host.inv = inv;
+                host.observed = true;
+            }
+        }
+    }
+    pub(super) fn reconcile(&mut self, network: &mut Network) {
+        for (pos, host) in &mut self.hosts {
+            let registration = network.node_service(*pos);
+            if host.registration != registration {
+                if let Some((service, node)) = host.registration
+                    && let Some(service) = self.services.get_mut(&service)
+                {
+                    service.remove_node(node);
+                }
+                host.registration = None;
+                host.refresh = true;
+            }
+            let mut drive = host.drive.lock().unwrap();
+            let online = !host.blocked && network.is_online(*pos);
+            if drive.online != online {
+                drive.online = online;
+                host.refresh = true;
+            }
+            let idle = drive.idle_drain();
+            drop(drive);
+            if registration.is_some() {
+                network.set_idle(*pos, idle).expect("loaded Drive node");
+            }
+            if let Some((service, node)) = registration {
+                let storage = self.services.entry(service).or_default();
+                if host.registration.is_none() {
+                    storage
+                        .add_node(node, host.drive.clone())
+                        .expect("unique Drive registration");
+                    host.registration = registration;
+                    host.refresh = false;
+                } else if host.refresh {
+                    storage
+                        .refresh_node(node)
+                        .expect("registered Drive provider");
+                    host.refresh = false;
+                }
+            }
+        }
+        let used: BTreeSet<_> = self
+            .hosts
+            .values()
+            .filter_map(|h| h.registration.map(|r| r.0))
+            .collect();
+        self.services.retain(|id, _| used.contains(id));
+    }
+    pub(super) fn end_tick(&mut self) {
+        for service in self.services.values_mut() {
+            service.end_tick(&mut |_, _, _, _| {});
+        }
+    }
+    pub(super) fn persist(&mut self, game: &mut Game<'_>) {
+        for (pos, host) in &mut self.hosts {
+            if host.blocked {
+                continue;
+            }
+            let mut items = host.items.clone();
+            let drive = host.drive.lock().unwrap();
+            let mut failed = false;
+            for (slot, cell) in drive.slots.iter().enumerate() {
+                if let Some(cell) = cell {
+                    let cell = cell.lock().unwrap();
+                    if cell.dirty
+                        && let Some(stack) = items[slot].as_mut()
+                    {
+                        if codec::persist_cell(stack, &cell.cell).is_err() {
+                            failed = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if failed {
+                continue;
+            }
+            let inv = encode_inv(&items, host.inv.as_ref());
+            let packed = drive.packed_state();
+            if let Some(BlockEntity::Mod(be)) =
+                game.world.block_entities.get_mut(&(pos[0], pos[1], pos[2]))
+            {
+                if be.id != Kind::Drive.block() {
+                    continue;
+                }
+                let changed = be.items.get(..SLOTS) != Some(&items[..])
+                    || be.nbt.get(&JavaString::from("inv")) != Some(&inv);
+                be.items.resize(be.items.len().max(SLOTS), None);
+                be.items[..SLOTS].clone_from_slice(&items);
+                be.nbt.insert(JavaString::from("inv"), inv.clone());
+                // Two ContainerData words transport the original packed u32.
+                be.data = vec![(packed & 0xffff) as i32, (packed >> 16) as i32];
+                if changed {
+                    game.world.modified.insert((pos[0] >> 4, pos[2] >> 4));
+                }
+                // Clear dirty bits only after every slot encoded and the
+                // complete inventory reached the still-existing block entity.
+                for cell in drive.slots.iter().flatten() {
+                    cell.lock().unwrap().dirty = false;
+                }
+            } else {
+                continue;
+            }
+            host.items = items;
+            host.inv = Some(inv);
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::super::{
+        ae2_grid::Direction,
+        ae2_keys::{KeyProperties, KeyType},
+        ae2_network::Snapshot,
+        ae2_storage::{Cell, Tier},
+    };
+    use super::*;
+    fn node(pos: Pos, kind: Kind) -> Snapshot {
+        Snapshot {
+            pos,
+            kind,
+            front: Direction::North,
+            stored: 0.0,
+            saved_buffer: 0.0,
+        }
+    }
+    fn setup_host(drives: &mut Drives, pos: Pos, amount: u64) -> Arc<Mutex<DriveCell<Key>>> {
+        let mut cell = Cell::new(Tier::K1, KeyType::Item);
+        cell.insert(
+            Key::new(
+                KeyType::Item,
+                "minecraft:iron_ingot".into(),
+                vec![],
+                KeyProperties::default(),
+            )
+            .unwrap(),
+            amount,
+            true,
+        );
+        let cell = Arc::new(Mutex::new(DriveCell::new(cell)));
+        let host = Host::default();
+        host.drive.lock().unwrap().slots[0] = Some(cell.clone());
+        drives.hosts.insert(pos, host);
+        cell
+    }
+    fn run(network: &mut Network, drives: &mut Drives) {
+        drives.reconcile(network);
+        network.begin_tick();
+        network.end_tick();
+        drives.reconcile(network);
+    }
+    fn iron() -> Key {
+        Key::new(
+            KeyType::Item,
+            "minecraft:iron_ingot".into(),
+            vec![],
+            KeyProperties::default(),
+        )
+        .unwrap()
+    }
+    #[test]
+    fn native_drive_binding_unmounts_on_power_loss_and_remounts_same_cell() {
+        let mut drives = Drives::default();
+        let mut network = Network::default();
+        let pos = [0, 0, 0];
+        let cell = setup_host(&mut drives, pos, 64);
+        let drive = node(pos, Kind::Drive);
+        let source = node([0, 0, 1], Kind::CreativeEnergyCell);
+        network.sync(vec![drive, source]);
+        run(&mut network, &mut drives);
+        let registration = network.node_service(pos).unwrap();
+        let inventory = drives.services[&registration.0].inventory().clone();
+        assert_eq!(
+            inventory.extract(&iron(), 64, false, &Source::default()),
+            64
+        );
+        network.sync(vec![drive]);
+        run(&mut network, &mut drives);
+        assert_eq!(inventory.extract(&iron(), 64, true, &Source::default()), 0);
+        assert_eq!(cell.lock().unwrap().cell.stored_count(), 64);
+        network.sync(vec![drive, source]);
+        for _ in 0..40 {
+            run(&mut network, &mut drives);
+        }
+        let id = network.node_service(pos).unwrap().0;
+        assert_eq!(
+            drives.services[&id]
+                .inventory()
+                .extract(&iron(), 64, true, &Source::default()),
+            64
+        );
+        assert!(cell.lock().unwrap().dirty);
+    }
+    #[test]
+    fn native_drive_mounts_follow_grid_merge_split_without_copying_contents() {
+        let mut drives = Drives::default();
+        let mut network = Network::default();
+        let a = [0, 0, 0];
+        let b = [2, 0, 0];
+        let ca = setup_host(&mut drives, a, 64);
+        let cb = setup_host(&mut drives, b, 50);
+        let nodes = vec![
+            node(a, Kind::Drive),
+            node(b, Kind::Drive),
+            node([0, 0, 1], Kind::CreativeEnergyCell),
+            node([2, 0, 1], Kind::CreativeEnergyCell),
+        ];
+        network.sync(nodes.clone());
+        run(&mut network, &mut drives);
+        let ida = network.node_service(a).unwrap().0;
+        let idb = network.node_service(b).unwrap().0;
+        assert_ne!(ida, idb);
+        let olda = drives.services[&ida].inventory().clone();
+        let oldb = drives.services[&idb].inventory().clone();
+        let mut merged = nodes.clone();
+        merged.push(node([1, 0, 0], Kind::EnergyCell));
+        network.sync(merged);
+        run(&mut network, &mut drives);
+        let id = network.node_service(a).unwrap().0;
+        assert_eq!(id, network.node_service(b).unwrap().0);
+        assert_eq!(
+            drives.services[&id]
+                .inventory()
+                .extract(&iron(), 200, false, &Source::default()),
+            114
+        );
+        // Only the retained service still owns the mounts; the discarded one
+        // must be empty even when an external capability keeps its handle.
+        let discarded = if id == ida { oldb } else { olda };
+        assert_eq!(discarded.extract(&iron(), 200, true, &Source::default()), 0);
+        network.sync(nodes);
+        for _ in 0..40 {
+            run(&mut network, &mut drives);
+        }
+        let ida = network.node_service(a).unwrap().0;
+        let idb = network.node_service(b).unwrap().0;
+        assert_ne!(ida, idb);
+        assert_eq!(
+            drives.services[&ida]
+                .inventory()
+                .extract(&iron(), 200, true, &Source::default()),
+            64
+        );
+        assert_eq!(
+            drives.services[&idb]
+                .inventory()
+                .extract(&iron(), 200, true, &Source::default()),
+            50
+        );
+        assert_eq!(
+            ca.lock().unwrap().cell.stored_count() + cb.lock().unwrap().cell.stored_count(),
+            0
+        );
+    }
+    #[test]
+    fn original_inv_item_slots_roundtrip_and_preserve_components() {
+        let mut items = vec![None; SLOTS];
+        let mut stack = ItemStack::new("ae2:item_storage_cell_1k", 1);
+        stack
+            .data_mut()
+            .set_other("ae2:upgrades", Some(Tag::List(vec![])));
+        items[9] = Some(stack);
+        let inv = encode_inv(&items, None);
+        assert_eq!(decode_inv(&inv).unwrap(), items);
+        assert!(matches!(inv.get("item0"), Some(Tag::Compound(c)) if c.is_empty()));
+        assert!(inv.get("item9").is_some());
+        assert!(inv.get("item10").is_none());
+    }
+    #[test]
+    fn malformed_drive_inventory_is_rejected_without_changing_the_original() {
+        let bad = Tag::compound([("item0", Tag::String(JavaString::from("broken")))]);
+        let saved = bad.clone();
+        assert!(decode_inv(&bad).is_err());
+        assert_eq!(bad, saved);
+        let bad_count = Tag::compound([(
+            "item0",
+            item_to_nbt(&ItemStack::new("ae2:item_storage_cell_1k", 2)),
+        )]);
+        assert!(decode_inv(&bad_count).is_err());
+    }
+}

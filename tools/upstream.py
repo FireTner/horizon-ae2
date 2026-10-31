@@ -67,6 +67,18 @@ PARTIAL.update({
     "blockentity/misc/ChargerBlockEntity.java": ("mixins/ae2/glue.rs", "recipe branch plus private buffer refilled from real ME EnergyService, at most 800 AE per doWork; tools/config/sync/filter/visuals pending"),
 })
 
+PARTIAL.update({
+    "me/service/StorageService.java": ("mixins/ae2/service.rs", "node/global providers, duplicate guards, refresh/unmount, lazy public cache with private baseline, synchronous watcher changes; no Java service oracle, debug dump or world watcher consumers"),
+    "me/helpers/InterestManager.java": ("mixins/ae2/service.rs", "key interests and watch-all collections through shared watcher handles; stable ID ordering instead of Java hashes"),
+    "me/helpers/StackWatcher.java": ("mixins/ae2/service.rs", "deduplicated interests, watch-all, reset and permanent destroy; native host callbacks and Java oracle pending"),
+    "blockentity/storage/DriveBlockEntity.java": ("mixins/ae2/drive_glue.rs", "ten basic cell slots, real network provider, priority, power/channel gating, exact idle costs, packed state, original inv persistence and restart; GUI, dynamic render, full lifecycle/capabilities and other cell types pending"),
+    "me/storage/DriveWatcher.java": ("mixins/ae2/drive.rs", "preferred existing stack, simulate/commit and status transitions/dirty tracking; immediate native visual callback delivery pending"),
+    "blockentity/AEBaseInvBlockEntity.java": ("mixins/ae2/drive_glue.rs", "Drive-only inv.itemN ItemStack load/save with Horizon Items transport mirror; full base-class inventory/drop/capability hooks pending"),
+    "me/cells/BasicCellInventory.java": ("mixins/ae2/storage.rs", "capacity, exact/fuzzy partitions, distribution/void, native persistence and Drive mounts; terminal and malformed/missing-content recovery pending"),
+    "me/storage/NetworkStorage.java": ("mixins/ae2/mounts.rs", "priority/preference/queues/recursion, 2000 Java traces; consumed by native StorageService/Drive; ME Chest, terminal and handler filters pending"),
+    "blockentity/grid/AENetworkedBlockEntity.java": ("mixins/ae2/grid_glue.rs", "Charger, three energy cells and Drive register by dimension, adjacency and proxy.e; full security/events/readiness/other block kinds pending"),
+})
+
 
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()

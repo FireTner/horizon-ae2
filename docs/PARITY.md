@@ -5,11 +5,13 @@
 
 | Подсистема | Написано | Что остаётся |
 |---|---|---|
-| BasicCellInventory | байты/типы/округление, пять размеров, items/fluids, exact/fuzzy partitions, distribution/void, simulate/modulate/extract; native загрузка и сохранение storage_cell_inv, проверка вложенных basic cells | Drive/mounts/терминал, полное восстановление malformed/missing content, другие типы storage cells |
+| BasicCellInventory | байты/типы/округление, пять размеров, items/fluids, exact/fuzzy partitions, distribution/void, simulate/modulate/extract; native codec, nested restrictions и Drive mounts | GUI Drive/терминал, полное восстановление malformed/missing content, другие типы storage cells |
 | AEKey / GenericStack / KeyCounter | компонентные ключи, typed NBT, signed long counts, fuzzyEquals и FuzzySearch, signed deficits/zero pruning | prototype normalization, wrapped items, packet codecs, missing-content placeholders, drop/display API |
-| ME topology/pathing | controller validation, BFS priorities, bottleneck ancestry, DFS counts, dense/normal/ad-hoc, P2P rules; 2000 Java differential cases; world adapter для четырёх full blocks | остальные block/part nodes, полная grid service identity/merge priorities, security/listeners/boot events |
+| ME topology/pathing | controller validation, BFS priorities, bottleneck ancestry, DFS counts, dense/normal/ad-hoc, P2P rules; 2000 Java differential cases; пять world full blocks, Drive require-channel | остальные block/part nodes, полная grid service identity/merge priorities, security/listeners/boot events |
 | StoredEnergyAmount / EnergyService | amount/capacity/simulation, storage events, приоритеты, per-node buffer, public power delay, averages/cache, overlay/passive rules; full-block world binding; 2000 Java traces | addon storage providers, полные watchers/event callbacks, QuartzFiber и passive-generator blocks, config integration, полные watcher/addon oracle scenarios |
-| NetworkStorage | mount priorities, preferred passes, mutation queues, recursion guard, weak links; 2000 Java traces/410882 операций | StorageService/provider lifecycle/cache/watchers, MEStorage handler filters, Drive/ME Chest/terminal world integration |
+| NetworkStorage | mount priorities, preferred passes, mutation queues, recursion guard, weak links; 2000 Java traces/410882 операций; native StorageService/Drive consumers | MEStorage handler filters, ME Chest/terminal и остальные providers |
+| StorageService | node/global provider identity, refresh/unmount, lazy public cache/private counts, key/watch-all changes и permanent watcher destroy | Java service oracle, world watcher hosts, full callback/hash iteration/exception fidelity, debug dump |
+| DriveBlockEntity / DriveWatcher | десять basic cells, реальные mounts по online/priority, REQUIRE_CHANNEL, 2 AE + disk drain, front exclusion, original inv.itemN + Horizon Items mirror, packed status; world restart | GUI/menu filters и automation, dynamic cell chassis/LEDs/sync, creative/other cells, all inventory/drop/chunk/capability paths |
 | EnergyCellBlockEntity | normal/dense/creative block entities, реальные сетевые хранилища, internalCurrentPower и proxy.e persistence | fullness drawing/sync, comparator, energy components у item/drop/placement, redstone/template side effects |
 | Charger recipes | таблица ae2:charger, local 1600 AE, threshold 1599, interval 10, random > 0.8, один предмет, сохранение энергии/слота; сеть пополняет private buffer до 800 AE/call | инструменты, config multiplier/rates, hopper фильтры, эффекты и рендер предмета |
 | Wooden Crank | rotation/hits/charge, 18 ticks/160 AE, busy window, 11 отказов ломают рукоятку, charger-side restriction | placement/survival, fake-player rule, статистика, анимация и sync |
@@ -29,11 +31,11 @@
   ещё не перенесена. Нельзя выдавать текущий отказ за полный fault-tolerant codec.
 - В native tooltip resolver сейчас знает предметы из Items и vanilla fluids
   water/lava; реестр custom fluids и native fluid capability ещё не подключены.
-- В мире сейчас подключены только Charger и три energy cell. CableBus,
-  controller, Drive/терминалы и остальные nodes ещё не подключены. Поэтому
-  channel pathing проверен core/oracle, но работающие каналы потребителей
-  в мире ещё не заявляются. Full blocks соединяются соседними открытыми гранями;
-  Charger исключает front. Grid service merge/split переносит per-node buffer,
+- В мире сейчас подключены Charger, три energy cell и Drive. CableBus,
+  controller, терминалы и остальные nodes ещё не подключены. Drive требует
+  канал; ад-hoc limit и отключение при нехватке канала проверены тестом binding.
+  Full blocks соединяются соседними открытыми гранями;
+  Charger и Drive исключают front. Grid service merge/split переносит per-node buffer,
   сохраняет сервис с pivot при разделении и более крупный при слиянии. Полные
   grid priorities, ties, listeners, ownership/readiness и event ordering pending.
 - Java oracle использует оригинальный PathingCalculation и извлечённые без
@@ -57,11 +59,25 @@
 - NetworkStorage отдельно сверён с неизменённым Java на 2000 traces/410882
   операций. Host inventories — bounded test bins, ключ один; это проверка
   mount/routing/queue правил, не persistence/cell bytes/provider lifecycle.
-  Сам слой пока не подключён к native world. Операции принимают opaque action
+  Слой подключён к native Drive через StorageService. Операции принимают opaque action
   source и передают его без изменений; native security ещё не реализована.
   Невалидные провайдеры, возвращающие больше запрошенного, отклоняются;
   пользовательские Java equals/exception behaviours не являются текущим
   native API контрактом. Для циклических links используются weak handles.
+- Drive пока не открывает меню: его реальные десять слотов можно проверять
+  через test control/исходный inv NBT. Unfiltered vanilla menu и hopper access
+  отключены до переноса slot filters/limits, всех кликов и sync. Housing —
+  исходный drive_base, runtime cell models/LED renderer ещё не подключены.
+- Native Drive отражает inv.item0..item9 в Horizon Items для сохранения/слотов;
+  это одни и те же ItemStacks, не два набора содержимого. Неизменённый echo
+  не перезагружает изменённый backend; malformed inv сохраняется и unmount-ится.
+  Это более строгий отказ, чем source recovery, и не доказательство всех ошибок
+  codecs. Перед player destroy добавлен flush; полные inventory extraction,
+  explosion/drop и chunk unload/save paths ещё нужно закрыть до терминалов.
+- StorageService пока не имеет Java oracle. Cache/watchers проверены Rust,
+  world Drive и native merge/split tests. Уведомления в core синхронные;
+  callbacks с мутацией живых Java iterator-коллекций и identity-hash порядок
+  пока не воспроизведены. Native world watcher consumers ещё не подключены.
 - Блоки world adapter опрашивают loaded block entities в pre/post hooks. Это
   сохраняет изменения NBT/блоков внутри тика, но полная source lifecycle/event
   модель и производительность больших сетей ещё не подтверждены. Неизменённый

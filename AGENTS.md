@@ -13,9 +13,10 @@ Rules live in mixins/ae2/*.rs and are exposed by src/lib.rs for standalone tests
 glue.rs owns Horizon types. Only modules actually consumed by the adapter belong
 in horizon-mixin.toml. keys.rs, storage.rs and cells.rs feed the native cell
 tooltip/codec adapter. energy.rs/grid.rs/power.rs feed network.rs and the
-grid_glue.rs world adapter (currently Charger + three energy-cell kinds).
-mounts.rs is the NetworkStorage rule layer, standalone/oracle only until the
-StorageService/Drive adapter consumes it; keep it out of the native manifest.
+grid_glue.rs world adapter (currently Charger + three energy-cell kinds + Drive).
+mounts.rs/service.rs/drive.rs are consumed by drive_glue.rs and belong in the
+native manifest. Drive currently has ten real cell slots/providers, original
+inv persistence and power/channel gating; GUI and filtered automation remain open.
 Injected payloads cannot use inner attributes/comments, external mod files or
 include!. Helpers are tiny, uniquely named ae2_* functions.
 

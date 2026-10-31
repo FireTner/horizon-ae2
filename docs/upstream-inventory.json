@@ -9,8 +9,8 @@
       "pending": 52
     },
     "blockentity": {
-      "partial": 7,
-      "pending": 43
+      "partial": 9,
+      "pending": 41
     },
     "client": {
       "partial": 0,
@@ -69,8 +69,8 @@
       "pending": 54
     },
     "me": {
-      "partial": 15,
-      "pending": 49
+      "partial": 19,
+      "pending": 45
     },
     "menu": {
       "partial": 0,
@@ -2107,8 +2107,10 @@
     {
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/AEBaseInvBlockEntity.java",
+      "port": "mixins/ae2/drive_glue.rs",
+      "scope": "Drive-only inv.itemN ItemStack load/save with Horizon Items transport mirror; full base-class inventory/drop/capability hooks pending",
       "sha256": "d2a9b5f480e3e1e5b70aef85433d170bdac74cb0edefc74319c2893a97160a1b",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "blockentity",
@@ -2174,7 +2176,7 @@
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/grid/AENetworkedBlockEntity.java",
       "port": "mixins/ae2/grid_glue.rs",
-      "scope": "four full-block kinds register by dimension, adjacency and proxy.e persistence; full node security/events/readiness/other block types pending",
+      "scope": "Charger, three energy cells and Drive register by dimension, adjacency and proxy.e; full security/events/readiness/other block kinds pending",
       "sha256": "5da677532dc14a66bd0d91cdab5556b167d2566ced48d28e925e2f3a1d4b6013",
       "status": "partial"
     },
@@ -2385,8 +2387,10 @@
     {
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/storage/DriveBlockEntity.java",
+      "port": "mixins/ae2/drive_glue.rs",
+      "scope": "ten basic cell slots, real network provider, priority, power/channel gating, exact idle costs, packed state, original inv persistence and restart; GUI, dynamic render, full lifecycle/capabilities and other cell types pending",
       "sha256": "1cd6e904a76eba014f8ba11d23a603815784b1e0c7558cc9c835bdf1ebcc0d27",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "blockentity",
@@ -6110,7 +6114,7 @@
       "family": "me",
       "path": "src/main/java/appeng/me/cells/BasicCellInventory.java",
       "port": "mixins/ae2/storage.rs",
-      "scope": "capacity, exact/fuzzy partitions, distribution/void, native contents persistence; no Drive/terminal mount or malformed recovery",
+      "scope": "capacity, exact/fuzzy partitions, distribution/void, native persistence and Drive mounts; terminal and malformed/missing-content recovery pending",
       "sha256": "86471cf7a482c96903192883d9f93dc71840ef0a052461c0ede95e7968bfaa3e",
       "status": "partial"
     },
@@ -6247,8 +6251,10 @@
     {
       "family": "me",
       "path": "src/main/java/appeng/me/helpers/InterestManager.java",
+      "port": "mixins/ae2/service.rs",
+      "scope": "key interests and watch-all collections through shared watcher handles; stable ID ordering instead of Java hashes",
       "sha256": "2acc4e1f0f01370350e19e54e42f6d08f40da5ebc63ab18923ee132d64ada1df",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "me",
@@ -6265,8 +6271,10 @@
     {
       "family": "me",
       "path": "src/main/java/appeng/me/helpers/StackWatcher.java",
+      "port": "mixins/ae2/service.rs",
+      "scope": "deduplicated interests, watch-all, reset and permanent destroy; native host callbacks and Java oracle pending",
       "sha256": "6e1b46b046d3f1d3609b42cac8f77bb9007da23cce71d9c0f4fcfc9bd1d97cff",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "me",
@@ -6363,8 +6371,10 @@
     {
       "family": "me",
       "path": "src/main/java/appeng/me/service/StorageService.java",
+      "port": "mixins/ae2/service.rs",
+      "scope": "node/global providers, duplicate guards, refresh/unmount, lazy public cache with private baseline, synchronous watcher changes; no Java service oracle, debug dump or world watcher consumers",
       "sha256": "32983f7e4a79973c02f8224bfe682d623b681675f76dbd5540c65bca6d8bd83f",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "me",
@@ -6411,8 +6421,10 @@
     {
       "family": "me",
       "path": "src/main/java/appeng/me/storage/DriveWatcher.java",
+      "port": "mixins/ae2/drive.rs",
+      "scope": "preferred existing stack, simulate/commit and status transitions/dirty tracking; immediate native visual callback delivery pending",
       "sha256": "09b5a74a229be07593728ef229bfbe919bd25e93fcac4666ab7a5053f4d6f956",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "me",
@@ -6448,7 +6460,7 @@
       "family": "me",
       "path": "src/main/java/appeng/me/storage/NetworkStorage.java",
       "port": "mixins/ae2/mounts.rs",
-      "scope": "mount priorities, two-pass preference, recursive guard, queued changes and deferred listing; 2000 original-Java differential traces; StorageService/provider lifecycle, Drive/terminal world integration pending",
+      "scope": "priority/preference/queues/recursion, 2000 Java traces; consumed by native StorageService/Drive; ME Chest, terminal and handler filters pending",
       "sha256": "53ad52bc6a4cc167d429672a53b27398ef40371426f7b2b36d2f35ec17c954b5",
       "status": "partial"
     },

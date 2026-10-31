@@ -26,6 +26,9 @@ class ContentTests(unittest.TestCase):
         content.write_json(carried / "assets/ae2/blockstates/charger.json", {
             "variants": {f"facing={face},spin=0": {"model": "ae2:block/charger"} for face in content.FACINGS}
         })
+        content.write_json(carried / "assets/ae2/blockstates/drive.json", {
+            "variants": {f"facing={face},spin=0": {"model": "ae2:block/drive"} for face in content.FACINGS}
+        })
         content.write_json(carried / "data/ae2/recipe/charger/a.json", {
             "type": "ae2:charger", "ingredient": {"item": "ae2:certus_quartz_crystal"},
             "result": {"id": "ae2:charged_certus_quartz_crystal"}
@@ -67,11 +70,14 @@ class ContentTests(unittest.TestCase):
     def test_native_hosts_have_block_entities_and_valid_six_facing_models(self):
         carried, jar = self.fixture()
         content.fit(carried, jar)
-        for name in ["charger", "crank", "energy_cell", "dense_energy_cell", "creative_energy_cell"]:
+        for name in ["charger", "crank", "drive", "energy_cell", "dense_energy_cell", "creative_energy_cell"]:
             block = json.loads((carried / f"data/ae2/horizon/block/{name}.json").read_text())
             self.assertEqual(block["template"], "minecraft:dispenser")
         states = json.loads((carried / "assets/ae2/blockstates/charger.json").read_text())
         self.assertEqual(set(states["variants"]), {f"facing={face}" for face in content.FACINGS})
+        drive = json.loads((carried / "assets/ae2/blockstates/drive.json").read_text())
+        self.assertEqual(set(drive["variants"]), {f"facing={face}" for face in content.FACINGS})
+        self.assertTrue(all(v["model"] == "ae2:block/drive/drive_base" for v in drive["variants"].values()))
 
     def test_wrong_jar_is_rejected_without_touching_output(self):
         carried, jar = self.fixture()

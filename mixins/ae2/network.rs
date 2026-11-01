@@ -345,6 +345,31 @@ impl Network {
     pub fn begin_tick(&mut self) {
         self.energy.begin_tick();
     }
+    /// A real placement created a new block entity, even if its position,
+    /// kind and saved amounts happen to equal the old one's last snapshot.
+    pub fn forget_node(&mut self, pos: Pos) {
+        if self.nodes.contains_key(&pos) {
+            let remaining = self
+                .nodes
+                .values()
+                .filter(|node| node.snapshot.pos != pos)
+                .map(|node| node.snapshot)
+                .collect();
+            self.sync(remaining);
+        }
+    }
+    /// Read live storage only if the BE still echoes this node's last saved
+    /// amount. A newer external /data replacement must not be overwritten.
+    pub fn storage_for_snapshot(&self, pos: Pos, kind: Kind, saved: f64) -> Option<f64> {
+        let node = self.nodes.get(&pos)?;
+        if node.snapshot.kind != kind || node.snapshot.stored.to_bits() != saved.to_bits() {
+            return None;
+        }
+        self.energy
+            .service(node.service?)?
+            .store(node.id)
+            .map(Store::amount)
+    }
     pub fn extract(&mut self, pos: Pos, amount: f64, multiplier: f64, commit: bool) -> f64 {
         let Some(service) = self.nodes.get(&pos).and_then(|n| n.service) else {
             return 0.0;
@@ -413,6 +438,62 @@ impl Network {
 mod tests {
     use super::*;
 
+    #[test]
+    fn placement_after_same_tick_break_never_reuses_a_spent_node_with_identical_saved_nbt() {
+        let pos = [1, 2, 3];
+        let mut network = Network::default();
+        network.sync(vec![snapshot(pos, Kind::EnergyCell, 10000.0)]);
+        let old = network.node_service(pos).unwrap().1;
+        assert_eq!(network.extract(pos, 1600.0, 1.0, true), 1600.0);
+        assert!(
+            network
+                .storage_for_snapshot(pos, Kind::EnergyCell, 10000.0)
+                .unwrap()
+                < 10000.0
+        );
+        network.forget_node(pos);
+        network.sync(vec![snapshot(pos, Kind::EnergyCell, 10000.0)]);
+        assert_ne!(network.node_service(pos).unwrap().1, old);
+        assert_eq!(
+            network.storage_for_snapshot(pos, Kind::EnergyCell, 10000.0),
+            Some(10000.0)
+        );
+    }
+
+    #[test]
+    fn live_storage_export_sees_same_tick_extraction_but_never_overwrites_new_external_data() {
+        let mut network = Network::default();
+        network.sync(vec![snapshot([1, 2, 3], Kind::EnergyCell, 10000.0)]);
+        assert_eq!(
+            network.storage_for_snapshot([1, 2, 3], Kind::EnergyCell, 10000.0),
+            Some(10000.0)
+        );
+        assert_eq!(network.extract([1, 2, 3], 1600.0, 1.0, false), 1600.0);
+        assert_eq!(
+            network.storage_for_snapshot([1, 2, 3], Kind::EnergyCell, 10000.0),
+            Some(10000.0)
+        );
+        assert_eq!(network.extract([1, 2, 3], 1600.0, 1.0, true), 1600.0);
+        assert!(
+            network
+                .storage_for_snapshot([1, 2, 3], Kind::EnergyCell, 10000.0)
+                .unwrap()
+                < 10000.0
+        );
+        assert_eq!(
+            network.storage_for_snapshot([1, 2, 3], Kind::EnergyCell, 12000.0),
+            None
+        );
+        assert_eq!(
+            network.storage_for_snapshot([1, 2, 3], Kind::DenseEnergyCell, 10000.0),
+            None
+        );
+        network.sync(vec![]);
+        assert_eq!(
+            network.storage_for_snapshot([1, 2, 3], Kind::EnergyCell, 10000.0),
+            None
+        );
+    }
     #[test]
     fn finite_cell_initial_load_uses_set_stored_threshold_without_touching_controller() {
         for kind in [Kind::EnergyCell, Kind::DenseEnergyCell] {

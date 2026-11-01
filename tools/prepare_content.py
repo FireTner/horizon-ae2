@@ -133,6 +133,14 @@ def fit(content, jar, platform):
                            "requires_tool": False, "map_color": 0, "sounds": "minecraft:glass"},
         })
 
+    for name in ["energy_cell", "dense_energy_cell"]:
+        # Source item ratios are fifths, not the placed block's quarters.
+        write_json(content / f"assets/ae2/items/{name}.json", {"model": {
+            "type": "minecraft:select", "property": "minecraft:block_state", "block_state_property": "fullness",
+            "cases": [{"when": str(i), "model": {"type": "minecraft:model", "model": f"ae2:block/{name}_{i}"}} for i in range(5)],
+            "fallback": {"type": "minecraft:model", "model": f"ae2:block/{name}_0"},
+        }})
+
     for name in ["charger", "drive"]:
         original = json.loads((states / f"{name}.json").read_text())
         variants = {}

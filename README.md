@@ -15,6 +15,11 @@
 
 Что уже написано:
 
+- Предметы Energy/Dense Cell используют исходные fixed capacity/rates и threshold,
+  заряжаются в Charger; ёмкость и upgrades не подменяют их block profile. Item
+  models переключаются по исходным float fifths, без зелёного powered-item bar и
+  без изменения сохранённых компонентов. При установке/дропе переносится local
+  stored_energy; полные base settings/tooltip/capabilities и lifecycle ещё нужны.
 - Energy/Dense Cell используют исходные пять `fullness` states и модели,
   отдельную double-формулу компаратора по локальному запасу энергии и отложенные
   уведомления в ticking chunks. Creative Cell имеет одно состояние без analog

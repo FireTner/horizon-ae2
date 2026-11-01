@@ -3,6 +3,75 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
+## EnergyCellBlockItem power / models / placement / drop — 1 ноября 2026
+
+- **111 core / 156 native game / 14 native library / 7 native assets / 11 Python
+  PASS**; fmt/rustfmt, clippy -D warnings, source audits и native check/build PASS.
+  Native game: `target/energy-cell-item-native-identity-final.json`; library:
+  `target/energy-cell-item-native-library-final.json`; assets:
+  `target/energy-cell-item-native-assets-final.log`; check/build:
+  `target/energy-cell-item-native-identity-{check,build}.json`.
+  Core/tooling: `target/energy-cell-item-all-checks-final.log`.
+- Два finite block items используют исходные 200000/1600000 AE и 800/1600 rates,
+  WRITE charging, threshold 0.00001 вместо AEBasePoweredItem 0.0001; capacity
+  override/upgrades игнорируются, но сохраняются. Нет унаследованного зелёного
+  13-pixel bar. **100000 original Java power operations PASS**:
+  `docs/energy-cell-item-oracle.json`. Семь методов включены дословно, components
+  и block profile — stubs; AEBlocks constructors и InitItemModelsProperties
+  проверены отдельно. Прежний AEBasePoweredItem/bar oracle: **400000 operations
+  PASS**, `docs/energy-cell-item-base-regression.json`. Это не world oracle.
+- Item models используют source float current/max с thresholds .2/.4/.6/.8,
+  а не placed-block quarters/+0.01. Official Minecraft 1.21.1 client/mappings
+  повторно проверены SHA-1; просмотрен BakedOverride.test bytecode fcmpg/ifge:
+  NaN проходит predicates и выбирает последний model. Hashes в oracle report,
+  javap под `target/energy-cell-item-oracle/`. Render-only bridge сохраняет
+  NaN/±Infinity, которые обычный JSON renderer view терял. Сам ItemStack,
+  typed components, count/click hashes/packet/save не меняются. Actual resolver
+  test покрывает оба profiles/all five models, capacity override, чужие fields
+  и special numbers; native stack_view test проверяет отсутствие mutation.
+- EnergyCellBlockEntity import/exportSettings(DISMANTLE_ITEM): stored_energy
+  импортируется в реальной placement до shrink, с setStored threshold/cap.
+  В первый matching loot stack копируется только положительный local stored
+  energy, без proxy.e. Native Pending сохраняет matching/at-most-once policy.
+  Live storage snapshot guard перед player/Level resource drop видит уже
+  потраченную в этом тике энергию и не затирает external NBT replacement.
+  Реальная cell placement также сбрасывает старый node identity, даже если
+  position/kind/saved NBT совпали после same-tick removal; core test проверяет
+  новую node ID и отсутствие унаследованного расхода. General block/chunk/command
+  identity/event lifecycle остаётся открытым. Другие loot metadata сохраняются.
+- **World energy-cell-item-z5e22fr2 — 13 checks PASS**:
+  `docs/energy-cell-item-world-smoke.json`. Оба items: real Charger reaches fixed
+  maximum despite capacity=1/energy card, точный overflow/conservation и custom
+  component retention. Затем действительно заряженный item устанавливается и
+  добывается в survival. Zero/tiny/exact MIN/cap clamp, `/setblock air destroy`,
+  count-two placement/drop и десять render variants проверены. Native GUI
+  screenshot просмотрен. Renderer не добавляет block_state в реальные stacks;
+  все ten componentful items переживают restart точно. Отдельный charged dense
+  block после restart и добычи возвращает **333333 AE**.
+- **Charging item-charging-k25cy3dn PASS**, все прежние 16 profiles, local/grid/
+  overflow/conservation, front, Crank, components/restart/retrieval:
+  `docs/energy-cell-item-charging-regression.json`.
+  Content hmod build/check PASS, SHA-256
+  `32dd198615b5729de3975d631c99f55735f01a904ed9afe0151215821fae951c`.
+  `target/energy-cell-item-content-{build.log,check.json}`. No resource fallback.
+- Исправленные invocations: Arc<str>/LevelDimension API и Context без Default;
+  cancellable helper требует lexical return type StackView. Один shell job без
+  fail-fast продолжил проверку старой stage после отказа planner; этот run не
+  принят как доказательство текущего кода, финальная цепочка fail-fast прошла.
+  Первые world fixtures не подбирали spawned Charger item и ожидали pretty SNBT
+  вместо compact. После restart immediate tp+break отправлял mining до server
+  position update; focused run с barrier подтвердил exact drop, затем полная
+  matrix повторно прошла с wait и обязательным actual-air assertion.
+- **83 partial / 1346 pending / 0 complete**. Complete tooltip/base naming/
+  ownership/settings, external energy capabilities, все pick/loot-command/
+  unloaded/saved-BE/explosion paths и полный Java/NeoForge/multiplayer lifecycle
+  ещё открыты. Native finite block power malformed/nonfinite recovery отличается
+  от source; renderer-specific fix не объявляется решением всех numeric codecs.
+  Unused API warnings и rust-objcopy/libLLVM diagnostics сохранены; успешные
+  Cargo exits и actual game подтверждены отдельно. Свои клиенты закрыты;
+  player resources/saves, original engine/Create этой работой не менялись.
+  Goal активен, полного 1:1 ещё нет. No push/install/deployment.
+
 ## Energy Cell fullness / comparator — 1 ноября 2026
 
 - **108 core / 151 native game / 13 native library / 11 Python PASS**.

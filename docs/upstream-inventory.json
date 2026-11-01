@@ -5,8 +5,8 @@
       "pending": 252
     },
     "block": {
-      "partial": 6,
-      "pending": 48
+      "partial": 7,
+      "pending": 47
     },
     "blockentity": {
       "partial": 11,
@@ -17,8 +17,8 @@
       "pending": 216
     },
     "core": {
-      "partial": 2,
-      "pending": 67
+      "partial": 3,
+      "pending": 66
     },
     "crafting": {
       "partial": 0,
@@ -57,8 +57,8 @@
       "pending": 3
     },
     "init": {
-      "partial": 1,
-      "pending": 24
+      "partial": 2,
+      "pending": 23
     },
     "integration": {
       "partial": 0,
@@ -1805,8 +1805,8 @@
     {
       "family": "block",
       "path": "src/main/java/appeng/block/AEBaseEntityBlock.java",
-      "port": "mixins/ae2/inventory_signal_glue.rs",
-      "scope": "Drive/Charger analog output from actual ten/one source slots, excluding wire-menu padding; other block/entity APIs and hosts pending",
+      "port": "mixins/ae2/energy_cell_item.rs",
+      "scope": "Drive/Charger comparator and finite energy-cell placement/importSettings plus stored_energy on first matching block drop; general base names/ownership/settings, all loot contexts and other hosts pending",
       "sha256": "2ca9b85a1afbf6b4e834779e68e5ba90d8cdfdac1936dbe5a55ab1d952ef3285",
       "status": "partial"
     },
@@ -1997,8 +1997,10 @@
     {
       "family": "block",
       "path": "src/main/java/appeng/block/networking/EnergyCellBlockItem.java",
+      "port": "mixins/ae2/item_energy.rs",
+      "scope": "fixed block-derived capacities/rates, original inject/extract/simulate/overflow and 0.00001 component removal; native Charger adapter and render-only item predicate; complete tooltip/external capability and remaining base item APIs pending",
       "sha256": "c8d0364c079f5af422147a503e234b552e31599dd1ae1fc564977376c3c931fe",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "block",
@@ -2363,8 +2365,8 @@
     {
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/networking/EnergyCellBlockEntity.java",
-      "port": "mixins/ae2/energy_cell_glue.rs",
-      "scope": "public finite stores, original internalCurrentPower, four-step display and deferred comparator/fullness notifications in block-ticking chunks; pure visual/comparator Java oracle; original TickManager/event/readiness ordering, dismantle components and full lifecycle pending",
+      "port": "mixins/ae2/energy_cell_item.rs",
+      "scope": "finite storage/fullness/comparator plus stored-energy import/export for player placement, matching first loot stack, live same-tick power flush before player/Level resource drops; full TickManager/readiness/chunk/spatial/saved-BE/loot command/base settings lifecycle pending",
       "sha256": "0c8a815d87bce5b91b2392a670184164f11392c0e7aeadabc1954ae26d4c7f86",
       "status": "partial"
     },
@@ -3815,8 +3817,10 @@
     {
       "family": "core",
       "path": "src/main/java/appeng/core/definitions/AEBlocks.java",
+      "port": "mixins/ae2/item_energy.rs",
+      "scope": "normal/dense energy-cell fixed capacity/rate/priority and corresponding block-item power profiles; source-audited constructors, remaining block registration/settings API pending",
       "sha256": "350ecdb536e2a57f3380aae04639ab761d64467f573f134b069e0a0c898a5d58",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "core",
@@ -5079,8 +5083,10 @@
     {
       "family": "init",
       "path": "src/main/java/appeng/init/client/InitItemModelsProperties.java",
+      "port": "mixins/ae2/energy_cell_model.rs",
+      "scope": "energy-cell float current/max predicate with original .2/.4/.6/.8 model overrides, native render-only projection; color-applicator predicate and addon/item-property APIs pending",
       "sha256": "92b976ff36b38a0fd3d49680e62c445187d6055c57194d70ef2b82594ffd23b1",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "init",

@@ -174,6 +174,25 @@ pub(super) fn extract(
 pub(super) fn reset() {
     NETWORKS.lock().unwrap_or_else(|e| e.into_inner()).clear();
 }
+
+pub(super) fn cell_stored(dimension: &str, pos: [i32; 3], kind: Kind, saved: f64) -> Option<f64> {
+    NETWORKS
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .get(dimension)?
+        .network
+        .storage_for_snapshot(pos, kind, saved)
+}
+
+pub(super) fn cell_placed(dimension: &str, pos: [i32; 3]) {
+    if let Some(state) = NETWORKS
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .get_mut(dimension)
+    {
+        state.network.forget_node(pos);
+    }
+}
 pub(super) fn flush_drives(game: &mut Game<'_>) {
     if game.serving.is_none() && game.options.dedicated.is_none() {
         return;

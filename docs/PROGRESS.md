@@ -3,9 +3,23 @@
 Цель активна: полный перенос AE2 19.2.18 на Horizon, 1:1, без субагентов.
 Пользователь возобновил goal после контрольной точки ME Controller.
 Цель не уменьшена до текущего набора механик. Все 1429 исходных Java-файлов
-остаются в реестре; сейчас 80 partial, 1349 pending, полностью закрытых нет.
+остаются в реестре; сейчас 83 partial, 1346 pending, полностью закрытых нет.
 
 ## Последний результат
+
+- EnergyCellBlockItem: исходные fixed capacities/rates, отдельный 0.00001
+  threshold, inject/extract/simulate/overflow; Charger поддерживает ещё два
+  block items, игнорируя чужие capacity/upgrades. Item models — source float
+  fifths, без powered-item bar и persistent render projection; NaN/±Infinity
+  не теряются в JSON bridge. Player placement/first matching loot stack
+  переносят stored_energy без proxy.e; live snapshot guard сохраняет same-tick
+  расход и не затирает новую external NBT; actual placement создаёт новый node
+  identity даже при совпадении position/kind/saved value. 111 core / 156 native game / 14 native
+  library / 7 assets / 11 Python PASS; new Java 100000 operations и прежний
+  base-powered 400000 operations PASS. World energy-cell-item-z5e22fr2 —
+  13 checks PASS: оба Charger -> survival placement/drop, zero/tiny/cap clamp,
+  level destroy, count-two, десять моделей без mutation и exact restart/drop.
+  Tooltip/base settings/capabilities и все loot/unloaded/explosion paths остаются.
 
 - Energy/Dense Cell: исходные пять fullness states, original models и double
   comparator только по local stored power. Creative Cell — одно состояние без

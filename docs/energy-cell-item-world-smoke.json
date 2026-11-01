@@ -1,0 +1,109 @@
+{
+  "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/energy-cell-item-z5e22fr2",
+  "checks": [
+    {
+      "case": "ae2:energy_cell fixed capacity/overflow/conservation",
+      "total": 202590.0,
+      "maximum": 200000.0
+    },
+    "ae2:energy_cell Charger -> player placement -> survival drop preserves energy",
+    {
+      "case": "ae2:dense_energy_cell fixed capacity/overflow/conservation",
+      "total": 1602590.0,
+      "maximum": 1600000.0
+    },
+    "ae2:dense_energy_cell Charger -> player placement -> survival drop preserves energy",
+    {
+      "case": "player placement/drop ae2:energy_cell",
+      "input_energy": null,
+      "block_energy": 0.0,
+      "count": 1,
+      "returned": [
+        {
+          "count": 1,
+          "item": "ae2:energy_cell",
+          "slot": 0
+        }
+      ]
+    },
+    {
+      "case": "player placement/drop ae2:energy_cell",
+      "input_energy": 5e-07,
+      "block_energy": 0.0,
+      "count": 1,
+      "returned": [
+        {
+          "count": 1,
+          "item": "ae2:energy_cell",
+          "slot": 0
+        }
+      ]
+    },
+    {
+      "case": "player placement/drop ae2:energy_cell",
+      "input_energy": 1e-06,
+      "block_energy": 1e-06,
+      "count": 1,
+      "returned": [
+        {
+          "components": "{\"ae2:stored_energy\":1.0E-6d}",
+          "count": 1,
+          "item": "ae2:energy_cell",
+          "slot": 0
+        }
+      ]
+    },
+    {
+      "case": "player placement/drop ae2:energy_cell",
+      "input_energy": 200001.0,
+      "block_energy": 200000.0,
+      "count": 1,
+      "returned": [
+        {
+          "components": "{\"ae2:stored_energy\":200000.0d}",
+          "count": 1,
+          "item": "ae2:energy_cell",
+          "slot": 0
+        }
+      ]
+    },
+    {
+      "case": "destroy placement/drop ae2:dense_energy_cell",
+      "input_energy": 123456.0,
+      "block_energy": 123456.0,
+      "count": 1,
+      "returned": [
+        {
+          "components": "{\"ae2:stored_energy\":123456.0d}",
+          "count": 1,
+          "item": "ae2:dense_energy_cell",
+          "slot": 0
+        }
+      ]
+    },
+    {
+      "case": "player placement/drop ae2:energy_cell",
+      "input_energy": 1000.0,
+      "block_energy": 1000.0,
+      "count": 2,
+      "returned": [
+        {
+          "components": "{\"ae2:stored_energy\":1000.0d}",
+          "count": 2,
+          "item": "ae2:energy_cell",
+          "slot": 0
+        }
+      ]
+    },
+    "rendering all ten item models preserves original energy/capacity/custom components",
+    "placed charged dense cell survives restart and then drops its exact energy",
+    "all ten componentful energy-cell items survive process restart without render projection"
+  ],
+  "limits": [
+    "complete tooltip formatting/base naming/ownership settings",
+    "all explosion/unloaded/saved-BE/pick-block/loot-command paths",
+    "full Java/NeoForge lifecycle and external multiplayer",
+    "nonfinite/malformed native power component recovery"
+  ]
+}

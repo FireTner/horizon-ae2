@@ -7,6 +7,87 @@ priority = 100
 horizon_revision = "aa27eca326db26e999d4e59d7899576016764b1e"
 
 [[module]]
+id = "energy-cell-render-numbers"
+file = "crates/horizon-client/src/item_render.rs"
+name = "ae2_energy_cell_render_bridge"
+source = "energy_cell_render_bridge.rs"
+
+[[injection]]
+id = "energy-cell-render-view"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::item_render::stack_view"
+helper = "energy_cell_render_hook.rs"
+bindings = [
+  { name = "stack", ty = "&crate::items::ItemStack", value = "stack" },
+]
+
+[[module]]
+id = "energy-cell-item"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_energy_cell_item"
+source = "energy_cell_item.rs"
+
+[[injection]]
+id = "energy-cell-placement"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_place_block"
+helper = "energy_cell_placed.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "stack", ty = "&horizon_client::items::ItemStack", value = "stack" },
+  { name = "pos", ty = "[i32; 3]", value = "pos" },
+]
+
+[[injection]]
+id = "energy-cell-drop-record"
+kind = "HEAD"
+target = "horizon_client::game::spill::Pending::record"
+helper = "energy_cell_drop_record.rs"
+bindings = [
+  { name = "pending", ty = "&mut crate::game::spill::Pending", value = "&mut *self" },
+  { name = "pos", ty = "[i32; 3]", value = "pos" },
+  { name = "entity", ty = "&horizon_client::containers::BlockEntity", value = "entity" },
+  { name = "block", ty = "&str", value = "block" },
+]
+
+[[injection]]
+id = "energy-cell-level-drop"
+kind = "HEAD"
+target = "horizon_client::game::spill::GameLevel<'_>::drop_resources_now"
+helper = "energy_cell_drop_level.rs"
+bindings = [
+  { name = "level", ty = "&mut crate::game::GameLevel<'_>", value = "&mut *self" },
+  { name = "pos", ty = "horizon_core::position::BlockPos", value = "pos" },
+]
+
+[[module]]
+id = "item-energy-model-rules"
+file = "crates/horizon-assets/src/item_model.rs"
+name = "ae2_item_energy"
+source = "item_energy.rs"
+
+[[module]]
+id = "energy-cell-model"
+file = "crates/horizon-assets/src/item_model.rs"
+name = "ae2_energy_cell_model"
+source = "energy_cell_model.rs"
+
+[[injection]]
+id = "energy-cell-item-model"
+kind = "HEAD"
+cancellable = true
+target = "horizon_assets::item_model::ItemModels::append_layers"
+helper = "energy_cell_model_hook.rs"
+bindings = [
+  { name = "models", ty = "&crate::item_model::ItemModels", value = "&*self" },
+  { name = "out", ty = "&mut crate::item_model::ResolvedItem", value = "out" },
+  { name = "stack", ty = "&crate::item_model::StackView", value = "stack" },
+  { name = "ctx", ty = "&crate::item_model::Context", value = "ctx" },
+  { name = "env", ty = "&dyn crate::item_model::ItemEnv", value = "env" },
+]
+
+[[module]]
 id = "controller-rules-world"
 file = "crates/horizon-client/src/game.rs"
 name = "ae2_controller"

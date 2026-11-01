@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "operations": 100000,
+  "revision": "db17504a86128fdf3dae31f5fb7a112a646e0b93",
+  "input_sha256": "823d68becee05cd199c65c0b5f0d890b6d03b2d26ad0e5a82eb5bd54bebc54a3",
+  "source_sha256": {
+    "block/networking/EnergyCellBlockItem.java": "c8d0364c079f5af422147a503e234b552e31599dd1ae1fc564977376c3c931fe",
+    "core/definitions/AEBlocks.java": "350ecdb536e2a57f3380aae04639ab761d64467f573f134b069e0a0c898a5d58",
+    "init/client/InitItemModelsProperties.java": "92b976ff36b38a0fd3d49680e62c445187d6055c57194d70ef2b82594ffd23b1"
+  },
+  "verbatim_fragment_sha256": {
+    "inject": "98f69cb71546e9a903a42d0fa6aa694e76da7c91275ec3ac6ac4418edbae556b",
+    "extract": "f58075bdffc34d5a9b2f8b206ffb3ec400b9fffdcdf31c205131dace34a814f8",
+    "maximum": "eaae70f2feade82e3420e5f739a93bac46a8eec16ce1faef9c45d535e9c032e0",
+    "current": "effb23393e46a731d6827051a7eea02e9bcceff454c5e1b4a21db6c2af0b260d",
+    "rate": "347e6ee49b16167db2a12fd69ecea51be87449c0edde74b181fc0e8c578cf20d",
+    "capacity": "1492e14279e9859ab18b55ee5a228a6611a3dbd3379ffb249d2a1254c449add3",
+    "set": "dd7fd2bae93ab68f44a03359adf024124c95731580d25f5ecde0a31728df487f"
+  },
+  "minecraft_override_bytecode_sha256": "115d97b592a23c754599d723672aee8d6a23e8c7b7c7178da00bddf009c81709",
+  "minecraft_client_sha1": "30c73b1c5da787909b2f73340419fdf13b9def88",
+  "minecraft_mappings_sha1": "2244b6f072256667bcd9a73df124d6c58de77992",
+  "item_override_thresholds": [
+    0.2,
+    0.4,
+    0.6,
+    0.8
+  ],
+  "item_model_sha256": {
+    "assets/ae2/models/item/energy_cell.json": "ac174605b60cb1a458bf77a2a6f1d4068106ab733ac21f33133bfb7604abbe24",
+    "assets/ae2/models/item/dense_energy_cell.json": "5449ed7ec45bec27e078c80918f2aaea9eac5414df0701937626c20e8e782b73"
+  },
+  "scope": "unchanged EnergyCellBlockItem power methods; component/block-profile stubs, model float threshold semantics from source assets/official bytecode",
+  "limits": [
+    "minimal component/block host",
+    "no placement/drop/tooltip/NeoForge lifecycle",
+    "NaN outputs compared canonically as Java doubleToLongBits",
+    "not a world oracle"
+  ]
+}

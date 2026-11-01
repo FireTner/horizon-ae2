@@ -30,10 +30,14 @@ pub enum PoweredKind {
     WirelessTerminal,
     ChargedStaff,
     EntropyManipulator,
+    EnergyCell,
+    DenseEnergyCell,
 }
 impl PoweredKind {
     pub fn from_item(id: &str) -> Option<Self> {
         match id {
+            "ae2:energy_cell" => Some(Self::EnergyCell),
+            "ae2:dense_energy_cell" => Some(Self::DenseEnergyCell),
             "ae2:color_applicator" => Some(Self::ColorApplicator),
             "ae2:matter_cannon" => Some(Self::MatterCannon),
             "ae2:wireless_terminal" | "ae2:wireless_crafting_terminal" => {
@@ -49,12 +53,15 @@ impl PoweredKind {
             }
         }
     }
+    pub fn is_energy_cell(self) -> bool {
+        matches!(self, Self::EnergyCell | Self::DenseEnergyCell)
+    }
     /// AEConfig defaults, before a native config supplier is connected.
     pub fn default_capacity(self) -> f64 {
         match self {
             Self::Portable | Self::ColorApplicator => 20000.0,
-            Self::MatterCannon | Self::EntropyManipulator => 200000.0,
-            Self::WirelessTerminal => 1600000.0,
+            Self::MatterCannon | Self::EntropyManipulator | Self::EnergyCell => 200000.0,
+            Self::WirelessTerminal | Self::DenseEnergyCell => 1600000.0,
             Self::ChargedStaff => 8000.0,
         }
     }
@@ -64,6 +71,8 @@ impl PoweredKind {
             Self::MatterCannon | Self::WirelessTerminal => 800.0 + 800.0 * energy_cards as f64,
             Self::EntropyManipulator => 800.0,
             Self::ChargedStaff => 32.0,
+            Self::EnergyCell => 800.0,
+            Self::DenseEnergyCell => 1600.0,
         }
     }
 }
@@ -73,6 +82,7 @@ pub struct ItemEnergy {
     default_capacity: f64,
     capacity_override: Option<f64>,
     stored: Option<f64>,
+    cell: bool,
 }
 impl ItemEnergy {
     /// Component loading does not silently clamp existing stored energy.
@@ -86,6 +96,15 @@ impl ItemEnergy {
             default_capacity,
             capacity_override,
             stored,
+            cell: false,
+        }
+    }
+    pub fn from_energy_cell(capacity: f64, stored: Option<f64>) -> Self {
+        Self {
+            default_capacity: capacity,
+            capacity_override: None,
+            stored,
+            cell: true,
         }
     }
     pub fn capacity_override(&self) -> Option<f64> {
@@ -113,7 +132,11 @@ impl ItemEnergy {
         (rounded as i32).clamp(0, 13)
     }
     pub fn set_current(&mut self, power: f64) {
-        self.stored = if power < MIN_POWER { None } else { Some(power) };
+        self.stored = if power < if self.cell { 0.00001 } else { MIN_POWER } {
+            None
+        } else {
+            Some(power)
+        };
     }
     /// Returns overflow, as IAEItemPowerStorage requires.
     pub fn inject(&mut self, amount: f64, commit: bool) -> f64 {
@@ -121,7 +144,12 @@ impl ItemEnergy {
         let required = self.maximum() - current;
         let overflow = java_max(0.0, java_min(amount - required, amount));
         if commit {
-            self.set_current(current + java_min(amount, required));
+            let added = if self.cell {
+                java_min(required, amount)
+            } else {
+                java_min(amount, required)
+            };
+            self.set_current(current + added);
         }
         overflow
     }
@@ -150,9 +178,43 @@ impl ItemEnergy {
         self.set_maximum(self.default_capacity);
     }
 }
+/// InitItemModelsProperties uses a float fill ratio, and the original item
+/// model overrides have thresholds .2/.4/.6/.8. This is NOT block fullness.
+pub fn energy_cell_model_level(current: f64, maximum: f64) -> usize {
+    let ratio = (current / maximum) as f32;
+    [0.2f32, 0.4, 0.6, 0.8]
+        .into_iter()
+        .take_while(|threshold| ratio.partial_cmp(threshold) != Some(std::cmp::Ordering::Less))
+        .count()
+}
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn cell_item_uses_fixed_capacity_distinct_removal_threshold_and_item_model_ratios() {
+        let mut cell = ItemEnergy::from_energy_cell(200000.0, Some(0.00005));
+        let old = cell;
+        assert_eq!(cell.extract(0.00001, false), 0.00001);
+        assert_eq!(cell, old);
+        cell.extract(0.00001, true);
+        assert!(cell.stored_component().is_some());
+        cell.extract(1.0, true);
+        assert_eq!(cell.stored_component(), None);
+        for (current, expected) in [
+            (0.0, 0),
+            (39999.0, 0),
+            (40000.0, 1),
+            (80000.0, 2),
+            (120000.0, 3),
+            (160000.0, 4),
+            (200000.0, 4),
+        ] {
+            assert_eq!(energy_cell_model_level(current, 200000.0), expected);
+        }
+        assert_eq!(energy_cell_model_level(f64::NAN, 200000.0), 4);
+        assert!(PoweredKind::EnergyCell.is_energy_cell());
+        assert_eq!(PoweredKind::DenseEnergyCell.charge_rate(99), 1600.0);
+    }
     #[test]
     fn energy_bar_is_thirteen_pixels_with_java_rounding_narrowing_and_nan_rules() {
         let mut energy = ItemEnergy::from_components(13.0, None, None);

@@ -4,6 +4,9 @@ use super::{Game, HudBatch, hud_layout, hud_overlays};
 use horizon_client::items::ItemStack;
 
 pub(super) fn bar(stack: &ItemStack) -> Option<(i32, u32)> {
+    if super::ae2_item_energy::PoweredKind::from_item(&stack.item)?.is_energy_cell() {
+        return None; // EnergyCellBlockItem does not inherit AEBasePoweredItem's bar.
+    }
     let item = super::ae2_item_energy_glue::load(stack).ok().flatten()?;
     Some((item.energy.bar_width(), 0x00ff00))
 }
@@ -68,5 +71,7 @@ mod tests {
         assert_eq!(bar(&stack), Some((13, 0x00ff00)));
         assert_eq!(bar(&ItemStack::new("minecraft:diamond_pickaxe", 1)), None);
         assert_eq!(bar(&ItemStack::new("ae2:item_storage_cell_1k", 1)), None);
+        assert_eq!(bar(&ItemStack::new("ae2:energy_cell", 1)), None);
+        assert_eq!(bar(&ItemStack::new("ae2:dense_energy_cell", 1)), None);
     }
 }

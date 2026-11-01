@@ -93,8 +93,10 @@ Network Status Menu, external energy funnel/capabilities, full ready/shape/event
 timing и chunk/spatial lifecycle остаются частью полного переноса Controller.
 Energy/Dense Cell получили исходные fullness states 0..4 и original models,
 double local-energy comparator и deferred notifications в block-ticking chunks.
-Creative Cell — один property-free state без analog output. Item/drop stored_energy,
-точный TickManager/readiness lifecycle и внешние capabilities остаются открытыми.
+Creative Cell — один property-free state без analog output. Предметы конечных cells
+получили исходную зарядку, fifth-based модели и stored_energy placement/first-drop
+через snapshot guard; complete tooltip/base settings, все loot/chunk/explosion
+пути, точный TickManager/readiness lifecycle и внешние capabilities ещё открыты.
 Drive GUI уже показывает original layout и десять filtered cell slots; серверные
 pickup/drag/hotbar/shift правила и игровой restart проверены. Следующий слой —
 priority UI, special bulk actions, внешний capability API и полный lifecycle сохранения,

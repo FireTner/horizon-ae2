@@ -113,6 +113,12 @@ class ContentTests(unittest.TestCase):
         for name in ("energy_cell", "dense_energy_cell"):
             original = json.loads((carried / f"assets/ae2/blockstates/{name}.json").read_text())
             self.assertEqual(original, {"variants": {f"fullness={level}": {"model": f"ae2:block/{name}_{level}"} for level in range(5)}})
+        for name in ("energy_cell", "dense_energy_cell"):
+            item = json.loads((carried / f"assets/ae2/items/{name}.json").read_text())["model"]
+            self.assertEqual(item["property"], "minecraft:block_state")
+            self.assertEqual(item["block_state_property"], "fullness")
+            self.assertEqual([(entry["when"], entry["model"]["model"]) for entry in item["cases"]],
+                             [(str(i), f"ae2:block/{name}_{i}") for i in range(5)])
         states = json.loads((carried / "assets/ae2/blockstates/charger.json").read_text())
         self.assertEqual(set(states["variants"]), {f"facing={face}" for face in content.FACINGS})
         drive = json.loads((carried / "assets/ae2/blockstates/drive.json").read_text())

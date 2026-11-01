@@ -74,11 +74,19 @@ pub(super) fn load(stack: &ItemStack) -> Result<Option<PoweredItem>, String> {
         .transpose()?
         .map_or(0, |cards| cards.energy_multiplier());
     Ok(Some(PoweredItem {
-        energy: ItemEnergy::from_components(
-            kind.default_capacity(),
-            number(stack, "ae2:energy_capacity")?,
-            number(stack, "ae2:stored_energy")?,
-        ),
+        energy: if kind.is_energy_cell() {
+            // EnergyCellBlockItem ignores capacity overrides and upgrade data.
+            ItemEnergy::from_energy_cell(
+                kind.default_capacity(),
+                number(stack, "ae2:stored_energy")?,
+            )
+        } else {
+            ItemEnergy::from_components(
+                kind.default_capacity(),
+                number(stack, "ae2:energy_capacity")?,
+                number(stack, "ae2:stored_energy")?,
+            )
+        },
         charge_rate: kind.charge_rate(cards),
     }))
 }
@@ -103,6 +111,36 @@ pub(super) fn persist(stack: &mut ItemStack, item: &PoweredItem) {
 mod tests {
     use super::*;
     use horizon_client::save::{item_from_nbt, item_to_nbt};
+    #[test]
+    fn energy_cell_items_ignore_capacity_and_upgrade_components_without_losing_them() {
+        for (id, capacity, rate) in [
+            ("ae2:energy_cell", 200000.0, 800.0),
+            ("ae2:dense_energy_cell", 1600000.0, 1600.0),
+        ] {
+            let mut stack = ItemStack::new(id, 1);
+            stack
+                .data_mut()
+                .set_other("ae2:energy_capacity", Some(Tag::String("ignored".into())));
+            stack
+                .data_mut()
+                .set_other("ae2:upgrades", Some(Tag::String("ignored too".into())));
+            let original = stack.clone();
+            let mut item = load(&stack).unwrap().unwrap();
+            assert_eq!(item.energy.maximum(), capacity);
+            assert_eq!(item.charge_rate, rate);
+            assert_eq!(item.energy.inject(10.0, true), 0.0);
+            persist(&mut stack, &item);
+            assert_eq!(
+                stack.data().unwrap().other("ae2:energy_capacity"),
+                original.data().unwrap().other("ae2:energy_capacity")
+            );
+            assert_eq!(
+                stack.data().unwrap().other("ae2:upgrades"),
+                original.data().unwrap().other("ae2:upgrades")
+            );
+        }
+        assert!(!chargeable(&ItemStack::new("ae2:creative_energy_cell", 1)));
+    }
     #[test]
     fn command_registry_preserves_vanilla_and_energy_codec_requires_numbers() {
         let mut reg = horizon_client::command::Registries::default();

@@ -186,6 +186,15 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "block/networking/EnergyCellBlockItem.java": ("mixins/ae2/item_energy.rs", "fixed block-derived capacities/rates, original inject/extract/simulate/overflow and 0.00001 component removal; native Charger adapter and render-only item predicate; complete tooltip/external capability and remaining base item APIs pending"),
+    "init/client/InitItemModelsProperties.java": ("mixins/ae2/energy_cell_model.rs", "energy-cell float current/max predicate with original .2/.4/.6/.8 model overrides, native render-only projection; color-applicator predicate and addon/item-property APIs pending"),
+    "core/definitions/AEBlocks.java": ("mixins/ae2/item_energy.rs", "normal/dense energy-cell fixed capacity/rate/priority and corresponding block-item power profiles; source-audited constructors, remaining block registration/settings API pending"),
+    "blockentity/networking/EnergyCellBlockEntity.java": ("mixins/ae2/energy_cell_item.rs", "finite storage/fullness/comparator plus stored-energy import/export for player placement, matching first loot stack, live same-tick power flush before player/Level resource drops; full TickManager/readiness/chunk/spatial/saved-BE/loot command/base settings lifecycle pending"),
+    "block/AEBaseEntityBlock.java": ("mixins/ae2/energy_cell_item.rs", "Drive/Charger comparator and finite energy-cell placement/importSettings plus stored_energy on first matching block drop; general base names/ownership/settings, all loot contexts and other hosts pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

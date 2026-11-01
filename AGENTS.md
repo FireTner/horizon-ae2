@@ -26,12 +26,26 @@ is not a general custom-state API. Controller model schema requires named values
 finite-cell fullness uses integer [0,4]. Cells use source cube glass properties,
 never dispenser behaviour/inventory. energy_cell_glue.rs feeds local stored power
 to analog output and defers comparator/fullness notifications to block-ticking
-chunks, preserving pending NBT. Exact TickManager/readiness and item/drop energy
+chunks, preserving pending NBT. Exact TickManager/readiness and the full item/drop energy
 component lifecycle remain open. Do not call external callbacks while NETWORKS is locked.
 Controller status/type currently update at server post_tick; immediate shape/
 ready/events, external power funnel, Network Status Menu and full lifecycle
 remain open. Do not mark Controller fully ported on these tests alone.
-item_energy.rs/item_energy_glue.rs feed all 16 built-in powered items into Charger;
+item_energy.rs/item_energy_glue.rs feed 16 AEBasePoweredItem profiles and the two
+finite EnergyCellBlockItems into Charger. Cell items have fixed block capacities/
+rates, a distinct 0.00001 removal threshold and no AEBasePoweredItem green bar.
+energy_cell_model.rs projects only render views to the original float-ratio item
+models (20/40/60/80 percent), never the block's quarter-based fullness. Never write
+that temporary block_state component into real stacks, packets, saves or hashes.
+energy_cell_item.rs imports stored energy on actual placement and exports local
+energy only to the first matching block drop through Pending; proxy.e is not an
+item component. Live snapshot reads before player/Level drops must not restore
+spent same-tick energy or overwrite a newer external NBT replacement. Real finite
+cell placement forgets the old node even for identical position/kind/saved NBT;
+never retain a destroyed BE's spent store for the newly placed item. General
+block/chunk/command identity/readiness lifecycle is still pending. Full base
+names/ownership/settings, raw saved-BE/loot-command/explosion lifecycle and exact
+source tooltip formatting remain open.
 charger.rs preserves local/direct-grid/overflow/refill order. Command registry hooks
 add only supported component IDs, preserve vanilla types and validate energy numbers.
 item_energy_view.rs implements the source green 13-pixel bar, preserving count/cooldown.

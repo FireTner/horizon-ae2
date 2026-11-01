@@ -18,10 +18,11 @@
 | CreativeCellInventory / Handler | exact configured item/fluid keys, unlimited insert/extract simulate/commit, Integer.MAX_VALUE listing, preferred, TYPES_FULL и zero drain, empty nesting, no-op persist; native mounts и 2000 Java traces | tooltip image/shift list, workbench/config writer, descriptions, full item/handler/addon API и source iteration order |
 | PortableCellItem | половина bytes, прежний overhead, item type limits 54/45/36/27/18 и fluid 18, 0.5 idle drain, component-preserving backend/Drive mounts и storage tooltip | handheld terminal/menu, private use/disassembly, energy tooltip, item color/LED и full upgrades lifecycle |
 | DriveMenu / DriveScreen | original texture/layout, десять cell slots с лимитом 1, authoritative filters, pickup/shift/drag/hotbar rules, main-before-hotbar shift order и isolation; game restart | priority button/subscreen, ghost icons, AEBaseMenu bulk actions, external multiplayer и addon cell registry |
-| EnergyCellBlockEntity | normal/dense/creative block entities, реальные сетевые хранилища, internalCurrentPower и proxy.e persistence; finite fullness 0..4/original models и double comparator, deferred notifications в block-ticking chunks; creative single state без analog output | exact TickManager/event/readiness lifecycle, energy components у item/drop/placement, item models/tooltip/creative charged variant и full material parity |
-| Charger | таблица ae2:charger, local 1600 AE, threshold 1599, interval 10, random > 0.8, один предмет, сохранение энергии/слота; powered branch для 16 items с исходными rates и local/grid/overflow; сеть пополняет private buffer до 800 AE/call; native hopper/dropper automation по ChargerInvFilter со всех сторон | live config multiplier/rates, external capability API, полное inv/drop lifecycle, эффекты и рендер предмета |
+| EnergyCellBlockEntity | normal/dense/creative block entities, реальные сетевые хранилища, internalCurrentPower и proxy.e persistence; finite fullness 0..4/original models и double comparator, deferred notifications в block-ticking chunks; creative single state без analog output; finite stored_energy player placement/first matching loot stack, live same-tick flush | exact TickManager/event/readiness/base settings lifecycle, all explosion/saved-BE/pick/loot-command paths, tooltip/creative charged variant и full material parity |
+| Charger | таблица ae2:charger, local 1600 AE, threshold 1599, interval 10, random > 0.8, один предмет, сохранение энергии/слота; powered branch для 16 AEBasePoweredItems + 2 finite cell items с исходными rates и local/grid/overflow; сеть пополняет private buffer до 800 AE/call; native hopper/dropper automation по ChargerInvFilter со всех сторон | live config multiplier/rates, external capability API, полное inv/drop lifecycle, эффекты и рендер предмета |
 | Wooden Crank | rotation/hits/charge, 18 ticks/160 AE, busy window, 11 отказов ломают рукоятку, charger-side restriction | placement/survival, fake-player rule, статистика, анимация и sync |
 | Common platform tags | 461 generated c tags NeoForge 21.1.169, exact source hashes/licence, platform-before-AE2 layering/replace и real item predicate/restart checks | runtime membership всех registries/тегов, NeoForge API/events/recipe conditions и полная survival progression |
+| EnergyCellBlockItem / item predicate | fixed capacities 200000/1600000, rates 800/1600, source inject/extract/simulate/overflow and 0.00001 removal, native Charger, no powered-item bar; original .2/.4/.6/.8 float model thresholds through render-only projection; stored_energy placement and first matching drop with live pre-break flush | complete tooltip/base settings/capability APIs; all saved-BE/explosion/pick/loot-command lifecycle; nonfinite/malformed native recovery |
 
 ## Временные ограничения адаптера (не целевое поведение)
 
@@ -174,9 +175,9 @@
   сохраняет изменения NBT/блоков внутри тика, но полная source lifecycle/event
   модель и производительность больших сетей ещё не подтверждены. Неизменённый
   NBT не пополняет израсходованную в текущем тике энергию.
-- Energy cell content пока показывает fullness=0. Все оригинальные модели
-  остаются в assets, выбор по реальному уровню и sync ещё не подключены.
-  Рецепты normal/dense energy cells восстановлены из jar, survival chain пока
+- Placed energy cells уже используют исходные fullness states и модели,
+  выбираемые по локальному заряду. Рецепты normal/dense energy cells
+  восстановлены из jar, survival chain пока
   не проверена (в том числе Inscriber/processors и внешнее питание).
 - Выполнение Charger recipe пока отказывает результатам с неподдержанными
   components. Automation admission/extraction использует ingredient membership

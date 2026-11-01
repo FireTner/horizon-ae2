@@ -2,9 +2,19 @@
 
 Цель активна: полностью перенести AE2 19.2.18 на Horizon, 1:1, без субагентов.
 Цель не уменьшена до текущего набора механик. Все 1429 исходных Java-файлов
-остаются в реестре; сейчас 62 partial, 1367 pending, полностью закрытых нет.
+остаются в реестре; сейчас 69 partial, 1360 pending, полностью закрытых нет.
 
 ## Последний результат
+
+- Powered items подключены к Charger: all 16 IDs, source components/rates,
+  local/direct-grid/overflow/refill, шесть command component registrations.
+  94 core / 121 native / 10 Python PASS, native check/build PASS.
+  AEBasePoweredItem oracle: 400000 operations; дословный Charger.doWork
+  в stub host: 200000 calls, exact doubles — PASS. World
+  target/smoke/item-charging-vjhsnfav: conservation, all 16 insert/charge,
+  Crank/front restriction, partial energy + contents restart/retrieval PASS.
+  Это не handheld actions и не NeoForge/world oracle. Defaults config пока fixed;
+  actual config reload, tooltip/bar/creative tab и upgrade writer/callbacks открыты.
 
 - Исправлен оригинальный upgrade component reader: `slot/item`, разные
   physical slot limits шести storage host families и совместимость карт из
@@ -96,8 +106,8 @@ pinned checkout: target/upstream/{ae2,horizon,horizon-mixins,neoforge}. Original
 и horizon-create не менять. Ресурсы читать из HORIZON_RESOURCES, тестовые saves
 только под target. Все тестовые процессы последнего smoke завершены.
 
-- tools/check.py: fmt, clippy, 87 core tests, 10 tooling tests, inventory check.
-- tools/horizon.py test: 110 native tests (Game + typed NBT); warnings об unused
+- tools/check.py: fmt, clippy, 94 core tests, 10 tooling tests, inventory check.
+- tools/horizon.py test: 121 native tests (Game + typed NBT); warnings об unused
   API остаются до подключения всех потребителей API, не скрыты.
 - tools/horizon.py test --library: 5 tests, в том числе три server-click теста.
 - tools/pathing_oracle.py --cases 2000: JDK 21+, default local Homebrew JDK.
@@ -107,27 +117,20 @@ pinned checkout: target/upstream/{ae2,horizon,horizon-mixins,neoforge}. Original
 - tools/smoke.py --ctl "$HORIZON_CTL" --resources "$HORIZON_RESOURCES": новый
   изолированный мир; последняя успешная папка target/smoke/charger-1ta7ucsr.
 
-## Условие паузы по лимиту
+## Лимит
 
-Пользователь явно велел проверять account limits примерно раз в пять минут
-и поставить goal на паузу при остатке <=10% в релевантном окне. Использовать
-Codex get_usage_limits, не token counter goal. Последний подтверждённый остаток
-11% (89% consumed), проверка 1 ноября 2026. Не использовать reset credit и не покупать quota.
-При пороге зафиксировать текущую точку, вызвать update_goal(paused), сообщить
-возвращённый статус и прекратить работу. Сейчас условие не наступило.
+1 ноября пользователь отменил автоматическую остановку на остатке 10%.
+Продолжать полный перенос до фактического service limit; сброс выполняет
+пользователь. Не покупать и не сбрасывать quota инструментами.
 
+## Следующие работы
 
-## Следующая механика: powered items в Charger
-
-До нового кода сверены pinned AEBasePoweredItem, PortableCellItem,
-MatterCannonItem, ColorApplicatorItem и ChargerBlockEntity.doWork:
-- stored_energy default 0, MIN_POWER 0.0001; energy_capacity — override.
-  Portable/Color default 20000, Cannon 200000 AE. Config ещё нужен.
-- charge rate portable/color 80 + 80 × raw energy-card multiplier,
-  cannon 800 + 800 × multiplier; Charger умножает на ticksSinceLastCall/config.
-- Charger сначала извлекает rate из собственного буфера; затем добирает из
-  grid min(missingRate, missingPower); overflow от item возвращает в буфер.
-  Затем действует обычное пополнение буфера <=800 AE, capacity 1600.
-- Сейчас разрешён только recipe branch; нужно разрешить known chargeable
-  stacks при insertion и подключить их energy adapter до recipe lookup.
-Это заметки сверки, не реализованная и не протестированная механика.
+- Item energy bar/tooltip и исходные creative/reequip overrides.
+- Charger original inv/item lifecycle и native automation filters; исходный
+  ChargerRecipes.allowExtract разрешает любой предмет, не являющийся текущим
+  recipe input. Не придумывать запрет извлечения всех partially charged tools.
+- Workbench/upgrade writer: onUpgradesChanged меняет capacity multiplier
+  portable/cannon/color на 1+8×cards, wireless на 1+cards. Не выполнять этот
+  callback просто при чтении сохранённого item.
+- Live config (батареи/rates/power multipliers), common capability API.
+Цель остаётся полным 1:1 переносом, а не текущим playable subset.

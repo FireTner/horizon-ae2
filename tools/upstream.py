@@ -123,6 +123,26 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "items/tools/powered/powersink/AEBasePoweredItem.java": ("mixins/ae2/item_energy.rs", "component energy defaults/override, threshold, simulate/modulate inject overflow/extract, capacity clamp/multiplier/reset; 400000 unchanged-Java operations; native Charger consumes it; tooltip/bar/reequip/creative-tab and live config supplier pending"),
+    "api/implementations/items/IAEItemPowerStorage.java": ("mixins/ae2/item_energy_glue.rs", "built-in component power bridge, WRITE admission and per-item charge rates; external/addon item power capabilities and full item APIs pending"),
+    "items/tools/powered/ChargedStaffItem.java": ("mixins/ae2/item_energy.rs", "8000 AE default capacity and 32 AE/t Charger profile only; combat, lightning and item visuals pending"),
+    "items/tools/powered/EntropyManipulatorItem.java": ("mixins/ae2/item_energy.rs", "200000 AE default capacity and 800 AE/t Charger profile only; tool/block/entity interactions, permissions, recipes and visuals pending"),
+    "items/tools/powered/WirelessTerminalItem.java": ("mixins/ae2/item_energy_glue.rs", "1600000 AE default, 800 plus 800 per energy card rate, two-slot upgrade read and native Charger power; terminal/network/menu/linking/usage and changed-upgrade callback pending"),
+    "items/tools/powered/PortableCellItem.java": ("mixins/ae2/cells.rs", "all ten storage layouts/backends, source components and native Charger (20000 default, 80 plus 80 per energy card); handheld menus/use/disassembly, changed-upgrade capacity callback and full visuals pending"),
+    "items/tools/powered/MatterCannonItem.java": ("mixins/ae2/tool_glue.rs", "restricted storage backend and native Charger power (200000 default, 800 plus 800 per energy card); shooting/raycast/permissions, changed-upgrade capacity callback, visuals and live recipe reload pending"),
+    "items/tools/powered/ColorApplicatorItem.java": ("mixins/ae2/tool_filters.rs", "restricted storage backend and native Charger power (20000 default, 80 plus 80 per energy card); painting/cycle/select, changed-upgrade capacity callback, visuals and live tag reload pending"),
+    "blockentity/misc/ChargerBlockEntity.java": ("mixins/ae2/glue.rs", "source-ordered powered item/local buffer/grid/overflow branch plus recipe/refill, private storage and Crank integration; all 16 built-in power profiles; live config, hopper filter, full inventory/visual/sync API pending"),
+    "util/Platform.java": ("mixins/ae2/item_energy_glue.rs", "isChargeable for the 16 built-in WRITE powered items, maximum > 0 and nonempty stack; all other Platform utilities and addon item registry pending"),
+    "init/internal/InitUpgrades.java": ("mixins/ae2/upgrade_rules.rs", "built-in basic/portable/tool storage and wireless host card maxima only; other hosts and dynamic addon registration pending"),
+})
+
+
+PARTIAL.update({
+    "api/ids/AEComponents.java": ("mixins/ae2/component_registry.rs", "command registry names for six implemented storage/power components and numeric codecs for stored_energy/energy_capacity; remaining component registrations, full registry-aware codec recovery/network schema pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

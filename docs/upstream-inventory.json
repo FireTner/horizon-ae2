@@ -1,8 +1,8 @@
 {
   "families": {
     "api": {
-      "partial": 14,
-      "pending": 258
+      "partial": 16,
+      "pending": 256
     },
     "block": {
       "partial": 2,
@@ -65,8 +65,8 @@
       "pending": 97
     },
     "items": {
-      "partial": 6,
-      "pending": 51
+      "partial": 10,
+      "pending": 47
     },
     "me": {
       "partial": 21,
@@ -109,8 +109,8 @@
       "pending": 25
     },
     "util": {
-      "partial": 2,
-      "pending": 37
+      "partial": 3,
+      "pending": 36
     },
     "worldgen": {
       "partial": 0,
@@ -531,8 +531,10 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/ids/AEComponents.java",
+      "port": "mixins/ae2/component_registry.rs",
+      "scope": "command registry names for six implemented storage/power components and numeric codecs for stored_energy/energy_capacity; remaining component registrations, full registry-aware codec recovery/network schema pending",
       "sha256": "a0a1f3c9c00853d7b12a68444d685b66e4213baeaf001d86f20969679bfc8a4b",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
@@ -621,8 +623,10 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/implementations/items/IAEItemPowerStorage.java",
+      "port": "mixins/ae2/item_energy_glue.rs",
+      "scope": "built-in component power bridge, WRITE admission and per-item charge rates; external/addon item power capabilities and full item APIs pending",
       "sha256": "641275928b0137d12e3d0a908489e2c9cc07f12f118e4006ba94f2bbf57b8f43",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
@@ -2220,7 +2224,7 @@
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/misc/ChargerBlockEntity.java",
       "port": "mixins/ae2/glue.rs",
-      "scope": "recipe branch plus private buffer refilled from real ME EnergyService, at most 800 AE per doWork; tools/config/sync/filter/visuals pending",
+      "scope": "source-ordered powered item/local buffer/grid/overflow branch plus recipe/refill, private storage and Crank integration; all 16 built-in power profiles; live config, hopper filter, full inventory/visual/sync API pending",
       "sha256": "f199f50688334f637664cef367fc5e2197bbbcd6afd206768f8d5dbd631888df",
       "status": "partial"
     },
@@ -5112,7 +5116,7 @@
       "family": "init",
       "path": "src/main/java/appeng/init/internal/InitUpgrades.java",
       "port": "mixins/ae2/upgrade_rules.rs",
-      "scope": "built-in basic/portable/tool storage host card maxima only; other hosts and dynamic addon registration pending",
+      "scope": "built-in basic/portable/tool storage and wireless host card maxima only; other hosts and dynamic addon registration pending",
       "sha256": "e3fa76af77740ecede2da396473287b9faa909d191e79429ee295c2a0cb9d812",
       "status": "partial"
     },
@@ -5959,28 +5963,32 @@
     {
       "family": "items",
       "path": "src/main/java/appeng/items/tools/powered/ChargedStaffItem.java",
+      "port": "mixins/ae2/item_energy.rs",
+      "scope": "8000 AE default capacity and 32 AE/t Charger profile only; combat, lightning and item visuals pending",
       "sha256": "ada317ab4346a9f19f300983af51e23bda2fa7f35fe42e497601c8dcdaa4b407",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "items",
       "path": "src/main/java/appeng/items/tools/powered/ColorApplicatorItem.java",
       "port": "mixins/ae2/tool_filters.rs",
-      "scope": "2048-byte/27-type item inventory, vanilla/tagged dyes, snowball and paintball admission, 0.5 drain, native Drive persistence/nesting; charging/painting/cycle/select/render and live tag reload pending",
+      "scope": "restricted storage backend and native Charger power (20000 default, 80 plus 80 per energy card); painting/cycle/select, changed-upgrade capacity callback, visuals and live tag reload pending",
       "sha256": "65281cdce105ab55190813ab0fcefb8e3d581a49e8806a5b91b211388dab4151",
       "status": "partial"
     },
     {
       "family": "items",
       "path": "src/main/java/appeng/items/tools/powered/EntropyManipulatorItem.java",
+      "port": "mixins/ae2/item_energy.rs",
+      "scope": "200000 AE default capacity and 800 AE/t Charger profile only; tool/block/entity interactions, permissions, recipes and visuals pending",
       "sha256": "19e385e60a97b1030429439613a979012c49873b1d9583ef626e571309b05e03",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "items",
       "path": "src/main/java/appeng/items/tools/powered/MatterCannonItem.java",
       "port": "mixins/ae2/tool_glue.rs",
-      "scope": "512-byte/one-type inventory, first matching positive-weight ammo recipe or PaintBallItem admission, 0.5 idle drain, component-preserving native Drive backend and storable nested tool; charging/shooting/raycast/permissions/rendering and live recipe reload pending",
+      "scope": "restricted storage backend and native Charger power (200000 default, 800 plus 800 per energy card); shooting/raycast/permissions, changed-upgrade capacity callback, visuals and live recipe reload pending",
       "sha256": "e969b914d71276cd6c60c7f7d931e998f91e81fb571ddea06ff72f3fd29c8ba9",
       "status": "partial"
     },
@@ -5988,7 +5996,7 @@
       "family": "items",
       "path": "src/main/java/appeng/items/tools/powered/PortableCellItem.java",
       "port": "mixins/ae2/cells.rs",
-      "scope": "half-byte inventory layout, tier-dependent item type limit, 18 fluid types, 0.5 idle drain, component-preserving Drive backend and capacity tooltip; handheld menus, charge/use/disassembly and complete item rendering pending",
+      "scope": "all ten storage layouts/backends, source components and native Charger (20000 default, 80 plus 80 per energy card); handheld menus/use/disassembly, changed-upgrade capacity callback and full visuals pending",
       "sha256": "2447a2bcc87e96047be7f00d7fc2e811e623529f496393273d33b811bf6166e0",
       "status": "partial"
     },
@@ -6007,14 +6015,18 @@
     {
       "family": "items",
       "path": "src/main/java/appeng/items/tools/powered/WirelessTerminalItem.java",
+      "port": "mixins/ae2/item_energy_glue.rs",
+      "scope": "1600000 AE default, 800 plus 800 per energy card rate, two-slot upgrade read and native Charger power; terminal/network/menu/linking/usage and changed-upgrade callback pending",
       "sha256": "c223ccbf2f86c9bd1a675ceee8a75f8641a709e8802c57d6651e92c1bf4d5269",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "items",
       "path": "src/main/java/appeng/items/tools/powered/powersink/AEBasePoweredItem.java",
+      "port": "mixins/ae2/item_energy.rs",
+      "scope": "component energy defaults/override, threshold, simulate/modulate inject overflow/extract, capacity clamp/multiplier/reset; 400000 unchanged-Java operations; native Charger consumes it; tooltip/bar/reequip/creative-tab and live config supplier pending",
       "sha256": "2594de6d12611838da95440f7f024e1e216bf6563a25a687afb449f3f880aef5",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "items",
@@ -8593,8 +8605,10 @@
     {
       "family": "util",
       "path": "src/main/java/appeng/util/Platform.java",
+      "port": "mixins/ae2/item_energy_glue.rs",
+      "scope": "isChargeable for the 16 built-in WRITE powered items, maximum > 0 and nonempty stack; all other Platform utilities and addon item registry pending",
       "sha256": "46ea0437a96b14479ab9c1ea16bb201f5fe62ec5868bf733da769e65773dec28",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "util",

@@ -50,7 +50,7 @@
 - Backend десяти portable item/fluid cells: половина ёмкости, исходные
   type limits и 0.5 AE/tick на диск, codec/tooltip и mounts Drive. Обычные и
   переносные профили сверены с исходным BasicCellInventory: 2000 сценариев,
-  572000 операций без расхождений. Handheld UI/зарядка/применение ещё не перенесены.
+  572000 операций без расхождений. Handheld UI/применение ещё не перенесены; Charger charging подключена.
 - Creative cell backend: configured keys, unlimited insert/extract, исходный
   listing cap, статус и нулевой расход диска; Drive online/offline mounts,
   codec и restart. Ещё 2000 Java сценариев/572000 операций PASS. Tooltip image,
@@ -58,14 +58,20 @@
 - Tool storage backends: Matter Cannon (512 bytes/1 type) и Color Applicator
   (2048 bytes/27 types), исходные recipe/tag admission rules, 0.5 idle drain,
   сохранение энергии и разрешённое nesting заполненных tools. Drive подключает
-  все 23 встроенных storage handlers. Handheld charging/shooting/painting ещё нужны.
+  все 23 встроенных storage handlers. Charger charging подключена; handheld shooting/painting ещё нужны.
 - Исходные upgrade container components читаются как `slot/item`, с разными
   slot/card limits обычных, portable и tool cells. Количество установленных
   карт считается по слотам и ограничивается host. Workbench/upgrade writer,
   callbacks и addon registry ещё не перенесены.
+- Энергия всех 16 powered items в Charger: original stored_energy/capacity,
+  per-item rates/energy cards, local-first/grid/overflow и общее пополнение буфера.
+  Ядро AEBasePoweredItem сверено с unchanged Java на 400000 операций, а дословный
+  Charger.doWork в stub host — ещё на 200000 вызовов. Command registry знает
+  шесть поддержанных AE2 component IDs; energy codecs принимают только числа.
+  Workbench callbacks/config reload, energy bar/tooltip и handheld actions ещё нужны.
 - Подготовка контента, source-only `.hnmod`, закреплённые исходники и
   проверяемый реестр **всех 1429 Java-файлов** оригинала. В реестре нет
-  полностью закрытых классов; 62 отмечены как частично перенесённые.
+  полностью закрытых классов; 69 отмечены как частично перенесённые.
 - Подготовка также переносит 461 исходный общий тег NeoForge из pinned source,
   с лицензией/хэшами и порядком platform → AE2. World item predicates и restart
   проверены. Три прежних ручных списка заменены исходными данными платформы.
@@ -98,6 +104,8 @@ python3.12 tools/mounts_oracle.py --java-home /path/to/jdk21 --cases 2000
 python3.12 tools/cells_oracle.py --java-home /path/to/jdk21 --cases 2000
 python3.12 tools/cells_oracle.py --java-home /path/to/jdk21 --creative --cases 2000
 python3.12 tools/cells_oracle.py --java-home /path/to/jdk21 --tools --cases 2000
+python3.12 tools/item_energy_oracle.py --cases 2000
+python3.12 tools/charger_oracle.py --cases 2000
 
 python3.12 tools/horizon.py check
 python3.12 tools/horizon.py build
@@ -141,6 +149,8 @@ python3.12 tools/smoke_drive.py --creative --ctl /path/to/horizon-ctl \
 python3.12 tools/smoke_drive.py --tools --ctl /path/to/horizon-ctl \
   --resources /path/to/prepared/26.3
 python3.12 tools/smoke_platform_tags.py --ctl /path/to/horizon-ctl \
+  --resources /path/to/prepared/26.3
+python3.12 tools/smoke_item_charging.py --ctl /path/to/horizon-ctl \
   --resources /path/to/prepared/26.3
 ```
 

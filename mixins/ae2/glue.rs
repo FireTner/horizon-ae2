@@ -134,6 +134,43 @@ fn recipe(game: &Game<'_>, stack: &ItemStack) -> Option<ItemStack> {
         })
 }
 
+fn charger_work(game: &mut Game<'_>, pos: Pos, be: &mut ModBlockEntity, power: &mut f64) -> bool {
+    let Some(stack) = be.items.first().and_then(Option::as_ref) else {
+        return false;
+    };
+    match super::ae2_item_energy_glue::load(stack) {
+        Err(_) => return false, // Strict codec refusal preserves the original stack.
+        Ok(Some(mut item)) if item.is_chargeable() => {
+            let working = rules::charge_item(
+                power,
+                &mut item.energy,
+                item.charge_rate,
+                rules::CHARGER_INTERVAL,
+                1.0,
+                1.0,
+                |amount| super::ae2_grid_glue::extract(game.dim.id(), pos, amount, 1.0, true),
+            );
+            if working {
+                super::ae2_item_energy_glue::persist(be.items[0].as_mut().unwrap(), &item);
+            }
+            return working;
+        }
+        _ => {}
+    }
+    let result = recipe(game, stack);
+    // Consume world RNG only when the non-chargeable recipe branch would roll.
+    let random = if *power >= rules::POWER_THRESHOLD && result.is_some() {
+        game.world.random.next_float()
+    } else {
+        0.0
+    };
+    let (working, done) = rules::recipe_work(power, result.is_some(), random, 1.0);
+    if done {
+        be.items[0] = result;
+    }
+    working
+}
+
 pub(super) fn tick(game: &mut Game<'_>, pos: Pos, be: &mut ModBlockEntity) {
     match be.id.as_str() {
         CRANK => {
@@ -159,18 +196,7 @@ pub(super) fn tick(game: &mut Game<'_>, pos: Pos, be: &mut ModBlockEntity) {
             }
             be.data[0] = 0;
             let mut power = energy(&be.nbt);
-            let result = be
-                .items
-                .first()
-                .and_then(Option::as_ref)
-                .and_then(|s| recipe(game, s));
-            // Consume world RNG only when upstream would roll.
-            let random = if power >= rules::POWER_THRESHOLD && result.is_some() {
-                game.world.random.next_float()
-            } else {
-                0.0
-            };
-            let (working, done) = rules::recipe_work(&mut power, result.is_some(), random, 1.0);
+            let working = charger_work(game, pos, be, &mut power);
             // ChargerBlockEntity.doWork refills AFTER processing, from the ME
             // grid, at most 800 AE per call. The local crank buffer is private.
             if power < rules::POWER_THRESHOLD {
@@ -187,9 +213,6 @@ pub(super) fn tick(game: &mut Game<'_>, pos: Pos, be: &mut ModBlockEntity) {
                 Tag::Byte(i8::from(working)),
             );
             set_energy(&mut be.nbt, power);
-            if done {
-                be.items[0] = result;
-            }
         }
         _ => {}
     }
@@ -203,7 +226,8 @@ pub(super) fn right_click(game: &mut Game<'_>, pos: Pos, canceled: &mut bool) {
         CHARGER => {
             *canceled = true;
             if let Some(hand) = game.held().cloned() {
-                if recipe(game, &hand).is_none() {
+                if !super::ae2_item_energy_glue::chargeable(&hand) && recipe(game, &hand).is_none()
+                {
                     return;
                 }
                 let inserted = game

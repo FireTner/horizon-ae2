@@ -6,6 +6,36 @@ priority = 100
 [compatibility]
 horizon_revision = "aa27eca326db26e999d4e59d7899576016764b1e"
 
+[[injection]]
+id = "component-command-registry"
+kind = "HEAD"
+target = "horizon_client::game::chat::Game<'_>::build_registries"
+helper = "component_registry.rs"
+bindings = [{ name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" }]
+
+[[injection]]
+id = "component-command-decode"
+kind = "HEAD"
+cancellable = true
+target = "horizon_command::item::decode_component"
+helper = "component_decode.rs"
+bindings = [
+  { name = "id", ty = "&str", value = "id" },
+  { name = "value", ty = "&horizon_world::nbt::Tag", value = "t" },
+]
+
+[[module]]
+id = "item-energy"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_item_energy"
+source = "item_energy.rs"
+
+[[module]]
+id = "item-energy-glue"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_item_energy_glue"
+source = "item_energy_glue.rs"
+
 [[module]]
 id = "upgrade-rules"
 file = "crates/horizon-client/src/game.rs"

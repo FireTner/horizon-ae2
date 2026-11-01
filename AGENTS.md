@@ -17,6 +17,10 @@ glue.rs owns Horizon types. Only modules actually consumed by the adapter belong
 in horizon-mixin.toml. keys.rs, storage.rs and cells.rs feed the native cell
 tooltip/codec adapter. energy.rs/grid.rs/power.rs feed network.rs and the
 grid_glue.rs world adapter (currently Charger + three energy-cell kinds + Drive).
+item_energy.rs/item_energy_glue.rs feed all 16 built-in powered items into Charger;
+charger.rs preserves local/direct-grid/overflow/refill order. Command registry hooks
+add only supported component IDs, preserve vanilla types and validate energy numbers.
+Handheld actions, config reload, item energy tooltip/bar and upgrade callbacks remain open.
 mounts.rs/service.rs/drive.rs are consumed by drive_glue.rs and belong in the
 native manifest. Drive currently has ten real cell slots/providers, supports
 all twenty-three built-in basic/portable/creative/tool cell types, original
@@ -56,7 +60,6 @@ Do not report a partial class or a carried resource as complete feature parity.
 All generated/intermediate files stay under target/. Update VALIDATION.md with
 what actually ran, including limits. No automatic push, publication or deployment.
 
-During the active full-port goal, check account usage with the Codex app tool
-about every five minutes. The user explicitly requested pausing the goal when
-any relevant available usage window has 10% or less remaining. Never reset or
-purchase quota. Unknown/missing windows do not mean zero remaining.
+The user removed the automatic 10% quota stop on 2026-11-01 and explicitly
+requested continuing until the service limit is reached; they will reset quota
+when needed. Do not pause at 10%. Never reset or purchase quota yourself.

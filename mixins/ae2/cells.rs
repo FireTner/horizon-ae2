@@ -225,6 +225,10 @@ pub(super) fn upgrades(stack: &ItemStack) -> Result<Upgrades, String> {
             }
         }
     };
+    upgrades_for_host(stack, host)
+}
+
+pub(super) fn upgrades_for_host(stack: &ItemStack, host: UpgradeHost) -> Result<Upgrades, String> {
     let mut slots = vec![None; host.slots()];
     let mut seen = BTreeSet::new();
     match component(stack, "ae2:upgrades") {

@@ -10,20 +10,29 @@ pub enum Host {
     PortableFluid,
     MatterCannon,
     ColorApplicator,
+    WirelessTerminal,
 }
 impl Host {
     pub fn slots(self) -> usize {
         match self {
             Self::FluidCell | Self::PortableFluid => 3,
-            Self::ColorApplicator => 2,
+            Self::ColorApplicator | Self::WirelessTerminal => 2,
             _ => 4,
         }
     }
     pub fn max_installed(self, card: &str) -> u32 {
         match card {
-            "ae2:void_card" => 1,
-            "ae2:equal_distribution_card" if self != Self::MatterCannon => 1,
-            "ae2:inverter_card" if self != Self::ColorApplicator => 1,
+            "ae2:void_card" if self != Self::WirelessTerminal => 1,
+            "ae2:equal_distribution_card"
+                if !matches!(self, Self::MatterCannon | Self::WirelessTerminal) =>
+            {
+                1
+            }
+            "ae2:inverter_card"
+                if !matches!(self, Self::ColorApplicator | Self::WirelessTerminal) =>
+            {
+                1
+            }
             "ae2:fuzzy_card"
                 if matches!(
                     self,
@@ -39,6 +48,7 @@ impl Host {
                         | Self::PortableFluid
                         | Self::MatterCannon
                         | Self::ColorApplicator
+                        | Self::WirelessTerminal
                 ) =>
             {
                 2

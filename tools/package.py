@@ -48,6 +48,8 @@ def package():
                  'examples/creative_oracle.rs', 'docs/creative-cell-oracle.json', 'docs/creative-world-smoke.json',
                  'tools/smoke_platform_tags.py', 'docs/platform-tags-report.json', 'docs/platform-tags-world-smoke.json',
                  'docs/tool-cell-oracle.json', 'docs/tool-world-smoke.json', 'docs/upgrade-world-smoke.json',
+                 'tools/item_energy_oracle.py', 'examples/item_energy_oracle.rs', 'docs/item-energy-oracle.json', 'tools/smoke_item_charging.py',
+                 'tools/charger_oracle.py', 'examples/charger_oracle.rs', 'docs/charger-oracle.json', 'docs/item-charging-world-smoke.json',
                  'examples/grid_oracle.rs', 'AGENTS.md', 'LICENSES/AE2-API-MIT',
                  'tools/upstream.py', 'tools/prepare_content.py', 'tools/package.py',
                  'docs/PARITY.md', 'docs/PLAN.md', 'docs/upstream-inventory.json',

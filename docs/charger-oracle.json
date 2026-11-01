@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "cases": 2000,
+  "operations": 200000,
+  "failed_operations": 0,
+  "first_failures": [],
+  "upstream": "db17504a86128fdf3dae31f5fb7a112a646e0b93",
+  "input_sha256": "6813d762b63fe120e2edda0857cd3ceec3e40c22148cb11adeb927fdcfb14521",
+  "source_sha256": {
+    "appeng/items/tools/powered/powersink/AEBasePoweredItem.java": "2594de6d12611838da95440f7f024e1e216bf6563a25a687afb449f3f880aef5",
+    "appeng/api/implementations/items/IAEItemPowerStorage.java": "641275928b0137d12e3d0a908489e2c9cc07f12f118e4006ba94f2bbf57b8f43",
+    "appeng/api/config/AccessRestriction.java": "1d05b65b3f59710ea7c51028b58b4439ef713335a5e6587d6bf3b5bd0ff135a7",
+    "appeng/api/config/Actionable.java": "ce15870e93740fb1a4fbfaa110c3259cf78a7f60015157bd043ed5e0c14c26fb",
+    "appeng/me/energy/StoredEnergyAmount.java": "c8a87e03895077e9ead2b55fdc13cd36211b0deafa259d337d13d1acd0719f86",
+    "appeng/api/config/PowerMultiplier.java": "6740a0a96239be1b087b708c8543e4c13a5901c161c653b2112d55d8dd25b4bb",
+    "appeng/blockentity/misc/ChargerBlockEntity.java": "f199f50688334f637664cef367fc5e2197bbbcd6afd206768f8d5dbd631888df"
+  },
+  "do_work_sha256": "5dec09fafd8901e107ddac894e3336e3e470fb63dd8bdec4e111fb8572b1ecbd",
+  "scope": "verbatim ChargerBlockEntity.doWork method in a stub host; unchanged AEBasePoweredItem/StoredEnergyAmount/PowerMultiplier; chargeable item local/direct-grid/overflow/common-refill order, working flag, exact requests and remaining amounts, config multipliers, no-grid/empty-grid, capacity overrides and overfull items",
+  "comparison": "exact f64 bits",
+  "not_covered": [
+    "complete ChargerBlockEntity superclass/native/world lifecycle",
+    "actual grid EnergyService dispatch and events",
+    "recipe branch/RNG/recipe lookup",
+    "item-specific rate methods and live config suppliers",
+    "nonfinite or invalid config/local buffer inputs"
+  ]
+}

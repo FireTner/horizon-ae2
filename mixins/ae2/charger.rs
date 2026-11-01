@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
-// ChargerBlockEntity.doWork (recipe branch), CrankBlockEntity and
+// ChargerBlockEntity.doWork (recipe and powered-item branches), CrankBlockEntity and
 // AENetworkedPoweredBlockEntity.Crankable at upstream.lock.json.
 // Copyright (c) AlgorithmX2 / AE2 contributors; 2026 Horizon port contributors.
 
@@ -85,9 +85,141 @@ pub fn recipe_work(
     (working, completed)
 }
 
+/// Source doWork charging branch. The caller performs the common grid refill
+/// afterwards; local-buffer extraction precedes the direct grid request.
+pub fn charge_item(
+    local: &mut f64,
+    item: &mut super::ae2_item_energy::ItemEnergy,
+    rate: f64,
+    ticks_since_last_call: u32,
+    charge_rate_factor: f64,
+    power_multiplier: f64,
+    mut grid_extract: impl FnMut(f64) -> f64,
+) -> bool {
+    if item.current().partial_cmp(&item.maximum()) != Some(std::cmp::Ordering::Less) {
+        return false;
+    }
+    let charge_rate = rate * ticks_since_last_call as f64 * charge_rate_factor;
+    let mut buffer = super::ae2_energy::StoredEnergy::new(*local, POWER_MAXIMUM);
+    let mut extracted = buffer.extract(charge_rate * power_multiplier, true).0 / power_multiplier;
+    let missing_rate = charge_rate - extracted;
+    let missing_power = item.maximum() - item.current();
+    extracted += grid_extract(missing_rate.min(missing_power));
+    let working = extracted > 0.0;
+    if working {
+        let adjustment = item.inject(extracted, true);
+        buffer.set_stored(buffer.amount() + adjustment);
+    }
+    *local = buffer.amount();
+    working
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    use super::super::ae2_item_energy::ItemEnergy;
+
+    #[test]
+    fn near_full_tool_returns_overflow_and_direct_grid_request_is_source_ordered() {
+        let mut item = ItemEnergy::from_components(20000.0, None, Some(19990.0));
+        let mut local = 1600.0;
+        let mut requested = vec![];
+        assert!(charge_item(
+            &mut local,
+            &mut item,
+            800.0,
+            10,
+            1.0,
+            1.0,
+            |amount| {
+                requested.push(amount);
+                amount
+            }
+        ));
+        // Source requests missingPower even though the extracted local buffer
+        // already covers it; injection then returns all excess to that buffer.
+        assert_eq!(requested, vec![10.0]);
+        assert_eq!(item.current(), 20000.0);
+        assert_eq!(local, 1600.0);
+    }
+    #[test]
+    fn local_buffer_and_grid_are_combined_without_manufacturing_energy() {
+        let mut item = ItemEnergy::from_components(20000.0, None, None);
+        let mut local = 1600.0;
+        let mut grid = 300.0;
+        assert!(charge_item(
+            &mut local,
+            &mut item,
+            80.0,
+            10,
+            1.0,
+            1.0,
+            |amount| {
+                let result = amount.min(grid);
+                grid -= result;
+                result
+            }
+        ));
+        assert_eq!(local, 800.0);
+        assert_eq!(grid, 300.0);
+        assert_eq!(item.current(), 800.0);
+        assert!(charge_item(
+            &mut local,
+            &mut item,
+            80.0,
+            20,
+            1.0,
+            1.0,
+            |amount| {
+                let result = amount.min(grid);
+                grid -= result;
+                result
+            }
+        ));
+        assert_eq!(local, 0.0);
+        assert_eq!(grid, 0.0);
+        assert_eq!(item.current(), 1900.0);
+        assert!(!charge_item(
+            &mut local,
+            &mut item,
+            80.0,
+            10,
+            1.0,
+            1.0,
+            |_| 0.0
+        ));
+    }
+    #[test]
+    fn configured_local_multiplier_and_charger_rate_factor_have_distinct_roles() {
+        let mut item = ItemEnergy::from_components(20000.0, None, None);
+        let mut local = 1600.0;
+        assert!(charge_item(
+            &mut local,
+            &mut item,
+            80.0,
+            10,
+            0.5,
+            2.0,
+            |amount| {
+                assert_eq!(amount, 0.0);
+                0.0
+            }
+        ));
+        assert_eq!(local, 800.0);
+        assert_eq!(item.current(), 400.0);
+        item.set_current(20000.0);
+        assert!(!charge_item(
+            &mut local,
+            &mut item,
+            80.0,
+            10,
+            1.0,
+            1.0,
+            |_| panic!("full item must not extract")
+        ));
+        assert_eq!(local, 800.0);
+    }
 
     #[test]
     fn turn_delivers_at_tick_eighteen_and_allows_two_tick_overlap() {

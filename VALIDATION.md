@@ -3,7 +3,45 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## Upgrade components — текущая проверка
+## Powered items / Charger — текущая проверка
+
+- Standalone **94 PASS**, fmt/rustfmt/clippy `-D warnings`, Python **10 PASS**:
+  target/item-energy-checks-final.log. Native **121 PASS**:
+  target/item-energy-native-tests.json. Native check/build PASS:
+  target/item-energy-native-check.json, target/item-energy-native-build.json.
+  Native unused API и прежний rust-objcopy/libLLVM warning остаются видимыми.
+- **2000 traces / 400000 energy operations PASS**, docs/item-energy-oracle.json:
+  unchanged AEBasePoweredItem и API classes, component map/game/UI — stubs.
+  Exact double bits (NaN payload equivalence), overflow/simulate/commit/extract,
+  thresholds, capacity override/multiplier/reset, signed zero/nonfinite/negative.
+- **2000 traces / 200000 Charger calls PASS**, docs/charger-oracle.json:
+  дословный doWork из pinned class в stub host, unchanged AEBasePoweredItem,
+  StoredEnergyAmount/PowerMultiplier. Exact double bits, working flag и оба
+  grid request values. Проверены source local-first/grid/overflow/refill,
+  config factors/multipliers, variable tick intervals, no/empty grid и overfull item.
+  Полный Charger superclass/NeoForge/world/grid dispatch не запускаются;
+  recipe finder всегда null, RNG/recipe branch этим oracle не проверяются.
+- Native tests покрывают defaults/rates всех 16 IDs, two-slot wireless и raw
+  energy card count, original capacity override без вызова change callback,
+  preservation upgrades/storage/custom components, malformed numeric refusal,
+  idempotent command registry и numeric command energy codecs.
+- Изолированный world **item-charging-vjhsnfav PASS**:
+  near-full portable с двумя energy cards: local 1600 + grid 1000 + item 990
+  -> local 1600 + grid 990 + item 1000; nested contents сохранены.
+  Cannon получает 5000 AE, из 6600 AE остаётся ровно 1600 в local buffer.
+  Front exclusion, один Crank -> ровно 160 AE в Staff, все 16 manual insert/
+  charging hosts, partial stored_energy 2011 + capacity override + contents после
+  restart и manual retrieval PASS. Report: docs/item-charging-world-smoke.json.
+- Первый world run выявил отсутствующую command component registration.
+  Добавлены шесть supported AE2 IDs, с предварительной загрузкой vanilla type
+  IDs до AE2 augmentation (исходный hydration условен по пустому списку).
+  Два numeric component codecs проверяются в horizon-command. Не заявляются
+  registration/полные codecs остальных AE2/addon компонентов.
+- Открыты: energy tooltip/bar/creative tab/reequip overrides, live config,
+  upgrade editing/callbacks, Charger hopper filters/capability и полное original
+  inv/item/drop lifecycle. Handheld firing/painting/terminal actions не перенесены.
+
+## Upgrade components — предыдущее подтверждение
 
 - Standalone **87 PASS**, fmt/rustfmt/clippy `-D warnings`, Python **10 PASS**:
   target/upgrades-checks-final.log. Native **110 PASS**:

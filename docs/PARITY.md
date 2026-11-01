@@ -13,12 +13,12 @@
 | NetworkStorage | mount priorities, preferred passes, mutation queues, recursion guard, weak links; 2000 Java traces/410882 операций; native StorageService/Drive consumers | MEStorage handler filters, ME Chest/terminal и остальные providers |
 | StorageService | node/global provider identity, refresh/unmount, lazy public cache/private counts, key/watch-all changes и permanent watcher destroy | Java service oracle, world watcher hosts, full callback/hash iteration/exception fidelity, debug dump |
 | DriveBlockEntity / DriveWatcher | десять slots для всех 23 built-in storage handlers, online/priority mounts, REQUIRE_CHANNEL, 2 AE + disk drain, front exclusion, original inv.itemN + Horizon Items mirror, packed status; native hopper/dropper filter/limit/flush и world restart | external capability API, dynamic cell chassis/LEDs/sync, all inventory/drop/chunk paths, reload invalidation и special menu actions |
-| MatterCannon / ColorApplicator storage | 512 bytes/1 type и 2048 bytes/27 types, recipe/tag item admission before void, positive-weight first recipe, paintballs/dyes/snowball, 0.5 idle drain, filled-tool nesting и private-energy retention | handheld charging/shooting/painting/cycling, full item APIs/visuals, live recipe/tag reload, unknown addon condition/class adapters и matching recipe iteration ties |
+| MatterCannon / ColorApplicator storage | 512 bytes/1 type и 2048 bytes/27 types, recipe/tag item admission before void, positive-weight first recipe, paintballs/dyes/snowball, 0.5 idle drain, filled-tool nesting и private-energy retention | handheld shooting/painting/cycling, full item APIs/visuals, live recipe/tag reload, unknown addon condition/class adapters и matching recipe iteration ties |
 | CreativeCellInventory / Handler | exact configured item/fluid keys, unlimited insert/extract simulate/commit, Integer.MAX_VALUE listing, preferred, TYPES_FULL и zero drain, empty nesting, no-op persist; native mounts и 2000 Java traces | tooltip image/shift list, workbench/config writer, descriptions, full item/handler/addon API и source iteration order |
-| PortableCellItem | половина bytes, прежний overhead, item type limits 54/45/36/27/18 и fluid 18, 0.5 idle drain, component-preserving backend/Drive mounts и storage tooltip | handheld terminal/menu, private charging/use/disassembly, energy tooltip, item color/LED и full upgrades lifecycle |
+| PortableCellItem | половина bytes, прежний overhead, item type limits 54/45/36/27/18 и fluid 18, 0.5 idle drain, component-preserving backend/Drive mounts и storage tooltip | handheld terminal/menu, private use/disassembly, energy tooltip, item color/LED и full upgrades lifecycle |
 | DriveMenu / DriveScreen | original texture/layout, десять cell slots с лимитом 1, authoritative filters, pickup/shift/drag/hotbar rules, main-before-hotbar shift order и isolation; game restart | priority button/subscreen, ghost icons, AEBaseMenu bulk actions, external multiplayer и addon cell registry |
 | EnergyCellBlockEntity | normal/dense/creative block entities, реальные сетевые хранилища, internalCurrentPower и proxy.e persistence | fullness drawing/sync, comparator, energy components у item/drop/placement, redstone/template side effects |
-| Charger recipes | таблица ae2:charger, local 1600 AE, threshold 1599, interval 10, random > 0.8, один предмет, сохранение энергии/слота; сеть пополняет private buffer до 800 AE/call | инструменты, config multiplier/rates, hopper фильтры, эффекты и рендер предмета |
+| Charger | таблица ae2:charger, local 1600 AE, threshold 1599, interval 10, random > 0.8, один предмет, сохранение энергии/слота; powered branch для 16 items с исходными rates и local/grid/overflow; сеть пополняет private buffer до 800 AE/call | live config multiplier/rates, hopper фильтры, полное inv/drop lifecycle, эффекты и рендер предмета |
 | Wooden Crank | rotation/hits/charge, 18 ticks/160 AE, busy window, 11 отказов ломают рукоятку, charger-side restriction | placement/survival, fake-player rule, статистика, анимация и sync |
 | Common platform tags | 461 generated c tags NeoForge 21.1.169, exact source hashes/licence, platform-before-AE2 layering/replace и real item predicate/restart checks | runtime membership всех registries/тегов, NeoForge API/events/recipe conditions и полная survival progression |
 
@@ -180,3 +180,23 @@
   сам clamp-ит нулевые counts; adapter проверяет их до вызова decoder.
   Java cell oracles используют stub upgrades и не доказывают этот новый reader;
   здесь доказательства — сверка pinned source, Rust/native tests и world retention.
+
+- AEBasePoweredItem energy methods сверены с unchanged original class:
+  2000 traces/400000 operations, exact double bits (NaN payloads эквивалентны),
+  включая simulate/commit, overflow, threshold, capacity override/multiplier/reset,
+  overcapacity, negative/nonfinite requests и signed zero. Компонентный map,
+  Minecraft item/UI infrastructure — stubs; полный component codec этим не доказан.
+- Charger.doWork сверён отдельно: дословный метод из pinned source компилируется
+  в stub host вместе с unchanged AEBasePoweredItem, StoredEnergyAmount и
+  PowerMultiplier; 2000 traces/200000 calls, exact doubles/working/request order.
+  Это не весь block entity: grid dispatch, inventory/config/world lifecycle — stubs,
+  recipe lookup всегда возвращает null. Рецепт/RNG этим oracle не проверяется.
+- Native powered adapter использует defaults AEConfig и charge factor/power
+  multiplier 1; rule core принимает параметры. Live config supplier/reload ещё нет.
+  Чтение energy cards меняет rate, но не пересчитывает capacity при загрузке:
+  исходный onUpgradesChanged делает это только при изменении инвентаря. Writer/
+  callbacks и capacity expansion через редактирование карт ещё не подключены.
+- Шесть поддержанных storage/power component IDs добавлены в command registries
+  с сохранением vanilla IDs. Два energy codecs проверяют numeric NBT, как
+  Codec.DOUBLE; generic container/key/fuzzy codecs и packet registrations ещё
+  частичные. Arbitrary addon components не объявляются известными автоматически.

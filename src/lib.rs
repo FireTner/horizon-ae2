@@ -27,3 +27,6 @@ pub mod ae2_storage;
 pub mod ae2_tool_filters;
 #[path = "../mixins/ae2/upgrade_rules.rs"]
 pub mod ae2_upgrade_rules;
+
+#[path = "../mixins/ae2/item_energy.rs"]
+pub mod ae2_item_energy;

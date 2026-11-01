@@ -227,3 +227,13 @@
   полные missing-content/legacy codecs и destruction/explosion/drop paths открыты.
   Формат optional count и empty stack сверялся с
   [Mojang Item Stack Format](https://www.minecraft.net/en-us/article/minecraft-snapshot-24w09a).
+
+- Drive и Charger используют общий inventory_codec для source optional stacks,
+  empty `{}`, omitted default count и original/native echo selection. Drive
+  больше не делегирует count-zero clamping general decoder и не снимает blocked
+  state при изменении одного native echo. Raw malformed original inv сохраняется
+  до explicit repair. Прямая source NBT загрузка положительного count>1 сохраняет
+  count: AEBaseInvBlockEntity вызывает setItemDirect без ограничения входного
+  слота; один slot даёт один storage handler, не ёмкость/idle вдвое. Нормальная
+  insertion через menu/hopper по-прежнему имеет limit one. Полная registry-aware
+  codec normalization/missing-content recovery и все legacy варианты ещё нужны.

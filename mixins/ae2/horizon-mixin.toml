@@ -7,6 +7,12 @@ priority = 100
 horizon_revision = "aa27eca326db26e999d4e59d7899576016764b1e"
 
 [[module]]
+id = "inventory-codec"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_inventory_codec"
+source = "inventory_codec.rs"
+
+[[module]]
 id = "charger-inventory"
 file = "crates/horizon-client/src/game.rs"
 name = "ae2_charger_inventory"

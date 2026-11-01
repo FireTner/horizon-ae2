@@ -10,12 +10,8 @@ use super::{
     ae2_network::{Kind, Network, Pos},
     ae2_service::StorageService,
 };
-use horizon_client::{
-    containers::BlockEntity,
-    items::ItemStack,
-    save::{item_from_nbt, item_to_nbt},
-};
-use horizon_world::nbt::{Compound, JavaString, Tag};
+use horizon_client::{containers::BlockEntity, items::ItemStack};
+use horizon_world::nbt::{JavaString, Tag};
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::{Arc, Mutex};
 
@@ -48,41 +44,15 @@ impl Default for Host {
     }
 }
 
+#[cfg(test)]
 fn decode_inv(tag: &Tag) -> Result<Vec<Option<ItemStack>>, &'static str> {
-    let Tag::Compound(map) = tag else {
-        return Err("Drive inv is not a compound");
-    };
-    (0..SLOTS)
-        .map(
-            |slot| match map.get(&JavaString::from(format!("item{slot}").as_str())) {
-                None => Ok(None),
-                Some(Tag::Compound(map)) if map.is_empty() => Ok(None),
-                Some(tag) => {
-                    let stack = item_from_nbt(tag).ok_or("invalid Drive item stack")?;
-                    if stack.count != 1 {
-                        return Err("Drive cell slot count must be one");
-                    }
-                    Ok(Some(stack))
-                }
-            },
-        )
-        .collect()
+    super::ae2_inventory_codec::read_slots(tag, SLOTS)
 }
 fn encode_inv(items: &[Option<ItemStack>], previous: Option<&Tag>) -> Tag {
-    let mut map = match previous {
-        Some(Tag::Compound(map)) => map.clone(),
-        _ => Compound::new(),
-    };
-    for slot in 0..SLOTS {
-        map.insert(
-            JavaString::from(format!("item{slot}").as_str()),
-            items
-                .get(slot)
-                .and_then(Option::as_ref)
-                .map_or_else(|| Tag::Compound(Compound::new()), item_to_nbt),
-        );
-    }
-    Tag::Compound(map)
+    super::ae2_inventory_codec::write_slots(
+        (0..SLOTS).map(|slot| items.get(slot).and_then(Option::as_ref)),
+        previous,
+    )
 }
 
 #[derive(Default)]
@@ -146,11 +116,14 @@ impl Drives {
             }
             if !host.observed || host.items != source_items || host.inv != inv {
                 let source_echo = source_items.clone();
-                let chosen = if (!host.observed || host.inv != inv) && inv.is_some() {
-                    decode_inv(inv.as_ref().unwrap())
-                } else {
-                    Ok(source_items)
-                };
+                let chosen = super::ae2_inventory_codec::choose_slots(
+                    inv.as_ref(),
+                    host.inv.as_ref(),
+                    &source_items,
+                    host.observed,
+                    host.blocked,
+                    SLOTS,
+                );
                 match chosen {
                     Ok(items) => {
                         for slot in 0..SLOTS {
@@ -518,8 +491,18 @@ mod tests {
         assert_eq!(bad, saved);
         let bad_count = Tag::compound([(
             "item0",
-            item_to_nbt(&ItemStack::new("ae2:item_storage_cell_1k", 2)),
+            horizon_client::save::item_to_nbt(&ItemStack::new("ae2:item_storage_cell_1k", 2)),
         )]);
-        assert!(decode_inv(&bad_count).is_err());
+        // AEBaseInvBlockEntity uses setItemDirect; slot input limits do not
+        // clamp a positive stack count loaded directly from original NBT.
+        assert_eq!(
+            decode_inv(&bad_count).unwrap()[0].as_ref().unwrap().count,
+            2
+        );
+        let zero = Tag::compound([(
+            "item0",
+            horizon_client::save::item_to_nbt(&ItemStack::new("ae2:item_storage_cell_1k", 0)),
+        )]);
+        assert!(decode_inv(&zero).is_err());
     }
 }

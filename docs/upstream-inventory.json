@@ -2120,7 +2120,7 @@
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/AEBaseInvBlockEntity.java",
       "port": "mixins/ae2/charger_inventory.rs",
-      "scope": "Drive and Charger original inv/itemN load/save with native Items echo; Charger count-one omission, live/source changes, strict malformed retention, actor flush and restart; full missing-content recovery, legacy migrations, capabilities and all drop paths pending",
+      "scope": "shared Drive/Charger original inv/itemN codec and native echo selection; prevalidate zero counts before native clamp, default-count omission, direct positive count load, blocked original retention and actor flush; full missing-content/registry normalization, migrations, capabilities and all drop paths pending",
       "sha256": "d2a9b5f480e3e1e5b70aef85433d170bdac74cb0edefc74319c2893a97160a1b",
       "status": "partial"
     },

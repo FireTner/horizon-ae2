@@ -3,7 +3,39 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## Charger original inventory — текущая проверка
+## Shared source inventory codec — текущий завершённый этап
+
+- Standalone **95 PASS**, native **130 PASS**, Python **10 PASS**, fmt/rustfmt,
+  clippy -D warnings, source inventory audit и native check/build PASS.
+  Logs: target/inventory-codec-core-checks.log,
+  target/inventory-codec-native-tests.json, target/inventory-codec-native-check.json,
+  target/inventory-codec-native-build.json. Library source не менялся;
+  его последние **9** packet/menu tests подтверждены предыдущим этапом.
+- inventory_codec общий для Drive/Charger: optional stack, nonpositive count
+  refusal до Horizon clamp, count-one omission, source/native echo precedence.
+  Blocked original не заменяется новым native echo. Положительный count>1 из
+  прямой source NBT загрузки сохраняется: BaseInv load вызывает setItemDirect,
+  ограничения обычной вставки не применяются к этому setter.
+- World **drive-inventory-hkskab5i PASS**, docs/drive-inventory-world-smoke.json:
+  source count-zero остаётся raw и не монтируется (drain 2.015625 AE/tick);
+  native echo заменён на 4k, но original не затёрт и не разблокирован;
+  restart удерживает blocked состояние, explicit repair монтирует original data;
+  loaded count-two сохраняется и даёт один cell idle drain, 2.515625 AE/tick.
+  Все измерения привязаны к фактическим game ticks и power snapshots.
+- Charger regression **charger-inventory-3zuq22ud PASS**:
+  original-format load, live charge/no stale echo, source replacement,
+  malformed retention/repair, native migration, restart/retrieval и recipe output.
+  docs/shared-codec-charger-regression.json.
+- Drive GUI regression **drive-gui-ife9_u0f PASS**:
+  normal limit-one/filter/pickup/shift, vanilla barrel isolation и restart.
+  docs/shared-codec-gui-regression.json.
+- Все тестовые клиенты этого этапа завершены. Нет изменений в оригинальных
+  Horizon/Create repos, пользовательских saves/options или установке модов.
+- Открыты полные registry-aware codecs, missing/malformed recovery, migrations,
+  capabilities/automation/drop lifecycle и остальной полный порт. Strict malformed
+  retention — временная политика, не доказательство source recovery parity.
+
+## Charger original inventory — предыдущее подтверждение
 
 - Standalone **95**, native **127**, Python **10** PASS; fmt/rustfmt/clippy,
   inventory audit и native check/build PASS. Logs target/charger-inventory-*.json,

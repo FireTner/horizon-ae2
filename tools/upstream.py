@@ -144,7 +144,7 @@ PARTIAL.update({
 
 
 PARTIAL.update({
-    "blockentity/AEBaseInvBlockEntity.java": ("mixins/ae2/charger_inventory.rs", "Drive and Charger original inv/itemN load/save with native Items echo; Charger count-one omission, live/source changes, strict malformed retention, actor flush and restart; full missing-content recovery, legacy migrations, capabilities and all drop paths pending"),
+    "blockentity/AEBaseInvBlockEntity.java": ("mixins/ae2/charger_inventory.rs", "shared Drive/Charger original inv/itemN codec and native echo selection; prevalidate zero counts before native clamp, default-count omission, direct positive count load, blocked original retention and actor flush; full missing-content/registry normalization, migrations, capabilities and all drop paths pending"),
     "blockentity/misc/ChargerBlockEntity.java": ("mixins/ae2/glue.rs", "powered/recipe/refill order, native all-16 power profiles, private buffer/Crank and original inv.item0 persistence; working flag transient; live config, hopper filter, full visual/sync and remaining inventory/capability/drop lifecycle pending"),
 })
 

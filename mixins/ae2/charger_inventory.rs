@@ -4,65 +4,20 @@ use super::Game;
 use horizon_client::{
     containers::{BlockEntity, ModBlockEntity},
     items::ItemStack,
-    save::{item_from_nbt, item_to_nbt},
 };
-use horizon_world::nbt::{Compound, JavaString, Tag};
+#[cfg(test)]
+use horizon_world::nbt::Compound;
+use horizon_world::nbt::{JavaString, Tag};
 use std::collections::{BTreeMap, BTreeSet};
 type Pos = [i32; 3];
 const CHARGER: &str = "ae2:charger";
 
 fn decode(tag: &Tag) -> Result<Option<ItemStack>, &'static str> {
-    let Tag::Compound(inv) = tag else {
-        return Err("Charger inv must be a compound");
-    };
-    let Some(tag) = inv.get(&JavaString::from("item0")) else {
-        return Ok(None);
-    };
-    let Tag::Compound(item) = tag else {
-        return Err("Charger item0 must be a compound");
-    };
-    if item.is_empty() {
-        return Ok(None);
-    }
-    // The general Horizon decoder clamps a nonpositive count to one. Read the
-    // source count first; ItemStack.CODEC has a 1..99 range and a default of one.
-    let count = match item.get(&JavaString::from("count")) {
-        None => 1,
-        Some(Tag::Byte(v)) => i64::from(*v),
-        Some(Tag::Short(v)) => i64::from(*v),
-        Some(Tag::Int(v)) => i64::from(*v),
-        Some(Tag::Long(v)) => *v,
-        _ => return Err("invalid Charger item count"),
-    };
-    if !(1..=99).contains(&count) {
-        return Err("invalid Charger item count");
-    }
-    let mut stack = item_from_nbt(tag).ok_or("invalid Charger item stack")?;
-    stack.count = count as u32; // Do not interpret the legacy native Count alias.
-    Ok(Some(stack))
+    let mut items = super::ae2_inventory_codec::read_slots(tag, 1)?;
+    Ok(items.remove(0))
 }
 fn encode(stack: Option<&ItemStack>, previous: Option<&Tag>) -> Tag {
-    let mut inv = match previous {
-        Some(Tag::Compound(inv)) => inv.clone(),
-        _ => Compound::new(),
-    };
-    inv.insert(
-        JavaString::from("item0"),
-        stack.filter(|stack| stack.count > 0).map_or_else(
-            || Tag::Compound(Compound::new()),
-            |stack| {
-                let mut tag = item_to_nbt(stack);
-                // ItemStack.CODEC omits the default count of one.
-                if stack.count == 1
-                    && let Tag::Compound(map) = &mut tag
-                {
-                    map.remove(&JavaString::from("count"));
-                }
-                tag
-            },
-        ),
-    );
-    Tag::Compound(inv)
+    super::ae2_inventory_codec::write_slots(std::iter::once(stack), previous)
 }
 pub(super) fn usable(be: &ModBlockEntity) -> bool {
     be.nbt
@@ -91,11 +46,15 @@ impl Echo {
         let inv = be.nbt.get(&JavaString::from("inv")).cloned();
         let native = be.items.first().cloned().flatten();
         if !self.observed || self.inv != inv || self.item != native || self.blocked {
-            let chosen = if inv.is_some() && (!self.observed || self.inv != inv || self.blocked) {
-                decode(inv.as_ref().unwrap())
-            } else {
-                Ok(native.clone())
-            };
+            let chosen = super::ae2_inventory_codec::choose_slots(
+                inv.as_ref(),
+                self.inv.as_ref(),
+                std::slice::from_ref(&native),
+                self.observed,
+                self.blocked,
+                1,
+            )
+            .map(|mut items| items.remove(0));
             match chosen {
                 Ok(item) => {
                     if be.items.is_empty() {

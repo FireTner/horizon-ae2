@@ -77,6 +77,10 @@
   записывает slot edits сразу и держит working transient. Source updates,
   malformed retention, native-save migration и restart проверены. Full recovery,
   hopper/capabilities и все drop paths ещё открыты.
+- Общий source inventory codec Drive/Charger проверяет count до native clamp,
+  сохраняет optional/default форму и защищает blocked original от изменения echo.
+  Прямой positive count из NBT сохраняется отдельно от limit-one обычной вставки.
+  Проверены block/unblock/restart, точный drain и регрессии обоих устройств/GUI.
 - Подготовка контента, source-only `.hnmod`, закреплённые исходники и
   проверяемый реестр **всех 1429 Java-файлов** оригинала. В реестре нет
   полностью закрытых классов; 69 отмечены как частично перенесённые.

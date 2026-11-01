@@ -6,6 +6,13 @@
 
 ## Последний результат
 
+- Текущий этап shared source inventory codec завершён и проверен: 95 core,
+  130 native, 10 Python, fmt/clippy/audit и native check/build PASS. World Drive
+  target/smoke/drive-inventory-hkskab5i: zero-count refusal, blocked echo retention,
+  restart/repair, direct count-two and exact drain PASS. Charger regression
+  target/smoke/charger-inventory-3zuq22ud и GUI target/smoke/drive-gui-ife9_u0f PASS.
+  Пользователь попросил паузу после этого этапа для совместного тестирования.
+
 - Charger original inv.item0 load/save + native echo, direct actor flush,
   count-one omission, transient working, strict malformed retention/recovery gate.
   95 core / 127 native / 10 Python + native check/build PASS. World
@@ -125,7 +132,7 @@ pinned checkout: target/upstream/{ae2,horizon,horizon-mixins,neoforge}. Original
 только под target. Все тестовые процессы последнего smoke завершены.
 
 - tools/check.py: fmt, clippy, 95 core tests, 10 tooling tests, inventory check.
-- tools/horizon.py test: 127 native tests (Game + typed NBT); warnings об unused
+- tools/horizon.py test: 130 native tests (Game + typed NBT); warnings об unused
   API остаются до подключения всех потребителей API, не скрыты.
 - tools/horizon.py test --library: 9 tests, в том числе три server-click теста.
 - tools/pathing_oracle.py --cases 2000: JDK 21+, default local Homebrew JDK.
@@ -154,7 +161,6 @@ pinned checkout: target/upstream/{ae2,horizon,horizon-mixins,neoforge}. Original
 - Live config (батареи/rates/power multipliers), common capability API.
 Цель остаётся полным 1:1 переносом, а не текущим playable subset.
 
-Known next audit: Drive decode_inv currently delegates count decoding to Horizon,
-which clamps count zero to one. Add prevalidation and test original malformed
-retention under native echo changes; blocked Drive must not become live merely
-because its native transport mirror changed. Do not silently erase raw source inv.
+Resolved audit: Drive now uses inventory_codec count prevalidation and blocked
+source selection. Count zero cannot be clamped into a live cell, and native echo
+changes do not clear a blocked original. All three world regressions passed.

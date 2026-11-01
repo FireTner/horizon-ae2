@@ -50,7 +50,7 @@ def package():
                  'docs/tool-cell-oracle.json', 'docs/tool-world-smoke.json', 'docs/upgrade-world-smoke.json',
                  'tools/item_energy_oracle.py', 'examples/item_energy_oracle.rs', 'docs/item-energy-oracle.json', 'tools/smoke_item_charging.py',
                  'tools/charger_oracle.py', 'examples/charger_oracle.rs', 'docs/charger-oracle.json', 'docs/item-charging-world-smoke.json',
-                 'tools/smoke_item_bars.py', 'tools/smoke_charger_inventory.py', 'docs/charger-inventory-world-smoke.json', 'docs/charger-inventory-charging-regression.json', 'docs/item-energy-view-oracle.json', 'docs/item-bars-world-smoke.json', 'docs/component-sync-drive-gui.json', 'docs/component-sync-charging-world.json',
+                 'tools/smoke_item_bars.py', 'tools/smoke_charger_inventory.py', 'tools/smoke_drive_inventory.py', 'docs/drive-inventory-world-smoke.json', 'docs/shared-codec-charger-regression.json', 'docs/shared-codec-gui-regression.json', 'docs/charger-inventory-world-smoke.json', 'docs/charger-inventory-charging-regression.json', 'docs/item-energy-view-oracle.json', 'docs/item-bars-world-smoke.json', 'docs/component-sync-drive-gui.json', 'docs/component-sync-charging-world.json',
                  'examples/grid_oracle.rs', 'AGENTS.md', 'LICENSES/AE2-API-MIT',
                  'tools/upstream.py', 'tools/prepare_content.py', 'tools/package.py',
                  'docs/PARITY.md', 'docs/PLAN.md', 'docs/upstream-inventory.json',

@@ -1,0 +1,96 @@
+{
+  "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/drive-inventory-hkskab5i",
+  "scope": [
+    "count_zero_refusal_before_native_clamp",
+    "original_raw_retention",
+    "blocked_native_echo_does_not_unblock",
+    "restart",
+    "explicit_repair",
+    "direct_source_count_two_preserved_one_backend"
+  ],
+  "measurements": [
+    {
+      "before": {
+        "tick": 54,
+        "energy": 19917.359375
+      },
+      "after": {
+        "tick": 80,
+        "energy": 19864.953125
+      },
+      "expected_per_tick": 2.015625
+    },
+    {
+      "before": {
+        "tick": 112,
+        "energy": 19784.953125
+      },
+      "after": {
+        "tick": 138,
+        "energy": 19719.546875
+      },
+      "expected_per_tick": 2.515625
+    },
+    {
+      "before": {
+        "tick": 171,
+        "energy": 19652.03125
+      },
+      "after": {
+        "tick": 197,
+        "energy": 19599.625
+      },
+      "expected_per_tick": 2.015625
+    },
+    {
+      "before": {
+        "tick": 230,
+        "energy": 19533.109375
+      },
+      "after": {
+        "tick": 256,
+        "energy": 19480.703125
+      },
+      "expected_per_tick": 2.015625
+    },
+    {
+      "before": {
+        "tick": 299,
+        "energy": 19394.03125
+      },
+      "after": {
+        "tick": 325,
+        "energy": 19341.625
+      },
+      "expected_per_tick": 2.015625
+    },
+    {
+      "before": {
+        "tick": 359,
+        "energy": 19257.59375
+      },
+      "after": {
+        "tick": 384,
+        "energy": 19194.703125
+      },
+      "expected_per_tick": 2.515625
+    },
+    {
+      "before": {
+        "tick": 417,
+        "energy": 19111.6875
+      },
+      "after": {
+        "tick": 442,
+        "energy": 19048.796875
+      },
+      "expected_per_tick": 2.515625
+    }
+  ],
+  "not_covered": [
+    "all malformed/missing-content recovery",
+    "complete legacy migrations",
+    "all drop/explosion/capability paths"
+  ]
+}

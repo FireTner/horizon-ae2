@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/charger-inventory-3zuq22ud",
+  "checks": [
+    {
+      "name": "original inv.item0 hydrates native slot and charging persists energy/contents without stale echo refill",
+      "state": {
+        "native": {
+          "local": 0.0,
+          "item": 2011.0,
+          "nbt": "8, 73, 7 has the following block data: {inv: {item0: {components: {\"ae2:stored_energy\": 2011.0d, \"ae2:energy_capacity\": 5000.0d, \"ae2:storage_cell_inv\": [{\"#t\": \"ae2:i\", \"#\": 123L, id: \"minecraft:iron_ingot\"}]}, id: \"ae2:portable_item_cell_1k\"}}, proxy: {p: -1}, x: 8, y: 73, Items: [{components: {\"ae2:stored_energy\": 2011.0d, \"ae2:energy_capacity\": 5000.0d, \"ae2:storage_cell_inv\": [{\"#t\": \"ae2:i\", \"#\": 123L, id: \"minecraft:iron_ingot\"}]}, count: 1, Slot: 0b, id: \"ae2:portable_item_cell_1k\"}], z: 7, id: \"ae2:charger\", internalCurrentPower: 0.0d}",
+          "back": 0.0,
+          "front": 0.0,
+          "total": 2011.0
+        },
+        "inv": "8, 73, 7 has the following block data: {item0: {components: {\"ae2:stored_energy\": 2011.0d, \"ae2:energy_capacity\": 5000.0d, \"ae2:storage_cell_inv\": [{\"#t\": \"ae2:i\", \"#\": 123L, id: \"minecraft:iron_ingot\"}]}, id: \"ae2:portable_item_cell_1k\"}}"
+      }
+    },
+    {
+      "name": "explicit source-format replacement wins over old native mirror and live charging is not reverted",
+      "state": {
+        "local": 0.0,
+        "item": 1500.0,
+        "nbt": "8, 73, 7 has the following block data: {inv: {item0: {components: {\"ae2:stored_energy\": 1500.0d}, id: \"ae2:charged_staff\"}}, proxy: {p: -1}, x: 8, y: 73, Items: [{components: {\"ae2:stored_energy\": 1500.0d}, count: 1, Slot: 0b, id: \"ae2:charged_staff\"}], z: 7, id: \"ae2:charger\", internalCurrentPower: 0.0d}",
+        "back": 0.0,
+        "front": 0.0,
+        "total": 1500.0
+      }
+    },
+    {
+      "name": "malformed source count is retained without creating a card/item or allowing manual extraction; explicit repair unblocks",
+      "state": {
+        "invalid": "8, 73, 7 has the following block data: {item0: {count: 0, id: \"ae2:charged_staff\"}}",
+        "repaired": "8, 73, 7 has the following block data: {item0: {}}"
+      }
+    },
+    {
+      "name": "legacy native Items migrates to original inv and survives restart/retrieval with exact private energy",
+      "state": {
+        "inv_before": "8, 73, 7 has the following block data: {item0: {components: {\"ae2:stored_energy\": 777.0d, \"ae2:energy_capacity\": 1000.0d}, id: \"ae2:color_applicator\"}}",
+        "inventory": "Player55034 has the following entity data: [{components: {\"ae2:stored_energy\": 777.0d, \"ae2:energy_capacity\": 1000.0d}, count: 1, Slot: 0b, id: \"ae2:color_applicator\"}]"
+      }
+    },
+    {
+      "name": "recipe output updates original inv.item0 and consumes exactly 1600 AE",
+      "state": {
+        "inv": "8, 73, 7 has the following block data: {item0: {id: \"ae2:charged_certus_quartz_crystal\"}}",
+        "native": {
+          "local": 0.0,
+          "item": 0.0,
+          "nbt": "8, 73, 7 has the following block data: {inv: {item0: {id: \"ae2:charged_certus_quartz_crystal\"}}, proxy: {p: -1}, x: 8, y: 73, Items: [{count: 1, Slot: 0b, id: \"ae2:charged_certus_quartz_crystal\"}], z: 7, id: \"ae2:charger\", internalCurrentPower: 0.0d}",
+          "back": 0.0,
+          "front": 0.0,
+          "total": 0.0
+        }
+      }
+    }
+  ],
+  "not_covered": [
+    "complete Minecraft malformed/missing-content recovery",
+    "Charger hopper/capability and full destruction/explosion/drop lifecycle",
+    "external multiplayer",
+    "all legacy migrations"
+  ]
+}

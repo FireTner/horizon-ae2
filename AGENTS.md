@@ -24,6 +24,9 @@ item_energy_view.rs implements the source green 13-pixel bar, preserving count/c
 component_sync.rs lives in the native client library, sends AE2 typed component
 maps through a versioned wire-only envelope and unwraps before normal decoding.
 It must preserve real custom_data, nested items, original saved keys and click hashes.
+inventory_codec.rs is shared by Drive/Charger for original optional ItemStacks,
+count validation/default omission and source-versus-native echo selection.
+Loaded positive stack counts are not the same as normal input slot limits.
 charger_inventory.rs reconciles original inv.item0 with native Items by value;
 unchanged echoes cannot restore stale contents/power. Malformed original inv stays
 blocked until an explicit repair; never overwrite it from a changed native echo.

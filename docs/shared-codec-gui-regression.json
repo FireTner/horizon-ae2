@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/drive-gui-ife9_u0f",
+  "scope": [
+    "original_screen_layout",
+    "ten_visible_slots",
+    "reject_non_cells",
+    "pickup",
+    "shift_insert",
+    "shift_extract_order",
+    "vanilla_window_isolation",
+    "no_item_loss",
+    "restart"
+  ],
+  "not_covered": [
+    "priority submenu",
+    "AEBaseMenu special bulk actions",
+    "external multiplayer client",
+    "dynamic chassis/LEDs"
+  ]
+}

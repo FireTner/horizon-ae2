@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
-// World-independent binding of AE2 full-block nodes to topology + energy services.
-// This grows alongside the complete port; CableBus parts and other services are
-// not yet connected by this full-block adapter.
+// World-independent binding of supported AE2 nodes to topology + energy.
+// Cable center profiles are accepted here; the world multipart host/decoder,
+// renderer and lifecycle are still separate unfinished adapter work.
 
+use super::ae2_cable::{Cable, Color};
 use super::ae2_grid::{
     ChannelMode, ConnectionId, ControllerState, Direction, Flags, Graph, NodeId, NodeSpec,
 };
@@ -18,6 +19,7 @@ pub enum Kind {
     DenseEnergyCell,
     CreativeEnergyCell,
     Drive,
+    Cable(Cable),
 }
 impl Kind {
     pub fn from_block(id: &str) -> Option<Self> {
@@ -39,6 +41,7 @@ impl Kind {
             Self::DenseEnergyCell => "ae2:dense_energy_cell",
             Self::CreativeEnergyCell => "ae2:creative_energy_cell",
             Self::Drive => "ae2:drive",
+            Self::Cable(_) => "ae2:cable_bus",
         }
     }
     pub fn capacity(self) -> f64 {
@@ -48,7 +51,20 @@ impl Kind {
             Self::EnergyCell => 200000.0,
             Self::DenseEnergyCell => 1600000.0,
             Self::CreativeEnergyCell => super::ae2_energy::MAX_MAXIMUM,
-            Self::Drive => 0.0,
+            Self::Drive | Self::Cable(_) => 0.0,
+        }
+    }
+    fn grid_color(self) -> Color {
+        match self {
+            Self::Cable(cable) => cable.color,
+            _ => Color::Transparent,
+        }
+    }
+    fn same_node(self, other: Self) -> bool {
+        // CablePart.changeColor updates the existing managed node in place.
+        match (self, other) {
+            (Self::Cable(a), Self::Cable(b)) => a.kind == b.kind,
+            _ => self == other,
         }
     }
     fn energy_node(self, amount: f64) -> EnergyNode {
@@ -68,7 +84,7 @@ impl Kind {
                 self.capacity(),
                 super::ae2_controller::STORAGE_PRIORITY,
             )),
-            Self::Charger | Self::Drive => None,
+            Self::Charger | Self::Drive | Self::Cable(_) => None,
             Self::EnergyCell => Some(Store::finite(
                 amount.clamp(0.0, self.capacity()),
                 self.capacity(),
@@ -97,12 +113,15 @@ pub struct Snapshot {
     pub pos: Pos,
     pub kind: Kind,
     pub front: Direction,
+    /// Exposed in-world faces; the multipart host removes blocked/occupied sides.
+    pub exposed: u8,
     pub stored: f64,
     pub saved_buffer: f64,
 }
 impl Snapshot {
     fn exposes(self, direction: Direction) -> bool {
-        !matches!(self.kind, Kind::Charger | Kind::Drive) || self.front != direction
+        self.exposed & (1 << direction as u8) != 0
+            && (!matches!(self.kind, Kind::Charger | Kind::Drive) || self.front != direction)
     }
 }
 #[derive(Clone, Copy, Debug)]
@@ -150,7 +169,11 @@ impl Network {
         let gone: Vec<_> = self
             .nodes
             .iter()
-            .filter(|(p, n)| incoming.get(*p).is_none_or(|s| s.kind != n.snapshot.kind))
+            .filter(|(p, n)| {
+                incoming
+                    .get(*p)
+                    .is_none_or(|s| !s.kind.same_node(n.snapshot.kind))
+            })
             .map(|(p, _)| *p)
             .collect();
         for pos in gone {
@@ -166,7 +189,10 @@ impl Network {
         for (pos, snapshot) in incoming {
             match self.nodes.get_mut(&pos) {
                 Some(node) => {
-                    if node.snapshot.front != snapshot.front {
+                    if node.snapshot.front != snapshot.front
+                        || node.snapshot.exposed != snapshot.exposed
+                        || node.snapshot.kind != snapshot.kind
+                    {
                         changed = true;
                     }
                     if node.snapshot.stored.to_bits() != snapshot.stored.to_bits()
@@ -186,6 +212,7 @@ impl Network {
                         flags: match snapshot.kind {
                             Kind::Drive => Flags::REQUIRE_CHANNEL,
                             Kind::Controller => Flags::CANNOT_CARRY | Flags::DENSE_CAPACITY,
+                            Kind::Cable(cable) => cable.kind.node_flags(),
                             _ => Flags::default(),
                         },
                         controller: (snapshot.kind == Kind::Controller).then_some(pos),
@@ -214,6 +241,11 @@ impl Network {
                 if let Some(other) = self.nodes.get(&neighbor)
                     && node.id < other.id
                     && other.snapshot.exposes(direction.opposite())
+                    && node
+                        .snapshot
+                        .kind
+                        .grid_color()
+                        .compatible(other.snapshot.kind.grid_color())
                 {
                     desired.insert((node.id, other.id), direction);
                 }
@@ -438,6 +470,107 @@ impl Network {
 mod tests {
     use super::*;
 
+    fn cable(pos: Pos, kind: super::super::ae2_cable::CableType, color: Color) -> Snapshot {
+        snapshot(pos, Kind::Cable(Cable { kind, color }), 0.0)
+    }
+    #[test]
+    fn cable_recolour_preserves_node_identity_but_rebuilds_colour_compatible_edges() {
+        use super::super::ae2_cable::CableType;
+        let mut n = Network::default();
+        let a = cable([0, 0, 0], CableType::Smart, Color::Red);
+        let mut b = cable([1, 0, 0], CableType::Smart, Color::Blue);
+        let supply = snapshot([-1, 0, 0], Kind::EnergyCell, 1000.0);
+        n.sync(vec![supply, a, b]);
+        let id = n.node_service(b.pos).unwrap().1;
+        assert_ne!(
+            n.node_service(a.pos).unwrap().0,
+            n.node_service(b.pos).unwrap().0
+        );
+        b.kind = Kind::Cable(Cable {
+            kind: CableType::Smart,
+            color: Color::Transparent,
+        });
+        n.sync(vec![supply, a, b]);
+        assert_eq!(n.node_service(b.pos).unwrap().1, id);
+        assert_eq!(
+            n.node_service(a.pos).unwrap().0,
+            n.node_service(b.pos).unwrap().0
+        );
+        assert_eq!(n.extract(b.pos, 10.0, 1.0, true), 10.0);
+        b.kind = Kind::Cable(Cable {
+            kind: CableType::Smart,
+            color: Color::Blue,
+        });
+        n.sync(vec![supply, a, b]);
+        assert_eq!(n.node_service(b.pos).unwrap().1, id);
+        assert_ne!(
+            n.node_service(a.pos).unwrap().0,
+            n.node_service(b.pos).unwrap().0
+        );
+        assert_eq!(n.extract(b.pos, 10.0, 1.0, true), 0.0);
+    }
+    #[test]
+    fn occupied_or_blocked_cable_face_disconnects_without_replacing_node() {
+        use super::super::ae2_cable::CableType;
+        let mut n = Network::default();
+        let a = cable([0, 0, 0], CableType::Glass, Color::Transparent);
+        let mut b = cable([1, 0, 0], CableType::Covered, Color::Red);
+        n.sync(vec![a, b]);
+        let id = n.node_service(b.pos).unwrap().1;
+        b.exposed &= !(1 << Direction::West as u8);
+        n.sync(vec![a, b]);
+        assert_eq!(n.node_service(b.pos).unwrap().1, id);
+        assert_ne!(
+            n.node_service(a.pos).unwrap().0,
+            n.node_service(b.pos).unwrap().0
+        );
+        b.exposed = 63;
+        n.sync(vec![a, b]);
+        assert_eq!(
+            n.node_service(a.pos).unwrap().0,
+            n.node_service(b.pos).unwrap().0
+        );
+        // The world adapter cannot infer a center cable from the host block ID.
+        assert_eq!(Kind::from_block("ae2:cable_bus"), None);
+    }
+    #[test]
+    fn dense_trunk_supplies_twelve_devices_and_normal_cable_is_a_real_bottleneck() {
+        use super::super::ae2_cable::CableType;
+        let mut n = Network::default();
+        let mut nodes = vec![
+            snapshot([-1, 0, 0], Kind::CreativeEnergyCell, 0.0),
+            snapshot([0, 0, 0], Kind::Controller, 0.0),
+        ];
+        for x in 1..=24 {
+            nodes.push(cable([x, 0, 0], CableType::DenseSmart, Color::Transparent));
+        }
+        let drives: Vec<_> = (1..=12).map(|x| [x * 2, 1, 0]).collect();
+        nodes.extend(drives.iter().map(|p| snapshot(*p, Kind::Drive, 0.0)));
+        n.sync(nodes.clone());
+        for _ in 0..40 {
+            n.begin_tick();
+            n.end_tick();
+        }
+        assert!(drives.iter().all(|p| n.is_online(*p)));
+        let dense = n.graph.node(n.node_service([1, 0, 0]).unwrap().1).unwrap();
+        assert!(dense.spec.flags.has(Flags::DENSE_CAPACITY));
+        assert!(!dense.spec.flags.has(Flags::PREFERRED));
+        assert_eq!(dense.max_channels(ChannelMode::Default), 32);
+        nodes.iter_mut().find(|s| s.pos == [1, 0, 0]).unwrap().kind = Kind::Cable(Cable {
+            kind: CableType::Smart,
+            color: Color::Transparent,
+        });
+        n.sync(nodes);
+        for _ in 0..40 {
+            n.begin_tick();
+            n.end_tick();
+        }
+        assert!(drives.iter().filter(|p| n.is_online(**p)).count() <= 8);
+        let normal = n.graph.node(n.node_service([1, 0, 0]).unwrap().1).unwrap();
+        assert!(normal.spec.flags.has(Flags::PREFERRED));
+        assert_eq!(normal.max_channels(ChannelMode::Default), 8);
+    }
+
     #[test]
     fn placement_after_same_tick_break_never_reuses_a_spent_node_with_identical_saved_nbt() {
         let pos = [1, 2, 3];
@@ -519,6 +652,7 @@ mod tests {
             pos,
             kind,
             front: Direction::North,
+            exposed: 63,
             stored,
             saved_buffer: 0.0,
         }

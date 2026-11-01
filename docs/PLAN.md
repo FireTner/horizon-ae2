@@ -34,6 +34,13 @@ SHA-256, подсистема и фактический объём начато�
    upgrade inventory, data component codecs и миграции, creative/portable cells,
    Cell Workbench. Проверки: NBT roundtrip, миллионы предметов, сложные компоненты,
    полные ячейки, фильтры, перезагрузка и запрет потери/дублирования.
+Текущий связующий слой перед закрытием ME-графа: cable core/source oracle и
+server profiles уже перенесены. Следом — настоящий CableBus host с source
+center/side/facade NBT, one-node-per-part identity/readiness, placement/partial
+break, renderer/collision/selection и update packets. Только после game/restart/
+chunk/color/dense tests можно считать кабели подключёнными в мире. Профили
+в изолированном binding не заменяют этот слой.
+
 3. **ME-граф.** Grid/Node/Connection/Storage/Service, сетевые события, цвета,
    CableBus/части/фасады, соединения на границах чанков, merge/split, ad-hoc,
    pathfinding, dense/обычные/умные кабели и каналы, контроллерные структуры,

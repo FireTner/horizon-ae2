@@ -1,0 +1,78 @@
+{
+  "passed": true,
+  "checks": [
+    "all original 18 state/type combinations resolve as real block states",
+    {
+      "three_AE_idle_and_no_refill": {
+        "before": {
+          "tick": 134,
+          "energy": 874.0
+        },
+        "after": {
+          "tick": 165,
+          "energy": 781.0
+        }
+      }
+    },
+    "unpowered controller remains offline with no invented energy",
+    "public local storage is capped at original 8000 AE",
+    {
+      "controller_powers_real_charger": {
+        "before": {
+          "tick": 232,
+          "energy": 4997.0
+        },
+        "after": {
+          "tick": 299,
+          "energy": 3196.0
+        },
+        "recipe_AE": 1600
+      }
+    },
+    {
+      "geometry": "block",
+      "state": "online"
+    },
+    {
+      "geometry": "column_x",
+      "state": "online"
+    },
+    {
+      "geometry": "column_y",
+      "state": "online"
+    },
+    {
+      "geometry": "column_z",
+      "state": "online"
+    },
+    {
+      "geometry": "inside_a",
+      "state": "conflicted"
+    },
+    {
+      "geometry": "inside_b",
+      "state": "conflicted"
+    },
+    "eight-wide conflict recovers to online at original seven-wide bound",
+    "controllers connected only through another node conflict",
+    {
+      "restart_retains_energy_without_refill": {
+        "before": {
+          "tick": 823,
+          "energy": 4865.0
+        },
+        "after": {
+          "tick": 875,
+          "energy": 4709.0
+        }
+      }
+    }
+  ],
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/controller-5_celrs8",
+  "limits": [
+    "Network Status Menu and external energy capabilities",
+    "event/readiness/chunk/spatial lifecycle fidelity",
+    "full controller lighting/material rendering parity",
+    "Java/NeoForge world oracle and full mod parity"
+  ]
+}

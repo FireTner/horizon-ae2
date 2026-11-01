@@ -14,6 +14,16 @@ SOURCE = ROOT / "target/upstream/ae2"
 
 # A partial implementation never marks a whole Java class as ported.
 PARTIAL = {
+    "api/util/AECableType.java": ("mixins/ae2/cable.rs", "variant/size min/max, dense/smart profile and ordinal rules; full public native API pending"),
+    "api/util/AECableVariant.java": ("mixins/ae2/cable.rs", "variant ordering/min/max through CableType; standalone addon API pending"),
+    "api/util/AECableSize.java": ("mixins/ae2/cable.rs", "size ordering/min/max through CableType; standalone addon API pending"),
+    "api/util/AEColor.java": ("mixins/ae2/cable.rs", "17 colors, source order/prefix/palette/tints; native dye/translation/codec API pending"),
+    "parts/CableBusStorage.java": ("mixins/ae2/part_storage.rs", "center and lazy six-part/facade arrays, source allocation/removal rules; native multipart host pending"),
+    "parts/networking/CablePart.java": ("mixins/ae2/cable.rs", "85 item profiles, node flags, connection lengths/boxes, visual channels and suffix payload; world placement, persistence, base packet and renderer pending"),
+    "parts/networking/GlassCablePart.java": ("mixins/ae2/cable.rs", "source cable type and raw shape boxes; actual world host/renderer pending"),
+    "parts/networking/CoveredCablePart.java": ("mixins/ae2/cable.rs", "source cable type and raw shape boxes; actual world host/renderer pending"),
+    "parts/networking/SmartCablePart.java": ("mixins/ae2/cable.rs", "source cable type and raw shape boxes; client updates/world host/renderer pending"),
+    "parts/networking/DenseCablePart.java": ("mixins/ae2/cable.rs", "replacement dense flags and selection/collision/neighbor widths; dense side-bus support, actual neighbor lookup/world host/renderer pending"),
     "me/cells/BasicCellInventory.java": ("mixins/ae2/storage.rs", "capacity, exact partitions, distribution/void; no fuzzy or component persistence adapter"),
     "items/storage/BasicStorageCell.java": ("mixins/ae2/storage.rs", "tier parameters only; no game item or tooltip adapter"),
     "items/storage/StorageTier.java": ("mixins/ae2/storage.rs", "all five byte and idle drain constants; no component suppliers"),
@@ -63,7 +73,7 @@ PARTIAL.update({
     "blockentity/networking/EnergyCellBlockEntity.java": ("mixins/ae2/grid_glue.rs", "full-block energy storage and dimension network adapter, internalCurrentPower persistence; fullness rendering/comparator/item energy lifecycle pending"),
     "blockentity/networking/CreativeEnergyCellBlockEntity.java": ("mixins/ae2/power.rs", "infinite provider, priority and world full-block node binding; client visuals pending"),
     "blockentity/grid/AENetworkedBlockEntity.java": ("mixins/ae2/grid_glue.rs", "four full-block kinds register by dimension, adjacency and proxy.e persistence; full node security/events/readiness/other block types pending"),
-    "me/InWorldGridNode.java": ("mixins/ae2/network.rs", "adjacent full-block sides, Charger front exclusion, removal/reload/split/merge; multipart/color/security/lifecycle ordering pending"),
+    "me/InWorldGridNode.java": ("mixins/ae2/network.rs", "adjacent exposed sides, cable color compatibility, recolor node identity, removal/reload/split/merge; world multipart host/security/lifecycle ordering pending"),
     "blockentity/misc/ChargerBlockEntity.java": ("mixins/ae2/glue.rs", "recipe branch plus private buffer refilled from real ME EnergyService, at most 800 AE per doWork; tools/config/sync/filter/visuals pending"),
 })
 

@@ -24,6 +24,35 @@
 | Common platform tags | 461 generated c tags NeoForge 21.1.169, exact source hashes/licence, platform-before-AE2 layering/replace и real item predicate/restart checks | runtime membership всех registries/тегов, NeoForge API/events/recipe conditions и полная survival progression |
 | EnergyCellBlockItem / item predicate | fixed capacities 200000/1600000, rates 800/1600, source inject/extract/simulate/overflow and 0.00001 removal, native Charger, no powered-item bar; original .2/.4/.6/.8 float model thresholds through render-only projection; stored_energy placement and first matching drop with live pre-break flush | complete tooltip/base settings/capability APIs; all saved-BE/explosion/pick/loot-command lifecycle; nonfinite/malformed native recovery |
 
+## CableBus / кабели: текущая граница
+
+`cable.rs` переносит five cable types, 17 source colors/prefixes/palette, ordinal
+connection lengths, independent variant/size min/max, source node flags,
+connection shape calls и visual channels. Dense flags **заменяют** PREFERRED;
+normal max 8 и dense max 32 следуют grid mode. `part_storage.rs` сохраняет центр,
+шесть side parts и шесть facades с lazy allocation: setPart(null) выделяет
+массив, setFacade(null) делегирует remove и не выделяет его. Это storage rule,
+не готовый multipart host, facade item или host persistence.
+
+`network.rs` принимает cable center profiles, применяет transparent/equal color
+совместимость только к in-world edges, exposed side masks и сохраняет node ID
+при смене цвета того же типа кабеля. Full blocks сохраняют transparent profile.
+`Kind::from_block("ae2:cable_bus")` намеренно не угадывает цвет/тип: центр должен
+читаться из host parts. Настоящие native CableBus placement/NBT/part nodes,
+callbacks, facade collision, partial selection/breaking, renderer, packets и
+chunk/event lifecycle ещё не подключены. Мир по-прежнему видит прежние шесть
+node kinds. Cable profiles в binding tests не являются игровым CableBus.
+
+Java oracle `docs/cable-oracle.json`: 278956 случаев. API enums/AEColor и
+CableBusStorage компилируются целиком без изменений; методы CablePart и
+subtype getBoxes/цветовая совместимость — дословные fragments. Host/grid,
+part connection lengths, power, neighbor density, base packet prefix, codecs
+и renderer stubbed. Geometry сравнивает raw addBox arguments (включая NaN),
+не normalized VoxelShapes. Сравниваются только bytes CablePart после base
+prefix, не полный host update или Minecraft protocol. Truncated suffix
+отклоняется Rust до изменения state; Java reader может менять state частично.
+Это более строгий malformed gate, не заявленная эквивалентность recovery.
+
 ## Временные ограничения адаптера (не целевое поведение)
 
 - Новый `cells.rs` использует исходные AE2 поля `id`, `components`, `#t`, `#` и

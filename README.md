@@ -15,6 +15,12 @@
 
 Что уже написано:
 
+- Ядро CableBus: пять типов кабелей × 17 цветов, исходные flags, tint palette,
+  connection lengths, raw shape boxes, visual channels и cable payload; sparse
+  storage центра/шести частей/фасадов. Network binding принимает cable profiles,
+  учитывает цвета/закрытые грани и сохраняет node identity при перекраске.
+  Java oracle: 278956 случаев. Native placement, multipart NBT, renderer и полный
+  lifecycle ещё не подключены; кабели пока нельзя использовать в игровом мире.
 - Предметы Energy/Dense Cell используют исходные fixed capacity/rates и threshold,
   заряжаются в Charger; ёмкость и upgrades не подменяют их block profile. Item
   models переключаются по исходным float fifths, без зелёного powered-item bar и

@@ -295,6 +295,7 @@ mod tests {
             pos,
             kind,
             front: Direction::North,
+            exposed: 63,
             stored: 0.0,
             saved_buffer: 0.0,
         }

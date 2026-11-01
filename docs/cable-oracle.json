@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "cases": 278956,
+  "operations": {
+    "T": 36,
+    "C": 2312,
+    "V": 20000,
+    "B": 216608,
+    "P": 20000,
+    "S": 20000
+  },
+  "revision": "db17504a86128fdf3dae31f5fb7a112a646e0b93",
+  "input_sha256": "da2ee93cf670b2ee60ab965957d13ffbb9d833b99b075ee0580c55e88692d26a",
+  "source_sha256": {
+    "api/util/AECableType.java": "a761136e26aca36e249ee3a8b6ba7635333f210e263165d11053eb8fdad9f15f",
+    "api/util/AECableVariant.java": "bd26216b15a67844e75da9bd72fb29ad9fd5066cd06174caea0f081e0eb4367f",
+    "api/util/AECableSize.java": "a14252f638cab0db91b7eabdbe4bd5f000b0b4970bc09d5faa27c090dd5db39a",
+    "api/util/AEColor.java": "b21a185ef86587abbf4c91c40d4c55ac6536d2cc8e48a7b968e741eee4ee03aa",
+    "parts/CableBusStorage.java": "8d50b79ad9f906bbc381a9fa9c41cc9e32ab7b7697337ebc91fc71716d81b64c",
+    "parts/networking/CablePart.java": "0bc810b4b8c344b5550796c970785be782a0543197a66a87d6e317d0ebaff68f",
+    "parts/networking/GlassCablePart.java": "d805a53c8ee9f0d3be30c1cae677b9ba2220fc74776d9ef1d0be0e71e6c95320",
+    "parts/networking/CoveredCablePart.java": "80f8151d1febc07ed483d1a29994d004a424aefe28df5cc0a90a25456c229cc9",
+    "parts/networking/SmartCablePart.java": "d02069227e395a75f6e1f56e70bbe78a0844a1141263dbc74e851f8ebc605449",
+    "parts/networking/DenseCablePart.java": "86949c343ab795f22d0cc1724776fd5f64242a2279ee3edfbe29fcd8176314db",
+    "me/InWorldGridNode.java": "8aa961cd4d7d84e1643100e80fd2b1815fee464b56914515918bac0818f639ef"
+  },
+  "verbatim_fragment_sha256": {
+    "connection_box": "b8442092a22b4b291788648b5d039a1bada7866063bce531d4066b55cf83876c",
+    "non_dense_boxes": "6803927686fe1fc486d5fec14eaa46587453f1ff9fdef84656ec3f68f3b36edb",
+    "length": "4383cf6e8291ac8bf3d3d73ca32db534ece48c061adc3ed132b1a76b05033e61",
+    "visual": "f88af1c15fec227ee48f74e2eb2497f9dfe33afd26d68c2e7f2cf3e2c553ad59",
+    "write": "d3e059cc096a4581464afd6f8240123b05d8b608158bb165dc9be2161b626d9b",
+    "read": "4fba628106e1d4fb17707b9301a2704969b9465ac2c0766d36db57dc07e40ae2",
+    "channels": "2f54e2a879f002ae1e803390d38a23f347063f4510f647ffcb3fabdbd4103461",
+    "GlassCablePart": "42dc7420fb0e9a488e04978ce68fe6909311cb1fc32ca50201bfce5a4b2c899d",
+    "CoveredCablePart": "426c4ccf8307020e2ab4bdfc56ec97794f93790b967d680a1798c2d89dd5c632",
+    "SmartCablePart": "426c4ccf8307020e2ab4bdfc56ec97794f93790b967d680a1798c2d89dd5c632",
+    "DenseCablePart": "8799d36cb21287608ab53b69bd7a708975ea6f13d03cede44c36eeb9b289963f",
+    "compatible": "bb5add3415d96471ecf77a91f66fac7b2c229de9111af5e4ec2f477fc969175c"
+  },
+  "scope": "unchanged AECableType/Variant/Size/AEColor and CableBusStorage; verbatim CablePart geometry/connection-length/channel payload methods, subtype geometry and InWorldGridNode color compatibility in stub hosts",
+  "limits": [
+    "Minecraft/NeoForge world, codecs/registries, renderer and full multipart host are not executed",
+    "AEBasePart packet prefix is a no-op stub; only CablePart suffix bytes are compared",
+    "grid channels/power/neighbour cable types and side-part lengths are injected, not calculated by Java grid services",
+    "raw addBox calls, not normalized VoxelShapes; updateConnections is a no-op stub",
+    "negative channel counts on part connections are excluded because Java takes max with zero; external connections include signed/overflow cases",
+    "truncated packet transactional rejection is a stricter Rust gate and is not claimed equivalent to partial Java reader mutation"
+  ]
+}

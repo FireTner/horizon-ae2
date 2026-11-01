@@ -1,11 +1,25 @@
 # Текущая точка полного переноса
 
 Цель активна: полный перенос AE2 19.2.18 на Horizon, 1:1, без субагентов.
-Пользователь возобновил goal после контрольной точки ME Controller.
+Пользователь возобновил goal; текущая работа — CableBus/кабели после EnergyCellBlockItem.
 Цель не уменьшена до текущего набора механик. Все 1429 исходных Java-файлов
-остаются в реестре; сейчас 83 partial, 1346 pending, полностью закрытых нет.
+остаются в реестре; сейчас 93 partial, 1336 pending, полностью закрытых нет.
 
 ## Последний результат
+
+- CableBus/cable core: все 85 цветных item profiles; source type/size/variant
+  ordering, 17 RGB/tint palettes, flags и connection lengths; raw geometry
+  для glass/covered/smart/dense, visual channel scaling и cable suffix packets.
+  Lazy center/side/facade storage воспроизводит различие setPart(null) и
+  setFacade(null). Java oracle — 278956 случаев PASS, из них 216608 shapes,
+  20000 visual counts, 20000 payloads и 20000 storage operations. Серверный
+  binding поддерживает цвета, exposed faces и сохранение node identity при
+  перекраске; dense trunk обслуживает 12 Drive profiles, normal bottleneck
+  ограничен восемью каналами. 119 core / 163 native game / 11 Python,
+  native check/build и 14-check Controller world regression PASS. Это
+  core/native profiles, не размещённые кабели.
+  World CableBus decoder/placement, per-part node lifecycle, NBT, renderer,
+  facades и client host sync остаются следующим обязательным слоем.
 
 - EnergyCellBlockItem: исходные fixed capacities/rates, отдельный 0.00001
   threshold, inject/extract/simulate/overflow; Charger поддерживает ещё два
@@ -186,7 +200,7 @@
 
 0. Продолжить real world CableBus и storage hosts; для Controller нужны Network
    Status Menu, capabilities и точный lifecycle. Для energy
-   cells остаётся отдельный fullness comparator. Component-specific stack overrides
+   cells остаётся полный TickManager/base-settings lifecycle. Component-specific stack overrides
    и остальные item components/actions также остаются в полном объёме.
 1. Продолжить source/oracle verification энергосервиса (watchers/addons), закрыть известные
    lifecycle/overlay/events gaps и реальную передачу состояния клиенту.
@@ -195,8 +209,8 @@
    ownership/readiness и полную модель событий/приоритетов GridConnection.
 3. Handheld tool charging/use/painting/shooting, admission reload invalidation;
    creative workbench/tooltip/API и portable handheld UI/energy.
-4. Для energy cells остаются fullness/sync/comparator, item/drop/placement
-   components; для Charger — полный item API/FX и capability lifecycle; для Crank — ориентация,
+4. Для energy cells остаются все saved-BE/explosion/pick/loot-command paths
+   и base settings/capabilities; для Charger — полный item API/FX и capability lifecycle; для Crank — ориентация,
    sync/анимация. Остальные задачи полного порта остаются в PLAN/PARITY.
 
 ## Локальные команды и данные

@@ -627,6 +627,12 @@ name = "ae2_power"
 source = "power.rs"
 
 [[module]]
+id = "cable"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_cable"
+source = "cable.rs"
+
+[[module]]
 id = "network"
 file = "crates/horizon-client/src/game.rs"
 name = "ae2_network"

@@ -60,6 +60,7 @@ def package():
                  'tools/smoke_energy_cell_item.py', 'docs/energy-cell-item-world-smoke.json', 'docs/energy-cell-item-base-regression.json', 'docs/energy-cell-item-charging-regression.json',
                  'tools/energy_cell_oracle.py', 'examples/energy_cell_oracle.rs', 'docs/energy-cell-visual-oracle.json',
                  'tools/smoke_energy_cell_display.py', 'docs/energy-cell-world-smoke.json', 'docs/energy-cell-charging-regression.json',
+                 'tools/cable_oracle.py', 'examples/cable_oracle.rs', 'docs/cable-oracle.json', 'docs/cable-controller-regression.json',
                  'tools/controller_oracle.py', 'examples/controller_oracle.rs', 'docs/controller-visual-oracle.json',
                  'tools/smoke_controller.py', 'docs/controller-world-smoke.json', 'docs/controller-charging-regression.json', 'docs/controller-drive-gui-regression.json',
                  'docs/PARITY.md', 'docs/PLAN.md', 'docs/upstream-inventory.json',

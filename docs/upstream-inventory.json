@@ -1,8 +1,8 @@
 {
   "families": {
     "api": {
-      "partial": 20,
-      "pending": 252
+      "partial": 24,
+      "pending": 248
     },
     "block": {
       "partial": 7,
@@ -81,8 +81,8 @@
       "pending": 17
     },
     "parts": {
-      "partial": 0,
-      "pending": 82
+      "partial": 6,
+      "pending": 76
     },
     "recipes": {
       "partial": 0,
@@ -1715,26 +1715,34 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/util/AECableSize.java",
+      "port": "mixins/ae2/cable.rs",
+      "scope": "size ordering/min/max through CableType; standalone addon API pending",
       "sha256": "a14252f638cab0db91b7eabdbe4bd5f000b0b4970bc09d5faa27c090dd5db39a",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
       "path": "src/main/java/appeng/api/util/AECableType.java",
+      "port": "mixins/ae2/cable.rs",
+      "scope": "variant/size min/max, dense/smart profile and ordinal rules; full public native API pending",
       "sha256": "a761136e26aca36e249ee3a8b6ba7635333f210e263165d11053eb8fdad9f15f",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
       "path": "src/main/java/appeng/api/util/AECableVariant.java",
+      "port": "mixins/ae2/cable.rs",
+      "scope": "variant ordering/min/max through CableType; standalone addon API pending",
       "sha256": "bd26216b15a67844e75da9bd72fb29ad9fd5066cd06174caea0f081e0eb4367f",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
       "path": "src/main/java/appeng/api/util/AEColor.java",
+      "port": "mixins/ae2/cable.rs",
+      "scope": "17 colors, source order/prefix/palette/tints; native dye/translation/codec API pending",
       "sha256": "b21a185ef86587abbf4c91c40d4c55ac6536d2cc8e48a7b968e741eee4ee03aa",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
@@ -6152,7 +6160,7 @@
       "family": "me",
       "path": "src/main/java/appeng/me/InWorldGridNode.java",
       "port": "mixins/ae2/network.rs",
-      "scope": "adjacent full-block sides, Charger front exclusion, removal/reload/split/merge; multipart/color/security/lifecycle ordering pending",
+      "scope": "adjacent exposed sides, cable color compatibility, recolor node identity, removal/reload/split/merge; world multipart host/security/lifecycle ordering pending",
       "sha256": "8aa961cd4d7d84e1643100e80fd2b1815fee464b56914515918bac0818f639ef",
       "status": "partial"
     },
@@ -7215,8 +7223,10 @@
     {
       "family": "parts",
       "path": "src/main/java/appeng/parts/CableBusStorage.java",
+      "port": "mixins/ae2/part_storage.rs",
+      "scope": "center and lazy six-part/facade arrays, source allocation/removal rules; native multipart host pending",
       "sha256": "8d50b79ad9f906bbc381a9fa9c41cc9e32ab7b7697337ebc91fc71716d81b64c",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "parts",
@@ -7485,14 +7495,18 @@
     {
       "family": "parts",
       "path": "src/main/java/appeng/parts/networking/CablePart.java",
+      "port": "mixins/ae2/cable.rs",
+      "scope": "85 item profiles, node flags, connection lengths/boxes, visual channels and suffix payload; world placement, persistence, base packet and renderer pending",
       "sha256": "0bc810b4b8c344b5550796c970785be782a0543197a66a87d6e317d0ebaff68f",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "parts",
       "path": "src/main/java/appeng/parts/networking/CoveredCablePart.java",
+      "port": "mixins/ae2/cable.rs",
+      "scope": "source cable type and raw shape boxes; actual world host/renderer pending",
       "sha256": "80f8151d1febc07ed483d1a29994d004a424aefe28df5cc0a90a25456c229cc9",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "parts",
@@ -7503,8 +7517,10 @@
     {
       "family": "parts",
       "path": "src/main/java/appeng/parts/networking/DenseCablePart.java",
+      "port": "mixins/ae2/cable.rs",
+      "scope": "replacement dense flags and selection/collision/neighbor widths; dense side-bus support, actual neighbor lookup/world host/renderer pending",
       "sha256": "86949c343ab795f22d0cc1724776fd5f64242a2279ee3edfbe29fcd8176314db",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "parts",
@@ -7515,8 +7531,10 @@
     {
       "family": "parts",
       "path": "src/main/java/appeng/parts/networking/GlassCablePart.java",
+      "port": "mixins/ae2/cable.rs",
+      "scope": "source cable type and raw shape boxes; actual world host/renderer pending",
       "sha256": "d805a53c8ee9f0d3be30c1cae677b9ba2220fc74776d9ef1d0be0e71e6c95320",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "parts",
@@ -7533,8 +7551,10 @@
     {
       "family": "parts",
       "path": "src/main/java/appeng/parts/networking/SmartCablePart.java",
+      "port": "mixins/ae2/cable.rs",
+      "scope": "source cable type and raw shape boxes; client updates/world host/renderer pending",
       "sha256": "d02069227e395a75f6e1f56e70bbe78a0844a1141263dbc74e851f8ebc605449",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "parts",

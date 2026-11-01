@@ -7,7 +7,7 @@ and other AE2 contributors; copyright (c) 2026 Horizon port contributors.
 
 Derived code is distributed under LGPL-3.0-or-later. LICENSE contains both the
 LGPLv3 and GPLv3 texts supplied by upstream. Upstream's API is MIT licensed;
-see LICENSES/AE2-API-MIT. Key/counter/fuzzy and storage API rules are adapted from that
+see LICENSES/AE2-API-MIT. Key/counter/fuzzy, storage, cable-type and color API rules are adapted from that
 MIT-licensed API; its copyright and permission notice are preserved there.
 
 tools/horizon.py and tools/package.py are adapted from horizon-create and the

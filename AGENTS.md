@@ -13,6 +13,14 @@ target/upstream/neoforge. Preserve its licence/provenance and resource layering;
 never replace missing platform tags with ad-hoc item lists.
 
 Rules live in mixins/ae2/*.rs and are exposed by src/lib.rs for standalone tests.
+cable.rs feeds network.rs with source cable types/colors/flags and core shape/
+visual rules. Cable profiles are binding-only: do not infer a fluix glass cable
+from ae2:cable_bus, and do not claim native placement/renderer from profile tests.
+Dense flags replace PREFERRED. Recolor preserves node identity; side masks and
+color compatibility rebuild in-world edges. part_storage.rs is library-only until
+an actual host consumes it; do not add unused host scaffolding to the manifest.
+CableBus part nodes use gn NBT by default, not full-block proxy. Multipart NBT,
+per-part nodes/lifecycle, placement/partial breaking/facades and renderer remain open.
 glue.rs owns Horizon types. Only modules actually consumed by the adapter belong
 in horizon-mixin.toml. keys.rs, storage.rs and cells.rs feed the native cell
 tooltip/codec adapter. energy.rs/grid.rs/power.rs feed network.rs and the

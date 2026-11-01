@@ -60,6 +60,7 @@ fn snapshots(game: &Game<'_>) -> Vec<Snapshot> {
             pos: [x, y, z],
             kind,
             front: direction(game, [x, y, z]),
+            exposed: 63,
             stored: get_double(&be.nbt, "internalCurrentPower"),
             saved_buffer,
         });

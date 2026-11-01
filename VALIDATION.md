@@ -3,6 +3,43 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
+## Cable core / source oracle / network profiles — 1 ноября 2026
+
+- **119 core / 163 native game / 11 Python PASS**, fmt/rustfmt, clippy
+  -D warnings и pinned source/item-limit audits PASS. Root/tooling:
+  `target/cable-all-checks.log`, final package-tooling:
+  `target/cable-tooling-final.log`. Native check/test:
+  `target/cable-native-{check,tests,build}.json`, cargo_exit 0. Fast build PASS;
+  сохраняются warnings об unused будущих API и toolchain rust-objcopy/libLLVM. Library/assets
+  payloads не менялись; это не новый запуск их прежних 14/7 tests.
+- **278956 Java cases PASS**, `docs/cable-oracle.json`: 36 type pairs,
+  2312 palette/tint/color pairs, 216608 raw shape cases, 20000 visual channel
+  cases, 20000 suffix packet cases, 20000 stateful CableBusStorage operations.
+  Unchanged API enums/AEColor/CableBusStorage и verbatim method fragments;
+  hashes/stubs/limits сохранены в отчёте. Shape cases включают каждый connection
+  mask/filter, normal/dense neighbor widths, оба dense box modes, missing parts,
+  fractional/invalid connection lengths и NaN. Packet cases проверяют порядок
+  direction bytes, external override, missing node, old-state reset и change flag.
+  Full AEBasePart prefix/Minecraft packets, NBT, renderer, lifecycle и
+  Java/NeoForge world этим oracle не доказываются.
+- Network binding принимает cable center profiles, source color compatibility
+  и exposed-face masks. Тесты подтверждают recolor без замены node ID, split/
+  reconnect закрытой грани, source dense flags и
+  twelve-drive dense trunk с normal-eight bottleneck. Это native/core test
+  profiles; в игровом мире CableBus ещё не зарегистрирован/подключён.
+- World regression `controller-5_celrs8` — **14 checks PASS**,
+  `docs/cable-controller-regression.json`: all 18 block states, exact 3 AE/tick
+  conservation, Controller-powered real Charger recipe, six geometries,
+  conflict/recovery at seven/eight bound, indirect-controller conflict и
+  exact energy save/restart. Client processes завершены. Это regression старых
+  full-block kinds, не CableBus world test и не полный Java/NeoForge oracle.
+- Staging macOS: rsync сохраняет mtime неизменившихся файлов вместо fresh
+  extraction timestamps. Два повторных stages: в каждом 3715 unchanged files,
+  0 retimed unchanged, 0 changed content (`target/stage-mtime-check.json`).
+  Повторный cached native check cargo_exit 0 (`target/stage-cache-native-check.json`).
+  Новый cable module затем компилировался и прошёл native tests; изменения
+  содержимого по-прежнему попадают в staged payload.
+
 ## EnergyCellBlockItem power / models / placement / drop — 1 ноября 2026
 
 - **111 core / 156 native game / 14 native library / 7 native assets / 11 Python

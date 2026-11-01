@@ -112,6 +112,12 @@ def fit(content, jar, platform):
         data["max_stack_size"] = 1 if path.stem in UNSTACKABLE else 64
         write_json(path, data)
     blocks = content / "data/ae2/horizon/block"
+    # The native state adapter registers Controller's original state/type
+    # product over this cube's physical rows. Keep its original assets intact.
+    write_json(blocks / "controller.json", {
+        "template": "minecraft:iron_block",
+        "properties": {"hardness": 6, "explosion_resistance": 6, "requires_tool": False},
+    })
     states = content / "assets/ae2/blockstates"
     # A dispenser supplies six-facing placement and a block entity. Its menu
     # and inventory are intercepted; template redstone remains a parity gap.

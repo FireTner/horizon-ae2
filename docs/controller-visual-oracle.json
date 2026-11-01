@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "cases": 4000,
+  "top_level_method_comparisons": 8000,
+  "revision": "db17504a86128fdf3dae31f5fb7a112a646e0b93",
+  "input_sha256": "1bc7005dd383177654a6e7c7d8c765bf551de04182f4a29246187f0631bf4ce6",
+  "source_sha256": {
+    "block/networking/ControllerBlock.java": "3e6fb40ae8e4acc9464f49b4e2dfd52f0d826f65548703428372683b06aba0ae",
+    "blockentity/networking/ControllerBlockEntity.java": "7273b831929915e3669d34da7fde40f261a4a3f267b72d89f6bf0730e1926a47"
+  },
+  "verbatim_fragment_sha256": {
+    "block_state": "fffb8a090b405974eff476dddc725964226a414068774da84e295698756c1fa1",
+    "render_type": "8f6dd1bb0a3dd80311c890c6f488e5940ccef091b99a635b5f4ea0dce4426d0f",
+    "get_controller_type": "9e23470422d3a14bfab355b7a8c3ab71a82050a031a426b52e14b6505ac47b93",
+    "is_controller": "1b78a0fea95a1db930008fd8b00c470821f812afeb49e8855ef1779338f8cb3e",
+    "update_state": "e72a9fd9631f45ed37a94d50112027a70330374761f5b0b0b891491290506dd9",
+    "check_controller": "1d348d6b2d21b52923b2e54947df128778b80d6b1d4ff68a3184a4196b2f96ab"
+  },
+  "scope": "verbatim ControllerBlock getControllerType and ControllerBlockEntity updateState in ready/loaded/grid-present stub host",
+  "limits": [
+    "power/conflict injected through stub services",
+    "grid validation/pathing not executed by this oracle",
+    "world events/chunks/spatial IO/UI, full block entity and Java/NeoForge world parity remain open"
+  ]
+}

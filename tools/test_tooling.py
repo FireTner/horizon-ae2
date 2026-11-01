@@ -95,6 +95,9 @@ class ContentTests(unittest.TestCase):
     def test_native_hosts_have_block_entities_and_valid_six_facing_models(self):
         carried, jar = self.fixture()
         content.fit(carried, jar, self.platform)
+        controller = json.loads((carried / "data/ae2/horizon/block/controller.json").read_text())
+        self.assertEqual(controller["template"], "minecraft:iron_block")
+        self.assertEqual(controller["properties"], {"hardness": 6, "explosion_resistance": 6, "requires_tool": False})
         for name in ["charger", "crank", "drive", "energy_cell", "dense_energy_cell", "creative_energy_cell"]:
             block = json.loads((carried / f"data/ae2/horizon/block/{name}.json").read_text())
             self.assertEqual(block["template"], "minecraft:dispenser")

@@ -1,11 +1,25 @@
 # Текущая точка полного переноса
 
-Цель активна: полностью перенести AE2 19.2.18 на Horizon, 1:1, без субагентов.
-Пользователь возобновил goal после контрольной точки Charger automation.
+Полный перенос AE2 19.2.18 на Horizon, 1:1, без субагентов приостановлен
+по просьбе пользователя после завершения текущего этапа ME Controller,
+для совместного тестирования. Продолжение — после явного возобновления goal.
 Цель не уменьшена до текущего набора механик. Все 1429 исходных Java-файлов
-остаются в реестре; сейчас 76 partial, 1353 pending, полностью закрытых нет.
+остаются в реестре; сейчас 78 partial, 1351 pending, полностью закрытых нет.
 
 ## Последний результат
+
+- Controller world backend и real state registry: 8000 public AE/default storage
+  priority 0, idle 3, CANNOT_CARRY/DENSE_CAPACITY, controller positions в настоящем
+  Graph/pathing и original NBT. 18 state/type variants, source column/interior/
+  parity и powered-before-conflict. 106 core / 148 native game / 12 native library /
+  11 Python PASS. Source visual oracle — 4000 cases/8000 comparisons PASS (ready/
+  loaded stub host, не Java world). Library проверяет vanilla IDs и чужие door/
+  button/shape/model references после расширения states. World controller-pz6q6dun
+  PASS: ровно 3 AE/tick, реальный Charger, все render types, width 8 conflict ->
+  7 recovery, indirect-controller conflict и exact restart ledger. Charging
+  item-charging-8r8yerow и Drive GUI drive-gui-nrm5z8ej regressions PASS.
+  Network Status Menu, external power/API и полный event/readiness/chunk/spatial
+  lifecycle/material parity остаются открытыми. Connected model screenshot просмотрен.
 
 - Comparator Drive/Charger: source slot limit 1, десять/один реальные slots,
   без transport padding; original inv precedence/strict malformed gate и air
@@ -145,7 +159,8 @@
 
 ## Следующий связующий слой
 
-0. Продолжить real world ME nodes/Controller/CableBus и storage hosts; для energy
+0. Продолжить real world CableBus и storage hosts; для Controller нужны Network
+   Status Menu, capabilities и точный lifecycle. Для energy
    cells остаётся отдельный fullness comparator. Component-specific stack overrides
    и остальные item components/actions также остаются в полном объёме.
 1. Продолжить source/oracle verification энергосервиса (watchers/addons), закрыть известные

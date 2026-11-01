@@ -171,6 +171,13 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "block/networking/ControllerBlock.java": ("mixins/ae2/controller.rs", "original 18 state/type registrations and models, source cube properties, column/interior geometry/parity and native world updates; 4000 verbatim Java visual cases; Network Status Menu, immediate shape callback timing and full item/lighting APIs pending"),
+    "blockentity/networking/ControllerBlockEntity.java": ("mixins/ae2/network.rs", "8000 AE public storage/default priority zero, idle three, CANNOT_CARRY/DENSE flags, original NBT, real pathing controller positions and offline/online/conflict state; native energy/Charger/restart checks; external power funnel/capabilities, full readiness/events/chunk/spatial lifecycle and menu pending"),
+    "blockentity/grid/AENetworkedPoweredBlockEntity.java": ("mixins/ae2/grid_glue.rs", "server-owned dimension network adapter for six full-block kinds including Controller, original proxy energy buffer persistence and exposed faces; full managed-node ownership/readiness/listeners/capabilities and other hosts pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

@@ -74,6 +74,7 @@ def main():
 
     try:
         first = launch(1)
+        ctl("tp", 8.5, 80, 4.5); ctl("wait", 60)
         ctl("command", "fill 5 72 3 11 72 9 stone"); ctl("command", "fill 5 73 3 11 78 9 air")
         ctl("tp", 8.5, 73, 4.5); ctl("command", "clear @s"); ctl("setblock", *drive, "ae2:drive[facing=north]")
         for id, count in [(item, 1), (fluid, 1), ("minecraft:stone", 4)]:
@@ -97,11 +98,13 @@ def main():
         ctl("screenshot", str(work / "drive-screen.png")); ctl("key", "escape", "down"); ctl("key", "escape", "up"); ctl("wait", 5)
         # The next ordinary container keeps vanilla insertion and reverse
         # quick-move order; a Drive policy must not leak across windows.
-        barrel = (10, 73, 7); ctl("setblock", *barrel, "minecraft:barrel"); ctl("interact", *barrel); ctl("wait", 5)
+        barrel = (10, 73, 7); ctl("setblock", *barrel, "minecraft:barrel")
+        ctl("tp", 10.5, 73, 5.5); ctl("wait", 5); ctl("interact", *barrel); ctl("wait", 5)
         click(inventory_slot("minecraft:stone")); click(300)
         assert ctl("container", *barrel)["slots"][0] == {"item": "minecraft:stone", "count": 4}
         click(300, "shift"); assert inventory_slot("minecraft:stone") == 8
         ctl("key", "escape", "down"); ctl("key", "escape", "up"); ctl("wait", 5)
+        ctl("tp", 8.5, 73, 4.5); ctl("wait", 5)
         ctl("save"); ctl("quit"); first.wait(timeout=20); launch(2); ctl("wait", 10); open_drive()
         assert slots()[0] == {"item": item, "count": 1} and slots()[1] == {"item": fluid, "count": 1}
         assert ctl("inventory")["counts"].get("minecraft:stone") == 4

@@ -1,15 +1,18 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 // World-independent binding of AE2 full-block nodes to topology + energy services.
 // This grows alongside the complete port; CableBus parts and other services are
-// not approximated by these four currently implemented node kinds.
+// not yet connected by this full-block adapter.
 
-use super::ae2_grid::{ChannelMode, ConnectionId, Direction, Flags, Graph, NodeId, NodeSpec};
+use super::ae2_grid::{
+    ChannelMode, ConnectionId, ControllerState, Direction, Flags, Graph, NodeId, NodeSpec,
+};
 use super::ae2_power::{EnergyNode, EnergyService, EnergySystem, ServiceId, Store};
 use std::collections::{BTreeMap, BTreeSet};
 pub type Pos = [i32; 3];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Kind {
+    Controller,
     Charger,
     EnergyCell,
     DenseEnergyCell,
@@ -19,6 +22,7 @@ pub enum Kind {
 impl Kind {
     pub fn from_block(id: &str) -> Option<Self> {
         match id {
+            "ae2:controller" => Some(Self::Controller),
             "ae2:charger" => Some(Self::Charger),
             "ae2:energy_cell" => Some(Self::EnergyCell),
             "ae2:dense_energy_cell" => Some(Self::DenseEnergyCell),
@@ -29,6 +33,7 @@ impl Kind {
     }
     pub fn block(self) -> &'static str {
         match self {
+            Self::Controller => super::ae2_controller::BLOCK,
             Self::Charger => "ae2:charger",
             Self::EnergyCell => "ae2:energy_cell",
             Self::DenseEnergyCell => "ae2:dense_energy_cell",
@@ -38,6 +43,7 @@ impl Kind {
     }
     pub fn capacity(self) -> f64 {
         match self {
+            Self::Controller => super::ae2_controller::CAPACITY,
             Self::Charger => 1600.0,
             Self::EnergyCell => 200000.0,
             Self::DenseEnergyCell => 1600000.0,
@@ -47,6 +53,11 @@ impl Kind {
     }
     fn energy_node(self, amount: f64) -> EnergyNode {
         let store = match self {
+            Self::Controller => Some(Store::finite(
+                amount.clamp(0.0, self.capacity()),
+                self.capacity(),
+                super::ae2_controller::STORAGE_PRIORITY,
+            )),
             Self::Charger | Self::Drive => None,
             Self::EnergyCell => Some(Store::finite(
                 amount.clamp(0.0, self.capacity()),
@@ -61,7 +72,11 @@ impl Kind {
             Self::CreativeEnergyCell => Some(Store::creative()),
         };
         EnergyNode {
-            idle: if self == Self::Drive { 2.0 } else { 0.0 },
+            idle: match self {
+                Self::Controller => super::ae2_controller::IDLE,
+                Self::Drive => 2.0,
+                _ => 0.0,
+            },
             store,
             passive_rate: None,
         }
@@ -87,6 +102,7 @@ pub struct Persisted {
     pub stored: Option<f64>,
     pub buffer_share: f64,
     pub powered: bool,
+    pub controller_model: Option<&'static str>,
 }
 #[derive(Clone, Debug)]
 struct Node {
@@ -103,6 +119,7 @@ pub struct Network {
     connections: BTreeMap<(NodeId, NodeId), ConnectionId>,
     pivots: BTreeMap<ServiceId, NodeId>,
     channel_power: BTreeMap<ServiceId, f64>,
+    controller_states: BTreeMap<ServiceId, ControllerState>,
     next_service: ServiceId,
 }
 impl Network {
@@ -156,11 +173,12 @@ impl Network {
                 }
                 None => {
                     let id = self.graph.add_node(NodeSpec {
-                        flags: if snapshot.kind == Kind::Drive {
-                            Flags::REQUIRE_CHANNEL
-                        } else {
-                            Flags::default()
+                        flags: match snapshot.kind {
+                            Kind::Drive => Flags::REQUIRE_CHANNEL,
+                            Kind::Controller => Flags::CANNOT_CARRY | Flags::DENSE_CAPACITY,
+                            _ => Flags::default(),
                         },
+                        controller: (snapshot.kind == Kind::Controller).then_some(pos),
                         ..Default::default()
                     });
                     self.nodes.insert(
@@ -249,6 +267,7 @@ impl Network {
             .collect();
         let mut assignments = BTreeMap::new();
         self.channel_power.clear();
+        self.controller_states.clear();
         for report in reports {
             let candidates: Vec<_> = self
                 .pivots
@@ -262,6 +281,7 @@ impl Network {
                 .unwrap_or_else(|| self.new_service(*report.nodes.first().unwrap()));
             self.channel_power
                 .insert(winner, report.channel_power_usage());
+            self.controller_states.insert(winner, report.controller);
             for id in report.nodes {
                 assignments.insert(id, winner);
             }
@@ -340,6 +360,13 @@ impl Network {
                     stored,
                     buffer_share: node.snapshot.saved_buffer,
                     powered: service.is_powered(),
+                    controller_model: (node.snapshot.kind == Kind::Controller).then(|| {
+                        super::ae2_controller::status(
+                            service.is_powered(),
+                            self.controller_states.get(&node.service.unwrap())
+                                == Some(&ControllerState::Conflict),
+                        )
+                    }),
                 }
             })
             .collect()
@@ -383,6 +410,137 @@ mod tests {
             stored,
             saved_buffer: 0.0,
         }
+    }
+    #[test]
+    fn controller_has_source_public_storage_priority_and_three_ae_idle() {
+        let mut n = Network::default();
+        n.sync(vec![snapshot([0, 0, 0], Kind::Controller, 1000.0)]);
+        let (service, id) = n.node_service([0, 0, 0]).unwrap();
+        assert_eq!(n.graph.node(id).unwrap().spec.controller, Some([0, 0, 0]));
+        assert!(
+            n.graph
+                .node(id)
+                .unwrap()
+                .spec
+                .flags
+                .has(Flags::CANNOT_CARRY | Flags::DENSE_CAPACITY)
+        );
+        assert_eq!(Kind::Controller.capacity(), 8000.0);
+        assert_eq!(n.extract([0, 0, 0], 100.0, 1.0, false), 100.0);
+        assert_eq!(
+            n.energy
+                .service(service)
+                .unwrap()
+                .store(id)
+                .unwrap()
+                .amount(),
+            1000.0
+        );
+        assert_eq!(
+            n.energy
+                .service(service)
+                .unwrap()
+                .store(id)
+                .unwrap()
+                .priority,
+            0
+        );
+        let mut saved = Vec::new();
+        for _ in 0..40 {
+            n.begin_tick();
+            saved = n.end_tick();
+        }
+        let remaining: f64 = saved
+            .iter()
+            .map(|s| s.stored.unwrap_or(0.0) + s.buffer_share)
+            .sum();
+        assert!((remaining - (1000.0 - 40.0 * 3.0)).abs() < 1e-9);
+        assert_eq!(saved[0].controller_model, Some("online"));
+    }
+    #[test]
+    fn controller_multiblock_supplies_channels_beyond_the_ad_hoc_limit() {
+        let mut n = Network::default();
+        let mut nodes = vec![snapshot([-1, 0, 0], Kind::CreativeEnergyCell, 0.0)];
+        let mut drives = Vec::new();
+        for x in 0..3 {
+            nodes.push(snapshot([x, 0, 0], Kind::Controller, 0.0));
+            for (y, z, front) in [
+                (1, 0, Direction::North),
+                (-1, 0, Direction::North),
+                (0, -1, Direction::North),
+                (0, 1, Direction::South),
+            ] {
+                let pos = [x, y, z];
+                let mut drive = snapshot(pos, Kind::Drive, 0.0);
+                drive.front = front;
+                nodes.push(drive);
+                drives.push(pos);
+            }
+        }
+        n.sync(nodes.clone());
+        for _ in 0..40 {
+            n.begin_tick();
+            n.end_tick();
+        }
+        assert!(
+            drives.iter().all(|p| n.is_online(*p)),
+            "twelve devices get real controller paths"
+        );
+        for node in &mut nodes {
+            if node.kind == Kind::Controller {
+                node.kind = Kind::Charger;
+            }
+        }
+        n.sync(nodes);
+        for _ in 0..40 {
+            n.begin_tick();
+            n.end_tick();
+        }
+        assert!(
+            drives.iter().all(|p| !n.is_online(*p)),
+            "same connected devices exceed ad-hoc eight"
+        );
+    }
+    #[test]
+    fn powered_controller_conflicts_follow_source_seven_block_bound_and_direct_connectivity() {
+        let mut n = Network::default();
+        let mut nodes = vec![snapshot([-1, 0, 0], Kind::CreativeEnergyCell, 0.0)];
+        nodes.extend((0..8).map(|x| snapshot([x, 0, 0], Kind::Controller, 0.0)));
+        n.sync(nodes.clone());
+        for _ in 0..40 {
+            n.begin_tick();
+            n.end_tick();
+        }
+        assert!(
+            n.end_tick()
+                .iter()
+                .filter(|s| s.kind == Kind::Controller)
+                .all(|s| s.controller_model == Some("conflicted"))
+        );
+        nodes.pop();
+        n.sync(nodes);
+        n.begin_tick();
+        assert!(
+            n.end_tick()
+                .iter()
+                .filter(|s| s.kind == Kind::Controller)
+                .all(|s| s.controller_model == Some("online"))
+        );
+        n.sync(vec![
+            snapshot([0, 0, 0], Kind::Controller, 0.0),
+            snapshot([1, 0, 0], Kind::CreativeEnergyCell, 0.0),
+            snapshot([2, 0, 0], Kind::Controller, 0.0),
+        ]);
+        for _ in 0..40 {
+            n.begin_tick();
+            n.end_tick();
+        }
+        assert!(
+            n.end_tick()
+                .iter()
+                .filter(|s| s.kind == Kind::Controller)
+                .all(|s| s.controller_model == Some("conflicted"))
+        );
     }
     #[test]
     fn finite_cell_drives_charger_only_through_an_exposed_face() {

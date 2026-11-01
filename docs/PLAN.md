@@ -85,6 +85,12 @@ AEKey/GenericStack/component persistence и GridNode/Connection/Pathing уже
 energy cells; finite/creative power и restart проверены в игре.
 StorageService и Drive basic-cell backend уже подключены: online/priority mounts,
 idle/channel costs и исходный inv persistence проверены, в том числе restart.
+Controller тоже подключён: public storage 8000 AE/idle 3, source node flags,
+controller positions и настоящий channel pathing. Native state adapter регистрирует
+исходные 18 state/type combinations и original models; geometry/power/conflict/
+restart проверены в мире, visual methods — в 4000 verbatim Java cases.
+Network Status Menu, external energy funnel/capabilities, full ready/shape/event
+timing и chunk/spatial lifecycle остаются частью полного переноса Controller.
 Drive GUI уже показывает original layout и десять filtered cell slots; серверные
 pickup/drag/hotbar/shift правила и игровой restart проверены. Следующий слой —
 priority UI, special bulk actions, внешний capability API и полный lifecycle сохранения,

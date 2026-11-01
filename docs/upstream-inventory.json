@@ -5,12 +5,12 @@
       "pending": 252
     },
     "block": {
-      "partial": 3,
-      "pending": 51
+      "partial": 4,
+      "pending": 50
     },
     "blockentity": {
-      "partial": 10,
-      "pending": 40
+      "partial": 11,
+      "pending": 39
     },
     "client": {
       "partial": 1,
@@ -1961,8 +1961,10 @@
     {
       "family": "block",
       "path": "src/main/java/appeng/block/networking/ControllerBlock.java",
+      "port": "mixins/ae2/controller.rs",
+      "scope": "original 18 state/type registrations and models, source cube properties, column/interior geometry/parity and native world updates; 4000 verbatim Java visual cases; Network Status Menu, immediate shape callback timing and full item/lighting APIs pending",
       "sha256": "3e6fb40ae8e4acc9464f49b4e2dfd52f0d826f65548703428372683b06aba0ae",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "block",
@@ -2211,8 +2213,8 @@
     {
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/grid/AENetworkedPoweredBlockEntity.java",
-      "port": "mixins/ae2/charger.rs",
-      "scope": "Charger Crankable only; not the networked base class",
+      "port": "mixins/ae2/grid_glue.rs",
+      "scope": "server-owned dimension network adapter for six full-block kinds including Controller, original proxy energy buffer persistence and exposed faces; full managed-node ownership/readiness/listeners/capabilities and other hosts pending",
       "sha256": "95985bf026103a9c37d94288d7ce0fd300121cf9a62507734ef2175514474c23",
       "status": "partial"
     },
@@ -2329,8 +2331,10 @@
     {
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/networking/ControllerBlockEntity.java",
+      "port": "mixins/ae2/network.rs",
+      "scope": "8000 AE public storage/default priority zero, idle three, CANNOT_CARRY/DENSE flags, original NBT, real pathing controller positions and offline/online/conflict state; native energy/Charger/restart checks; external power funnel/capabilities, full readiness/events/chunk/spatial lifecycle and menu pending",
       "sha256": "7273b831929915e3669d34da7fde40f261a4a3f267b72d89f6bf0730e1926a47",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "blockentity",

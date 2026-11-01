@@ -8,7 +8,8 @@
 | BasicCellInventory | basic/portable/tool layouts, байты/типы/округление, exact/fuzzy partitions, distribution/void, simulate/modulate/extract; native codec, nested restrictions и Drive mounts; original Java basic и tool profile traces | терминал, полное восстановление malformed/missing content, addon handlers и полный upgrades lifecycle |
 | ItemUpgradeInventory / UpgradeInventory | исходный `slot/item` container component, physical slot limits, supported cards и per-slot installed counts с host clamp для 22 finite storage items; исходный component сохраняется | writer/Workbench/callbacks/cache invalidation, addon upgrade registry и остальные hosts; полный Minecraft codec и malformed recovery |
 | AEKey / GenericStack / KeyCounter | компонентные ключи, typed NBT, signed long counts, fuzzyEquals и FuzzySearch, signed deficits/zero pruning | prototype normalization, wrapped items, packet codecs, missing-content placeholders, drop/display API |
-| ME topology/pathing | controller validation, BFS priorities, bottleneck ancestry, DFS counts, dense/normal/ad-hoc, P2P rules; 2000 Java differential cases; пять world full blocks, Drive require-channel | остальные block/part nodes, полная grid service identity/merge priorities, security/listeners/boot events |
+| ME topology/pathing | controller validation, BFS priorities, bottleneck ancestry, DFS counts, dense/normal/ad-hoc, P2P rules; 2000 Java differential cases; шесть world full blocks, реальный Controller и Drive require-channel | остальные block/part nodes/CableBus, полная grid service identity/merge priorities, security/listeners/boot events, расширенный original-Java multi-controller oracle |
+| ControllerBlock / ControllerBlockEntity | public 8000 AE/default storage priority 0, idle 3, CANNOT_CARRY/DENSE flags, реальные controller positions/pathing, original NBT, 18 state/type variants, source column/interior/parity и powered-before-conflict status; native power/Charger/restart и 4000 verbatim Java visual cases | Network Status Menu, external power funnel/capabilities, immediate shape/ready/event timing, full chunk/drop/spatial lifecycle, material/emissive parity и Java/NeoForge world oracle |
 | StoredEnergyAmount / EnergyService | amount/capacity/simulation, storage events, приоритеты, per-node buffer, public power delay, averages/cache, overlay/passive rules; full-block world binding; 2000 Java traces | addon storage providers, полные watchers/event callbacks, QuartzFiber и passive-generator blocks, config integration, полные watcher/addon oracle scenarios |
 | NetworkStorage | mount priorities, preferred passes, mutation queues, recursion guard, weak links; 2000 Java traces/410882 операций; native StorageService/Drive consumers | MEStorage handler filters, ME Chest/terminal и остальные providers |
 | StorageService | node/global provider identity, refresh/unmount, lazy public cache/private counts, key/watch-all changes и permanent watcher destroy | Java service oracle, world watcher hosts, full callback/hash iteration/exception fidelity, debug dump |
@@ -37,13 +38,23 @@
   ещё не перенесена. Нельзя выдавать текущий отказ за полный fault-tolerant codec.
 - В native tooltip resolver сейчас знает предметы из Items и vanilla fluids
   water/lava; реестр custom fluids и native fluid capability ещё не подключены.
-- В мире сейчас подключены Charger, три energy cell и Drive. CableBus,
-  controller, терминалы и остальные nodes ещё не подключены. Drive требует
+- В мире сейчас подключены Charger, три energy cell, Drive и Controller. CableBus,
+  терминалы и остальные nodes ещё не подключены. Drive требует
   канал; ад-hoc limit и отключение при нехватке канала проверены тестом binding.
   Full blocks соединяются соседними открытыми гранями;
   Charger и Drive исключают front. Grid service merge/split переносит per-node buffer,
   сохраняет сервис с pivot при разделении и более крупный при слиянии. Полные
   grid priorities, ties, listeners, ownership/readiness и event ordering pending.
+- Controller использует original state/type. Content API сначала создаёт cube
+  row; native mod_content build adapter разворачивает его в 18 реальных states
+  и согласованно обновляет девять JSON и шесть NBT tables. Vanilla IDs/rows не
+  сдвигаются, последующие mod state/shape/default references переносятся вместе.
+  Library проверяет чужой door/button с custom shapes и фактический renderer
+  model loader. Original jar assets сохранены. Default — offline/block.
+  Пока type/status пересчитываются на server post_tick; source immediate
+  updateShape/onReady/listener order, Network Status Menu и power funnel ещё нужны.
+  Source grid power importance/merge priority и полная service identity остаются
+  общими открытыми задачами adapter.
 - Java oracle использует оригинальный PathingCalculation и извлечённые без
   изменений pathing-методы GridNode/GridConnection. Окружение, события и коллекции
   заменены заглушками. Входы — связные сети с одним online controller и одинаковым

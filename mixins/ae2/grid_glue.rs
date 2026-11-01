@@ -93,6 +93,10 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
         state.drives.persist(game);
         states
     };
+    let controllers: Vec<_> = states
+        .iter()
+        .filter_map(|state| state.controller_model.map(|model| (state.pos, model)))
+        .collect();
     for state in states {
         let [x, y, z] = state.pos;
         let Some(BlockEntity::Mod(be)) = game.world.block_entities.get_mut(&(x, y, z)) else {
@@ -128,6 +132,22 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
         if be.nbt != before {
             game.world.modified.insert((x >> 4, z >> 4));
         }
+    }
+    // ControllerBlockEntity.updateState uses UPDATE_CLIENTS, preserving the BE
+    // and deliberately avoiding neighbour notifications during spatial moves.
+    for (pos, model) in controllers {
+        if game.native_block(pos) != super::ae2_controller::BLOCK {
+            continue;
+        }
+        let neighbours = Direction::ALL.map(|direction| {
+            let delta = direction.offset();
+            game.native_block(std::array::from_fn(|i| pos[i].wrapping_add(delta[i])))
+                == super::ae2_controller::BLOCK
+        });
+        let kind = super::ae2_controller::render_type(pos, neighbours);
+        let flags = horizon_world::level::flags::UPDATE_CLIENTS;
+        game.native_set_block_property_with(pos, "state", model, flags);
+        game.native_set_block_property_with(pos, "type", kind, flags);
     }
 }
 pub(super) fn extract(

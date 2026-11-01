@@ -3,7 +3,59 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## Drive/Charger comparator — 1 ноября 2026
+## ME Controller / native state registration — 1 ноября 2026
+
+- **106 core / 148 native game / 12 native library / 11 Python PASS**;
+  fmt/rustfmt, clippy -D warnings, source audits, native check/build PASS.
+  Core: `target/controller-core-checks-final.log`; native game/check:
+  `target/controller-native-{tests,check}-final.json`; library:
+  `target/controller-native-library-final.json`; fast build:
+  `target/controller-native-build-second.json`. Native unused-API/rust-objcopy
+  libLLVM diagnostics не скрывались; Cargo exit 0 и actual game PASS подтверждены.
+- Controller: public 8000 AE, priority 0 (IAEPowerStorage default), idle 3,
+  CANNOT_CARRY | DENSE_CAPACITY, реальные controller positions и original NBT.
+  Core проверяет 12 consumers с тремя controllers против ad-hoc eight, seven/
+  eight bound, indirect-controller conflict, storage simulation и точный idle.
+- Resource adapter разворачивает один cube row в 18 настоящих state/type states.
+  Согласованы 9 JSON и 6 NBT tables, defaults/render/rotation/collision mappings;
+  vanilla IDs/rows неизменны. Library fixture содержит preceding block, following
+  door и foreign button с custom shapes; проверяет реальные Assets и renderer
+  StateModels loaders для Controller, door и button. Content build/check PASS:
+  `target/controller-content-{build.log,check.json}`; hmod SHA-256
+  `ab35a03fd5196dbf026f1f419bc3738c01d48e3b1411bcd403fc4ca8cc7669bf`.
+- **4000 source visual cases / 8000 top-level comparisons PASS**:
+  `docs/controller-visual-oracle.json`, `target/controller-visual-oracle-final.log`.
+  getControllerType/isController и updateState/checkController включены дословно;
+  world/power/conflict dependencies stubbed (ready, loaded, grid present). Есть
+  все 64 neighbour masks и signed-coordinate extremes. Это не ControllerValidator
+  и не Java/NeoForge world oracle. Jars/classes/исходные exports остаются в target.
+- **World controller-pz6q6dun PASS**, `docs/controller-world-smoke.json`:
+  18 variants, empty offline, cap 8000, все column/interior types, powered conflict,
+  width 8 -> 7 recovery и controllers через non-controller node. Idle: 874 ->
+  781 AE за 31 tick, ровно 3/tick. Real Charger: 4997 -> 3262 за 45 ticks,
+  ровно 1600 recipe + 135 idle. Restart сохраняет total internal+proxy без refill.
+  `controller-connected.png` просмотрен: original textures/geometry отображаются;
+  full material/emissive parity отдельно не доказана.
+- **Charging item-charging-8r8yerow PASS**: все 16 powered profiles, overflow/
+  conservation, front, Crank, components/restart/retrieval.
+  `docs/controller-charging-regression.json`. **Drive GUI drive-gui-nrm5z8ej PASS**:
+  filters/shifts/main-before-hotbar, vanilla isolation и restart.
+  `docs/controller-drive-gui-regression.json`.
+- Исправленные failed invocations: initial Java harness не импортировал nested
+  enum; первый world выявил production model schema без named и resource fallback
+  (теперь renderer loader покрыт тестом, launch запрещает fallback); второй world
+  выявил fixture air/minecraft:air assertion. GUI regression отказал на visible-
+  face query контрольного barrel; fixture получил chunk-load barrier и явную
+  frontal pose, все assertions сохранены. Финальные relevant проверки прошли.
+  Все свои клиенты завершены, player resources/saves и original engine repos не менялись.
+- **78 partial / 1351 pending / 0 complete** из 1429 files. Menu, external power
+  funnel/capabilities, immediate shape/onReady/listener order, grid merge priority/
+  identity, full chunk/drop/spatial lifecycle и lighting/materials ещё открыты.
+  Status/type вычисляются server post_tick adapter. Текущий этап завершён;
+  goal приостановлен по просьбе пользователя для тестирования. Scope полного
+  1:1 порта не уменьшен. No push/install/deployment.
+
+## Drive/Charger comparator — предыдущее подтверждение
 
 - **101 core / 143 native game / 11 Python PASS**, fmt/rustfmt/clippy -D warnings,
   source audits и pinned native check/build PASS. Final evidence:

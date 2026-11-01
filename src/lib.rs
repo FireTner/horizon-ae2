@@ -36,3 +36,6 @@ pub mod ae2_charger_automation_rules;
 
 #[path = "../mixins/ae2/inventory_signal.rs"]
 pub mod ae2_inventory_signal;
+
+#[path = "../mixins/ae2/controller.rs"]
+pub mod ae2_controller;

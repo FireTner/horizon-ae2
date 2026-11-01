@@ -7,6 +7,36 @@ priority = 100
 horizon_revision = "aa27eca326db26e999d4e59d7899576016764b1e"
 
 [[module]]
+id = "controller-rules-world"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_controller"
+source = "controller.rs"
+
+[[module]]
+id = "controller-rules-model"
+file = "crates/horizon-client/src/mod_content.rs"
+name = "ae2_controller"
+source = "controller.rs"
+
+[[module]]
+id = "controller-states"
+file = "crates/horizon-client/src/mod_content.rs"
+name = "ae2_controller_states"
+source = "controller_states.rs"
+
+[[injection]]
+id = "controller-states-build"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::mod_content::build"
+helper = "controller_states_hook.rs"
+bindings = [
+  { name = "base", ty = "&std::path::Path", value = "base" },
+  { name = "mods", ty = "&[crate::mod_content::ContentMod]", value = "mods" },
+  { name = "out", ty = "&std::path::Path", value = "out" },
+]
+
+[[module]]
 id = "inventory-codec"
 file = "crates/horizon-client/src/game.rs"
 name = "ae2_inventory_codec"

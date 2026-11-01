@@ -16,7 +16,15 @@ Rules live in mixins/ae2/*.rs and are exposed by src/lib.rs for standalone tests
 glue.rs owns Horizon types. Only modules actually consumed by the adapter belong
 in horizon-mixin.toml. keys.rs, storage.rs and cells.rs feed the native cell
 tooltip/codec adapter. energy.rs/grid.rs/power.rs feed network.rs and the
-grid_glue.rs world adapter (currently Charger + three energy-cell kinds + Drive).
+grid_glue.rs world adapter (Charger + three energy-cell kinds + Drive + Controller).
+controller.rs supplies source 8000 public AE/idle 3, node profile and visual rules.
+controller_states.rs wraps only owned Controller content builds and expands the
+single physical cube row to its actual 18 state/type variants across effective
+JSON/NBT tables. Preserve vanilla ids and foreign shape/model references. This
+is not a general custom-state API. Renderer model schema requires named values.
+Controller status/type currently update at server post_tick; immediate shape/
+ready/events, external power funnel, Network Status Menu and full lifecycle
+remain open. Do not mark Controller fully ported on these tests alone.
 item_energy.rs/item_energy_glue.rs feed all 16 built-in powered items into Charger;
 charger.rs preserves local/direct-grid/overflow/refill order. Command registry hooks
 add only supported component IDs, preserve vanilla types and validate energy numbers.

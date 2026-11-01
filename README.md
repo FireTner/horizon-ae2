@@ -15,6 +15,11 @@
 
 Что уже написано:
 
+- ME Controller подключён к сети: public 8000 AE, 3 AE/tick, исходные node flags,
+  многоблочная проверка, каналы и original NBT. Зарегистрированы все 18 state/type
+  состояний и исходные column/interior модели. 4000 сравнений визуальных правил
+  с Java и world power/shape/conflict/restart прошли. Network Status Menu,
+  external power capabilities и полный event/chunk/spatial lifecycle ещё нужны.
 - Компараторы Drive/Charger: source slot limit 1, реальные 10/1 slots,
   исходная float32 арифметика, обновления от hopper/manual/GUI и restart.
   Обычные контейнеры сохраняют native поведение. Другие AE2 comparator hosts
@@ -31,7 +36,7 @@
   priority UI, специальные действия меню и терминал ещё не перенесены.**
 - `StoredEnergyAmount`, EnergyService и per-node buffer: приоритеты хранилищ,
   симуляция, события, power delay, overlay/passive rules. В мире подключены
-  обычная/плотная/творческая energy cell и Charger. CableBus/QuartzFiber parts
+  обычная/плотная/творческая energy cell, Charger, Drive и Controller. CableBus/QuartzFiber parts
   и остальные устройства пока не подключены. Правила сервиса и overlay сверены
   с Java: 2000 сценариев, 462175 операций, без расхождений.
 - Первый игровой срез Charger + Wooden Crank: один предмет, рецепт из
@@ -41,8 +46,8 @@
 - Ядро ME-графа: топология, controller validation, ad-hoc, три очереди
   pathfinding, bottlenecks, multiblock и compressed channels. На **2000 схемах**
   значения всех узлов/соединений совпали с исполняемым оригинальным Java-кодом
-  при одинаковом порядке входных узлов/связей. World/power adapter пока подключает пять типов full blocks; CableBus,
-  controllers и channel consumers в мире ещё не подключены.
+  при одинаковом порядке входных узлов/связей. World/power adapter подключает
+  шесть full-block kinds, включая Controller и Drive; CableBus и другие consumers ещё нужны.
 - Ядро `NetworkStorage`: приоритеты, два прохода вставки, очереди mount/unmount
   и защита от рекурсии; 2000 сценариев / 410882 операции совпали с Java.
   StorageService подключает десять дисков Drive, priority/online mounts,

@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/drive-automation-h96b79qa",
+  "scope": [
+    "reject_non_cells",
+    "all_six_insert_faces",
+    "offline_insert_extract",
+    "failed_pull_restores_cell",
+    "components_retained",
+    "ten_slots_limit_one",
+    "full_drive_remainder",
+    "save_restart"
+  ],
+  "not_covered": [
+    "external capability API",
+    "Create integration",
+    "world dirty backend mutation through terminal",
+    "all chunk/drop paths"
+  ]
+}

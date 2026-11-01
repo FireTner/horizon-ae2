@@ -3,7 +3,42 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## Charger native automation — 1 ноября 2026
+## Контрольная точка Charger automation перед паузой — 1 ноября 2026
+
+- Повторно проверён код `322cc27`: standalone **98 PASS**, native game
+  **135 PASS**, Python tooling **10 PASS**. fmt/rustfmt, clippy `-D warnings`,
+  source inventory audit, pinned Horizon check и fast build прошли.
+  Логи этой контрольной точки: `target/charger-automation-checkpoint-core.log`,
+  `target/charger-automation-checkpoint-native-{tests,check,build}.json`;
+  Cargo logs указаны внутри JSON. Library payload не менялся, его тесты
+  в этой точке не повторялись (последнее подтверждение — 9 PASS).
+- Новый isolated Charger world smoke **PASS**:
+  `docs/charger-automation-world-smoke.json`, полный transcript и game logs
+  находятся по пути `logs` в отчёте. Проверены реальные hopper/dropper,
+  все шесть сторон, все 16 powered items, recipe tag admission независимо
+  от поддержки result components, source overstack без потери компонентов,
+  failed-pull rollback, немедленный original inv flush и malformed gate/restart.
+- Drive regression **PASS**: `docs/charger-automation-drive-regression.json`.
+  Реальные hopper/dropper, фильтры/лимит десяти слотов, все грани, offline,
+  failed pull с сохранением компонентов, full remainder и restart.
+  Запущен исходный smoke через generated wrapper в target с единственной
+  заменой control endpoint на собственный `work/control.json` (Unix path limit).
+  Все клиенты обоих smoke завершены. Пользовательские saves/options/resources
+  и оригинальные engine repositories не изменялись.
+- Исходный пакет теперь включает Charger automation smoke и JSON-отчёты
+  игровых проверок для воспроизведения. Item catalog max-stack, comparator
+  fullness, general capabilities и полный Charger lifecycle остаются открытыми.
+  Ни один из 1429 Java-файлов не объявлен полностью перенесённым: 71 partial,
+  1358 pending. Подробные ограничения сохраняются в PARITY.
+- После изменения упаковки повторно прошли **10 Python tests**, включая
+  deterministic source bundle: `target/charger-automation-checkpoint-tooling-final.log`.
+- Native сборка успешна, но не warning-free: есть unused future API warnings
+  и диагностика rust-objcopy о недостающем libLLVM.dylib. Cargo exit status 0
+  подтверждён отдельно от фактического запуска и игровых assertions.
+- Пользователь запросил приостановить goal после этого этапа для тестирования.
+  Новые функциональные этапы не начинались; push/deployment не выполнялись.
+
+## Charger native automation — предыдущее подтверждение (`322cc27`)
 
 - Standalone **98 PASS**, native game **135 PASS**, Python tooling **10 PASS**.
   `cargo check --locked`, fmt, clippy `-D warnings`, tests, source audit,

@@ -1,10 +1,21 @@
 # Текущая точка полного переноса
 
-Цель активна: полностью перенести AE2 19.2.18 на Horizon, 1:1, без субагентов.
+Цель: полностью перенести AE2 19.2.18 на Horizon, 1:1, без субагентов.
+После завершения этапа Charger automation пользователь запросил паузу для тестирования.
 Цель не уменьшена до текущего набора механик. Все 1429 исходных Java-файлов
-остаются в реестре; сейчас 69 partial, 1360 pending, полностью закрытых нет.
+остаются в реестре; сейчас 71 partial, 1358 pending, полностью закрытых нет.
 
 ## Последний результат
+
+- Charger automation (`322cc27`): hopper/dropper на всех шести гранях,
+  исходный ChargerInvFilter, вставка по одному, сохранение компонентов и
+  остатка source-loaded stack, rollback неудачного извлечения и немедленный
+  flush inv.item0. Повреждённый original остаётся blocked до explicit repair,
+  в том числе после restart. Все 16 powered items и реальные recipe tags
+  участвуют в фильтре; unsupported result components не меняют membership.
+  98 core / 135 native / 10 Python PASS. Контрольная точка, игровые проверки
+  и ограничения зафиксированы в VALIDATION.md. Размер стопок в native item
+  catalog, comparator fullness и general capability API остаются открытыми.
 
 - Текущий этап shared source inventory codec завершён и проверен: 95 core,
   130 native, 10 Python, fmt/clippy/audit и native check/build PASS. World Drive
@@ -121,7 +132,7 @@
 3. Handheld tool charging/use/painting/shooting, admission reload invalidation;
    creative workbench/tooltip/API и portable handheld UI/energy.
 4. Для energy cells остаются fullness/sync/comparator, item/drop/placement
-   components; для Charger — tools/FX/inventory filter; для Crank — ориентация,
+   components; для Charger — полный item API/FX, comparator и capability lifecycle; для Crank — ориентация,
    sync/анимация. Остальные задачи полного порта остаются в PLAN/PARITY.
 
 ## Локальные команды и данные

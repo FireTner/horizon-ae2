@@ -13,8 +13,8 @@
       "pending": 39
     },
     "client": {
-      "partial": 1,
-      "pending": 216
+      "partial": 6,
+      "pending": 211
     },
     "core": {
       "partial": 3,
@@ -105,8 +105,8 @@
       "pending": 10
     },
     "thirdparty": {
-      "partial": 0,
-      "pending": 25
+      "partial": 1,
+      "pending": 24
     },
     "util": {
       "partial": 4,
@@ -3369,14 +3369,18 @@
     {
       "family": "client",
       "path": "src/main/java/appeng/client/render/cablebus/CableBuilder.java",
+      "port": "mixins/ae2/cable_render.rs",
+      "scope": "five-type core/straight/connection/constrained geometry, sprite/channel selection and source color state; native atlas/GPU/world integration pending",
       "sha256": "f96e16a1fe1d700837458ce5fbc4606283a3ab850f62165d31f3aa12f20cfaff",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "client",
       "path": "src/main/java/appeng/client/render/cablebus/CableBusBakedModel.java",
+      "port": "mixins/ae2/cable_render.rs",
+      "scope": "cable-only straight detection and core/internal/external composition; attachment/facade models, particles, caches and native GPU pending",
       "sha256": "72f985b60bc00105b0998c09456e85df3a2ad1d325c2cb0256906ddf3ee3e712",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "client",
@@ -3399,14 +3403,18 @@
     {
       "family": "client",
       "path": "src/main/java/appeng/client/render/cablebus/CableCoreType.java",
+      "port": "mixins/ae2/cable_render.rs",
+      "scope": "source core mapping and 17 texture color suffixes; native renderer/atlas registration pending",
       "sha256": "36b9a4798f1b1f4f5e4e00932a2f6151477dd164657c23fe6de31b7929adc37e",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "client",
       "path": "src/main/java/appeng/client/render/cablebus/CubeBuilder.java",
+      "port": "mixins/ae2/cube_builder.rs",
+      "scope": "all cube/quad UV/flip/rotation/color/fullbright geometry; native packed vertices/normals/AO/GPU integration pending",
       "sha256": "728a2b601396db6ad881f0d7d8871dde870fc7b55abbe598c95cc87e22684b5b",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "client",
@@ -3453,8 +3461,10 @@
     {
       "family": "client",
       "path": "src/main/java/appeng/client/render/cablebus/SmartCableTextures.java",
+      "port": "mixins/ae2/cable_render.rs",
+      "scope": "odd/even smart/dense channel texture boundaries; native sprite atlas lookup pending",
       "sha256": "7b9a454d81a324c7c3ccf5067900cddff8937b38a57659c2a61f42275fb9d0c1",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "client",
@@ -8519,8 +8529,10 @@
     {
       "family": "thirdparty",
       "path": "src/main/java/appeng/thirdparty/fabric/QuadEmitter.java",
+      "port": "mixins/ae2/cube_builder.rs",
+      "scope": "square coordinates/winding/epsilon cull metadata only; full Fabric emitter/packed-vertex pipeline not ported",
       "sha256": "7a5a2e868e000652e01e7bd108469e1d8fbecbfbdf55f11d0a9db8c9dcdf6a7e",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "thirdparty",

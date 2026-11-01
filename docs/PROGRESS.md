@@ -3,9 +3,17 @@
 Цель активна: полный перенос AE2 19.2.18 на Horizon, 1:1, без субагентов.
 Пользователь возобновил goal; текущая работа — CableBus/кабели после EnergyCellBlockItem.
 Цель не уменьшена до текущего набора механик. Все 1429 исходных Java-файлов
-остаются в реестре; сейчас 96 partial, 1333 pending, полностью закрытых нет.
+остаются в реестре; сейчас 102 partial, 1327 pending, полностью закрытых нет.
 
 ## Последний результат
+
+- Cable geometry rules: полный cable-only CubeBuilder/CableBuilder путь,
+  core textures, odd/even smart/dense channel overlays и CableBusBakedModel
+  straight/core/internal/external composition. 24405 cases / 467940 quads /
+  9358800 float fields совпали с Java, включая все 64 connection masks для
+  каждого type/color. 122 core / 11 Python и source audits PASS. Native
+  manifest/runtime этим checkpoint не менялись; renderer/GPU/packed normals/
+  AO, actual world state collector и attachment/facade models ещё нужны.
 
 - CableBus saved-host adapter: original cable.id/gn + six side/facade keys,
   buffered energy/owner persistence и raw unknown data retention. Source

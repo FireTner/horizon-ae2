@@ -3,6 +3,34 @@
 Последняя проверка: 2 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
+## Cable geometry builders — 2 ноября 2026
+
+- **122 core / 11 Python PASS**, fmt/rustfmt, clippy -D warnings и source/
+  item-limit audits PASS (`target/cable-render-checks.log`). Source inventory
+  1429 files: 102 partial / 1327 pending / 0 complete; не процент runtime parity.
+- **24405 Java cases / 467940 quads / 9358800 float fields PASS**:
+  `docs/cable-render-oracle.json`, outputs/input under target/cable-render-oracle.
+  4000 raw CubeBuilder cases, 10965 piece cases, 9440 composite model cases;
+  exhaustive 64 same-type connection masks × five types × 17 colors, plus
+  mixed-neighbor/attachments/core override/straight, every face/adjacency,
+  UV rotations/flips/custom rects, channel boundaries/overflow, constrained
+  distance boundaries/int overflow and three affine atlas rectangles.
+  Exact float bits, texture IDs, quad order, vertex color/fullbright, face/cull
+  metadata сравнивались построчно. Hashes и stubs/limits в committed report.
+- Java CubeBuilder/CableBuilder/CableCoreType/SmartCableTextures unchanged;
+  QuadEmitter.square и cable-only CableBusBakedModel methods дословные.
+  Stub MutableQuadViewImpl captures pre-pack emitter values. Packed vanilla
+  normals/AO/shading, actual atlas/GPU, world render-state collection, attachment/
+  facade models, particles и caches остаются открытыми. Cull metadata не равна
+  face culling готовых source BakedQuads. No native/game render proof claimed.
+- New geometry rules пока library-only; native manifest/consumed payloads не
+  менялись. Native check/build/172 game/14 library/7 assets tests и world smokes
+  здесь заново не запускались; прежние native evidence относятся к d6ca047.
+- Apache-2.0 notice для embedded Fabric QuadEmitter.square сохранён отдельно
+  в LICENSES/Fabric-Apache-2.0, original FabricMC attribution — NOTICE.md.
+  Первый javac probe обнаружил missing uv declaration в stub interface, добавлена;
+  source Java не менялся. Оба последующих сравнения (18965 и 24405) PASS.
+
 ## CableBus saved-host / node data — 2 ноября 2026
 
 - **120 core / 172 native game / 11 Python PASS**, fmt/rustfmt, clippy

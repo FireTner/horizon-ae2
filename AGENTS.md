@@ -30,6 +30,14 @@ collision, renderer/selection/partial breaking and client host sync remain open.
 Future physical states must be source light_level/waterlogged (32), not invented
 color/type/connection properties. CableBuilder texture names use enum names:
 TRANSPARENT texture suffix is transparent, whereas the item ID prefix is fluix.
+cube_builder.rs/cable_render.rs are standalone geometry rules until the native
+renderer consumes them; leave them out of the manifest meanwhile. They preserve
+source float32 operation order, UV flips/rotations, dense +3/4 wrapping, sprite
+suffixes and smart machine-cap vertex-color retention. Quad.cull records emitter
+metadata only: original cable BakedQuads are returned unculled, not by face.
+RenderState expects already resolved source connection types/core/channel inputs;
+world collection, attachment/facade quads, packed normals/AO and GPU remain open.
+Preserve FabricMC Apache-2.0 attribution for QuadEmitter.square coordinate rules.
 glue.rs owns Horizon types. Only modules actually consumed by the adapter belong
 in horizon-mixin.toml. keys.rs, storage.rs and cells.rs feed the native cell
 tooltip/codec adapter. energy.rs/grid.rs/power.rs feed network.rs and the

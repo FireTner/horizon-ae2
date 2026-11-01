@@ -47,7 +47,8 @@ chunk/color/dense tests можно считать кабели подключё�
 Source CableBusBlock — dynamicShape; статический iron/cube template не заменяет
 коллизии. В pinned Horizon нужны оба пути Game.outline_boxes/clip_ray и
 client-render SceneCollisions.context_shape, затем render-state/BE renderer.
-CableBuilder/CubeBuilder задают quads/UV; texture suffix берётся из enum name,
+CableBuilder/CubeBuilder rules и cable-only composition уже сверены с Java;
+нужно подключить их quads/UV к реальному native renderer и atlas. texture suffix берётся из enum name,
 поэтому TRANSPARENT использует transparent, хотя item registryPrefix — fluix.
 
 3. **ME-граф.** Grid/Node/Connection/Storage/Service, сетевые события, цвета,

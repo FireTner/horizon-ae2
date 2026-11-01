@@ -15,6 +15,11 @@
 
 Что уже написано:
 
+- Геометрия кабелей: source CubeBuilder/CableBuilder для всех пяти типов и
+  17 цветов, straight/core/internal/external connections, UV, vertex colors и
+  fullbright channel overlays. 24405 Java cases / 467940 quads совпали, включая
+  float bits. Это готовые правила построения геометрии; native GPU, world
+  render-state collection, attachments/facades и physical host ещё нужны.
 - Ядро CableBus: пять типов кабелей × 17 цветов, исходные flags, tint palette,
   connection lengths, raw shape boxes, visual channels и cable payload; sparse
   storage центра/шести частей/фасадов. Network binding принимает cable profiles,

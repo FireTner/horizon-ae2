@@ -14,6 +14,12 @@ SOURCE = ROOT / "target/upstream/ae2"
 
 # A partial implementation never marks a whole Java class as ported.
 PARTIAL = {
+    "client/render/cablebus/CubeBuilder.java": ("mixins/ae2/cube_builder.rs", "all cube/quad UV/flip/rotation/color/fullbright geometry; native packed vertices/normals/AO/GPU integration pending"),
+    "client/render/cablebus/CableBuilder.java": ("mixins/ae2/cable_render.rs", "five-type core/straight/connection/constrained geometry, sprite/channel selection and source color state; native atlas/GPU/world integration pending"),
+    "client/render/cablebus/CableCoreType.java": ("mixins/ae2/cable_render.rs", "source core mapping and 17 texture color suffixes; native renderer/atlas registration pending"),
+    "client/render/cablebus/SmartCableTextures.java": ("mixins/ae2/cable_render.rs", "odd/even smart/dense channel texture boundaries; native sprite atlas lookup pending"),
+    "client/render/cablebus/CableBusBakedModel.java": ("mixins/ae2/cable_render.rs", "cable-only straight detection and core/internal/external composition; attachment/facade models, particles, caches and native GPU pending"),
+    "thirdparty/fabric/QuadEmitter.java": ("mixins/ae2/cube_builder.rs", "square coordinates/winding/epsilon cull metadata only; full Fabric emitter/packed-vertex pipeline not ported"),
     "parts/CableBusContainer.java": ("mixins/ae2/cable_bus.rs", "source center/side keys, gn buffered energy and host snapshot persistence; side-part/facade registry codecs, placement/render/packets/lifecycle pending"),
     "parts/AEBasePart.java": ("mixins/ae2/cable_bus.rs", "part gn node data nesting and raw custom state preservation; full base settings/packet/ownership/visual lifecycle pending"),
     "me/ManagedGridNode.java": ("mixins/ae2/cable_bus.rs", "default gn persistence name and cable host saved-data binding; full readiness/deferred-init/security/events pending"),

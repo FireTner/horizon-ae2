@@ -47,3 +47,8 @@ pub mod ae2_part_storage;
 
 #[path = "../mixins/ae2/node_data.rs"]
 pub mod ae2_node_data;
+
+#[path = "../mixins/ae2/cable_render.rs"]
+pub mod ae2_cable_render;
+#[path = "../mixins/ae2/cube_builder.rs"]
+pub mod ae2_cube_builder;

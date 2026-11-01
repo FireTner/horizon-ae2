@@ -90,6 +90,28 @@ reset требует event/readiness port, не только перенесён�
 Physical CableBus registration/collision/render/placement по-прежнему нужны:
 этот decoder сам по себе не делает кабель доступным игроку.
 
+`cube_builder.rs`/`cable_render.rs` переносят cable-only геометрию исходных
+CubeBuilder/CableBuilder/CableBusBakedModel, включая все five types × 17 colors,
+core override, straight shortcut, constrained attachment connections, machine
+caps, texture names, odd/even channel layers, vertex RGB/fullbright и порядок
+quads. Dense channel groups используют wrapping (channels+3)/4; straight dense
+сегмент выступает до -0.01/16.01 pixels против z-fighting. Source smart machine
+cap оставляет bright vertex color после reset texture/fullbright; small segment
+сохраняет этот цвет. Математика float32 и порядок вычитаний не упрощены.
+
+24405 Java cases, 467940 quads и 9358800 float fields совпали по bits
+(`docs/cable-render-oracle.json`). Четыре builder/texture класса компилируются
+целиком без изменений; QuadEmitter.square и cable-only model composition —
+verbatim fragments. Sprite lookup — три контролируемых affine atlas rectangles;
+MutableQuadViewImpl лишь записывает emitter values. Actual vanilla packed
+vertices/normals/AO/shading, live atlas, GPU, render-state world collection,
+attachment/facade models, particles и caches не проверяются/ещё не перенесены.
+Quad.cull здесь только emitter metadata: source cable model отдаёт unculled
+BakedQuads, это не разрешение отбрасывать грани native world mesher-ом.
+Эти два geometry modules пока library-only, не включены в native manifest.
+Их наличие в source archive не меняет вид игрового мира. Physical CableBus
+registration/geometry/GPU integration остаётся следующим обязательным этапом.
+
 ## Временные ограничения адаптера (не целевое поведение)
 
 - Новый `cells.rs` использует исходные AE2 поля `id`, `components`, `#t`, `#` и

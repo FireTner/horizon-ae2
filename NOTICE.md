@@ -31,3 +31,9 @@ their contributors; their LGPL-2.1 text is copied from that checkout into
 `data/ae2/licenses/neoforge-lgpl-2.1.txt` in prepared content. Tag source hashes
 and layer merges are recorded in `data/ae2/platform-tags.json`. These data files
 are separate from the source-only `.hnmod`; no NeoForge JVM runtime is included.
+
+CubeBuilder's square coordinates also adapt QuadEmitter.square from the Fabric
+Renderer API embedded in AE2's appeng.thirdparty.fabric package. Copyright (c)
+2016, 2017, 2018, 2019 FabricMC, Apache-2.0; see LICENSES/Fabric-Apache-2.0.
+The implementation is modified/re-expressed in Rust; no Fabric runtime is bundled.
+Original attribution: https://github.com/FabricMC/fabric/blob/1.21.1/fabric-renderer-api-v1/src/client/java/net/fabricmc/fabric/api/renderer/v1/mesh/QuadEmitter.java

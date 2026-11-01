@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "cases": 20064,
+  "revision": "db17504a86128fdf3dae31f5fb7a112a646e0b93",
+  "input_sha256": "47e9ce76a6fd85064c4121f32cfcabcaec05b3e95e27a90ae62ac6fee013b2a6",
+  "output_sha256": "8e372835331f580260aeaafa05744773a7f66967bccc005a50e50b84b8869992",
+  "source_sha256": "ce0551535436b4a02bab281d6e407b8804f6bf609628f151fda9a4e23001e050",
+  "verbatim_fragment_sha256": "98e1dff2f79fb9d70d0a9653c14321e04ed56d6f3e8488c97052f62eea9e89ac",
+  "scope": "verbatim GridNode.areTagsEqualIgnoringPlayerId; missing/empty/owner-only maps, changed/missing non-owner keys and typed-value identity",
+  "limits": [
+    "CompoundTag and tag-value equality are map/string stubs, not Minecraft NBT implementations",
+    "readiness/destroy/Grid service callbacks and full GridNode.loadFromNBT are not executed",
+    "native typed NBT codec/lifecycle tests are separate evidence; nonfinite/nested tag equality is not proved"
+  ]
+}

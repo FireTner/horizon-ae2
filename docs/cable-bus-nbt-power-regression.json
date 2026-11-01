@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "scope": [
+    "finite_cell_power",
+    "front_face_restriction",
+    "creative_cell_power",
+    "restart_energy_conservation"
+  ],
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/power-_xs22713"
+}

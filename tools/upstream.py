@@ -14,6 +14,9 @@ SOURCE = ROOT / "target/upstream/ae2"
 
 # A partial implementation never marks a whole Java class as ported.
 PARTIAL = {
+    "parts/CableBusContainer.java": ("mixins/ae2/cable_bus.rs", "source center/side keys, gn buffered energy and host snapshot persistence; side-part/facade registry codecs, placement/render/packets/lifecycle pending"),
+    "parts/AEBasePart.java": ("mixins/ae2/cable_bus.rs", "part gn node data nesting and raw custom state preservation; full base settings/packet/ownership/visual lifecycle pending"),
+    "me/ManagedGridNode.java": ("mixins/ae2/cable_bus.rs", "default gn persistence name and cable host saved-data binding; full readiness/deferred-init/security/events pending"),
     "api/util/AECableType.java": ("mixins/ae2/cable.rs", "variant/size min/max, dense/smart profile and ordinal rules; full public native API pending"),
     "api/util/AECableVariant.java": ("mixins/ae2/cable.rs", "variant ordering/min/max through CableType; standalone addon API pending"),
     "api/util/AECableSize.java": ("mixins/ae2/cable.rs", "size ordering/min/max through CableType; standalone addon API pending"),
@@ -54,7 +57,7 @@ PARTIAL.update({
     'api/networking/GridFlags.java': ("mixins/ae2/grid.rs", 'all seven flags in pathing core; no native world binding'),
     'api/networking/pathing/ChannelMode.java': ("mixins/ae2/grid.rs", 'infinite/default/x2/x3/x4 capacities; config and saved forced modes pending'),
     'me/GridConnection.java': ("mixins/ae2/grid.rs", 'edge invariants, direction, route/count/finalize; no grid merge priorities or service events'),
-    'me/GridNode.java': ("mixins/ae2/grid.rs", 'topology, ancestry/bottlenecks/channel finalize; no world lifecycle, power or ownership persistence'),
+    'me/GridNode.java': ("mixins/ae2/grid.rs", 'topology, ancestry/bottlenecks/channel finalize; owner-ignoring saved-data comparison and cable reload identity; full readiness/security/service lifecycle pending'),
     'me/pathfinding/PathingCalculation.java': ("mixins/ae2/grid.rs", 'three-queue BFS, bottlenecks, compressed/multiblock channels, iterative DFS; 2000 original-Java differential cases; no world binding'),
     'me/pathfinding/ControllerValidator.java': ("mixins/ae2/grid.rs", 'controller-only connectivity, seven-block bound and cross rejection'),
     'me/pathfinding/AdHocChannelUpdater.java': ("mixins/ae2/grid.rs", 'node/edge counts in topology core'),

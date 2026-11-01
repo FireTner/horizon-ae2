@@ -9,7 +9,7 @@ use super::{
 };
 use horizon_client::containers::BlockEntity;
 use horizon_world::nbt::{Compound, JavaString, Tag};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Mutex;
 
 #[derive(Default)]
@@ -18,11 +18,12 @@ struct Dimension {
     drives: super::ae2_drive_glue::Drives,
     chargers: super::ae2_charger_inventory::Inventories,
     cells: super::ae2_energy_cell_glue::Displays,
+    cables: super::ae2_cable_bus::Hosts,
 }
 static NETWORKS: Mutex<BTreeMap<String, Dimension>> = Mutex::new(BTreeMap::new());
 
 pub(super) fn owns(block: &str) -> bool {
-    Kind::from_block(block).is_some()
+    Kind::from_block(block).is_some() || block == super::ae2_cable_bus::BLOCK
 }
 fn get_double(nbt: &Compound, key: &str) -> f64 {
     match nbt.get(&JavaString::from(key)) {
@@ -40,12 +41,24 @@ fn direction(game: &Game<'_>, pos: [i32; 3]) -> Direction {
         _ => Direction::North,
     }
 }
-fn snapshots(game: &Game<'_>) -> Vec<Snapshot> {
+fn snapshots(game: &Game<'_>, state: &mut Dimension) -> Vec<Snapshot> {
     let mut snapshots = vec![];
+    let mut cable_positions = BTreeSet::new();
     for (&(x, y, z), entity) in &game.world.block_entities {
         let BlockEntity::Mod(be) = entity else {
             continue;
         };
+        if be.id == super::ae2_cable_bus::BLOCK {
+            let pos = [x, y, z];
+            if !game.world.loaded(x, z) || game.native_block(pos) != super::ae2_cable_bus::BLOCK {
+                continue;
+            }
+            cable_positions.insert(pos);
+            if let Ok(snapshot) = state.cables.snapshot(pos, &be.nbt, &mut state.network) {
+                snapshots.extend(snapshot);
+            }
+            continue;
+        }
         let Some(kind) = Kind::from_block(&be.id) else {
             continue;
         };
@@ -65,6 +78,7 @@ fn snapshots(game: &Game<'_>) -> Vec<Snapshot> {
             saved_buffer,
         });
     }
+    state.cables.retain(&cable_positions);
     snapshots
 }
 pub(super) fn pre_tick(game: &mut Game<'_>, dimension: &str) {
@@ -72,7 +86,8 @@ pub(super) fn pre_tick(game: &mut Game<'_>, dimension: &str) {
     let state = networks.entry(dimension.to_owned()).or_default();
     state.chargers.sync(game);
     state.drives.read(game);
-    state.network.sync(snapshots(game));
+    let nodes = snapshots(game, state);
+    state.network.sync(nodes);
     state.drives.reconcile(&mut state.network);
     state.network.begin_tick();
 }
@@ -87,9 +102,26 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
         };
         state.chargers.sync(game);
         state.drives.read(game);
-        state.network.sync(snapshots(game));
+        let nodes = snapshots(game, state);
+        state.network.sync(nodes);
         state.drives.reconcile(&mut state.network);
         let states = state.network.end_tick();
+        for persisted in &states {
+            let Kind::Cable(cable) = persisted.kind else {
+                continue;
+            };
+            let [x, y, z] = persisted.pos;
+            let Some(BlockEntity::Mod(be)) = game.world.block_entities.get_mut(&(x, y, z)) else {
+                continue;
+            };
+            if be.id == super::ae2_cable_bus::BLOCK
+                && state
+                    .cables
+                    .persist(persisted.pos, &mut be.nbt, cable, persisted.buffer_share)
+            {
+                game.world.modified.insert((x >> 4, z >> 4));
+            }
+        }
         state.drives.reconcile(&mut state.network);
         state.drives.end_tick();
         state.drives.persist(game);
@@ -101,6 +133,9 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
         .filter_map(|state| state.controller_model.map(|model| (state.pos, model)))
         .collect();
     for state in states {
+        if matches!(state.kind, Kind::Cable(_)) {
+            continue;
+        }
         let [x, y, z] = state.pos;
         let Some(BlockEntity::Mod(be)) = game.world.block_entities.get_mut(&(x, y, z)) else {
             continue;

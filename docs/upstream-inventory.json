@@ -69,8 +69,8 @@
       "pending": 46
     },
     "me": {
-      "partial": 21,
-      "pending": 43
+      "partial": 22,
+      "pending": 42
     },
     "menu": {
       "partial": 3,
@@ -81,8 +81,8 @@
       "pending": 17
     },
     "parts": {
-      "partial": 6,
-      "pending": 76
+      "partial": 8,
+      "pending": 74
     },
     "recipes": {
       "partial": 0,
@@ -6140,7 +6140,7 @@
       "family": "me",
       "path": "src/main/java/appeng/me/GridNode.java",
       "port": "mixins/ae2/grid.rs",
-      "scope": "topology, ancestry/bottlenecks/channel finalize; no world lifecycle, power or ownership persistence",
+      "scope": "topology, ancestry/bottlenecks/channel finalize; owner-ignoring saved-data comparison and cable reload identity; full readiness/security/service lifecycle pending",
       "sha256": "ce0551535436b4a02bab281d6e407b8804f6bf609628f151fda9a4e23001e050",
       "status": "partial"
     },
@@ -6167,8 +6167,10 @@
     {
       "family": "me",
       "path": "src/main/java/appeng/me/ManagedGridNode.java",
+      "port": "mixins/ae2/cable_bus.rs",
+      "scope": "default gn persistence name and cable host saved-data binding; full readiness/deferred-init/security/events pending",
       "sha256": "84fe240bfa216cd3bf9ca4bfa5b2f1018b5b5ab5f1e50c944251c4028618f05f",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "me",
@@ -7205,8 +7207,10 @@
     {
       "family": "parts",
       "path": "src/main/java/appeng/parts/AEBasePart.java",
+      "port": "mixins/ae2/cable_bus.rs",
+      "scope": "part gn node data nesting and raw custom state preservation; full base settings/packet/ownership/visual lifecycle pending",
       "sha256": "a4fcf64b1586a7b7820eaf83e0dda70b92e1a7fe68c6e8871ead34506df9db19",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "parts",
@@ -7217,8 +7221,10 @@
     {
       "family": "parts",
       "path": "src/main/java/appeng/parts/CableBusContainer.java",
+      "port": "mixins/ae2/cable_bus.rs",
+      "scope": "source center/side keys, gn buffered energy and host snapshot persistence; side-part/facade registry codecs, placement/render/packets/lifecycle pending",
       "sha256": "60179b40ebe2d5af4dc3d3d298a0cdab6b4033ad00fa94688944e6660155dd07",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "parts",

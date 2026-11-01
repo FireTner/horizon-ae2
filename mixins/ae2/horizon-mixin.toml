@@ -639,6 +639,24 @@ name = "ae2_network"
 source = "network.rs"
 
 [[module]]
+id = "part_storage"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_part_storage"
+source = "part_storage.rs"
+
+[[module]]
+id = "node_data"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_node_data"
+source = "node_data.rs"
+
+[[module]]
+id = "cable_bus"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_cable_bus"
+source = "cable_bus.rs"
+
+[[module]]
 id = "grid_glue"
 file = "crates/horizon-client/src/game.rs"
 name = "ae2_grid_glue"

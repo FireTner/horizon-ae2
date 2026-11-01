@@ -35,11 +35,20 @@ SHA-256, подсистема и фактический объём начато�
    Cell Workbench. Проверки: NBT roundtrip, миллионы предметов, сложные компоненты,
    полные ячейки, фильтры, перезагрузка и запрет потери/дублирования.
 Текущий связующий слой перед закрытием ME-графа: cable core/source oracle и
-server profiles уже перенесены. Следом — настоящий CableBus host с source
-center/side/facade NBT, one-node-per-part identity/readiness, placement/partial
+server profiles и native saved-host parsing cable.id/gn уже перенесены.
+Следом — physical CableBus host/registration с full part/facade codecs,
+one-node-per-part identity/readiness, placement/partial
 break, renderer/collision/selection и update packets. Только после game/restart/
 chunk/color/dense tests можно считать кабели подключёнными в мире. Профили
 в изолированном binding не заменяют этот слой.
+
+Для physical host сохранить source states light_level=0..15 × waterlogged,
+не кодировать type/color/connection masks вымышленными block properties.
+Source CableBusBlock — dynamicShape; статический iron/cube template не заменяет
+коллизии. В pinned Horizon нужны оба пути Game.outline_boxes/clip_ray и
+client-render SceneCollisions.context_shape, затем render-state/BE renderer.
+CableBuilder/CubeBuilder задают quads/UV; texture suffix берётся из enum name,
+поэтому TRANSPARENT использует transparent, хотя item registryPrefix — fluix.
 
 3. **ME-граф.** Grid/Node/Connection/Storage/Service, сетевые события, цвета,
    CableBus/части/фасады, соединения на границах чанков, merge/split, ad-hoc,

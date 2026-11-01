@@ -32,13 +32,14 @@ connection shape calls и visual channels. Dense flags **заменяют** PREF
 normal max 8 и dense max 32 следуют grid mode. `part_storage.rs` сохраняет центр,
 шесть side parts и шесть facades с lazy allocation: setPart(null) выделяет
 массив, setFacade(null) делегирует remove и не выделяет его. Это storage rule,
-не готовый multipart host, facade item или host persistence.
+не готовый multipart host или facade item; native saved-host parsing описан ниже.
 
 `network.rs` принимает cable center profiles, применяет transparent/equal color
 совместимость только к in-world edges, exposed side masks и сохраняет node ID
 при смене цвета того же типа кабеля. Full blocks сохраняют transparent profile.
 `Kind::from_block("ae2:cable_bus")` намеренно не угадывает цвет/тип: центр должен
-читаться из host parts. Настоящие native CableBus placement/NBT/part nodes,
+читаться из host parts. Native saved-host parsing подключён к grid_glue;
+настоящие CableBus registration/placement/part nodes,
 callbacks, facade collision, partial selection/breaking, renderer, packets и
 chunk/event lifecycle ещё не подключены. Мир по-прежнему видит прежние шесть
 node kinds. Cable profiles в binding tests не являются игровым CableBus.
@@ -52,6 +53,42 @@ part connection lengths, power, neighbor density, base packet prefix, codecs
 prefix, не полный host update или Minecraft protocol. Truncated suffix
 отклоняется Rust до изменения state; Java reader может менять state частично.
 Это более строгий malformed gate, не заявленная эквивалентность recovery.
+
+`cable_bus.rs` читает original `cable`, down/up/north/south/west/east и
+facadeDown/Up/North/South/West/East, source hasRedstone (YesNo default 2).
+Центр распознаётся по одному из 85 cable item IDs; buffered energy читается из
+его `gn.e` только типа Double (EnergyService.addNode), owner — только
+`gn.p` Int. Grid-local buffer ограничен 25 AE на node при default config. Корневой `proxy` не используется. Raw
+part/facade/host/unknown service fields сохраняются; facade BlockState codec
+ещё не исполняется. Host с неподдержанной side part не подключается к сети,
+поскольку у неё должен быть собственный node/service. Это явная временная
+граница; центр не заменяет все части одним узлом.
+
+На raw NBT reload другой item ID (включая цвет) пересоздаёт part/node как
+CableBusContainer.loadPart, в отличие от direct changeColor. Изменившиеся gn
+данные пересоздают node; одно поле p не влияет. Отсутствующие/empty/p-only gn
+равны. Собственные writes обновляют observed snapshot, поэтому не вызывают
+новый reload. Persist проверяет точное совпадение текущего центра с observed
+и не перезаписывает новую external NBT правку; меняет только cable.gn.
+Unknown service data сохраняются до переноса их writers; это не полный
+Grid.saveNodeData или CableBusContainer.writeToNBT. В частности, весь host
+пока не пересериализуется через source part/facade registry.
+
+Неподдержанные IDs, side parts, malformed/non-Int hasRedstone, invalid ordinal
+и negative/nonfinite gn energy приводят к отказу с сохранением исходных данных.
+Это более строгий временный gate: source умеет игнорировать unknown items и
+часть malformed tags, что этим adapter не воспроизведено. `node_data.rs`
+сверён с verbatim GridNode.areTagsEqualIgnoringPlayerId на 20064 случаях
+(`docs/node-data-oracle.json`), но CompoundTag/value equality в Java oracle —
+map/string stubs. Native opaque Tag equality не доказывает всех Minecraft NBT
+NaN/nested/normalization cases; full readiness/destroy/service callbacks открыты.
+GridNode.savedData в Java хранит данные предыдущего load/перехода grid,
+а текущий polling adapter сравнивает новый gn с последним observed/own-save
+snapshot. Отдельного native события explicit BE load (`/data` с unchanged gn
+после расхода, chunk reload/readiness) ещё нет. Полное соответствие момента
+reset требует event/readiness port, не только перенесённой функции equality.
+Physical CableBus registration/collision/render/placement по-прежнему нужны:
+этот decoder сам по себе не делает кабель доступным игроку.
 
 ## Временные ограничения адаптера (не целевое поведение)
 

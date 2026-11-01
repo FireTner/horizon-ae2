@@ -17,10 +17,19 @@ cable.rs feeds network.rs with source cable types/colors/flags and core shape/
 visual rules. Cable profiles are binding-only: do not infer a fluix glass cable
 from ae2:cable_bus, and do not claim native placement/renderer from profile tests.
 Dense flags replace PREFERRED. Recolor preserves node identity; side masks and
-color compatibility rebuild in-world edges. part_storage.rs is library-only until
-an actual host consumes it; do not add unused host scaffolding to the manifest.
-CableBus part nodes use gn NBT by default, not full-block proxy. Multipart NBT,
-per-part nodes/lifecycle, placement/partial breaking/facades and renderer remain open.
+color compatibility rebuild in-world edges. cable_bus.rs now consumes
+part_storage.rs and node_data.rs for native saved-host parsing and snapshot
+identity. It reads cable.id/cable.gn, never root proxy, and preserves raw side/
+facade/unknown fields. Unsupported side parts keep the whole host inactive;
+registry/facade codecs and full save/load recovery are still pending. Owner p-only
+edits preserve identity; external part-item ID or other gn edits reset it. This
+NBT load path differs from direct painting's in-place recolor. Persist only a
+still-matching observed center, and update the observed gn after our own save.
+Physical CableBus registration/placement, per-part nodes/readiness, facade
+collision, renderer/selection/partial breaking and client host sync remain open.
+Future physical states must be source light_level/waterlogged (32), not invented
+color/type/connection properties. CableBuilder texture names use enum names:
+TRANSPARENT texture suffix is transparent, whereas the item ID prefix is fluix.
 glue.rs owns Horizon types. Only modules actually consumed by the adapter belong
 in horizon-mixin.toml. keys.rs, storage.rs and cells.rs feed the native cell
 tooltip/codec adapter. energy.rs/grid.rs/power.rs feed network.rs and the

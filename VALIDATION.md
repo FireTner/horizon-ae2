@@ -1,7 +1,54 @@
 # Проверка переноса
 
-Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
+Последняя проверка: 2 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
+
+## CableBus saved-host / node data — 2 ноября 2026
+
+- **120 core / 172 native game / 11 Python PASS**, fmt/rustfmt, clippy
+  -D warnings, source/item-limit audits, native check/build PASS. Evidence:
+  `target/cable-bus-nbt-checks.log`,
+  `target/cable-bus-nbt-native-integration-tests-final.json`,
+  `target/cable-bus-nbt-native-integration-{check,build}-final.json` (cargo_exit 0).
+  Native build сохраняет unused API/toolchain rust-objcopy/libLLVM warnings.
+  Library/assets payloads не менялись, их прежние 14/7 tests не запускались.
+- Native codec tests cover every one of 85 cable center IDs, reading gn.e
+  instead of root proxy.e, raw side/facade retention, strict unsupported-side
+  refusal, owner-only identity retention, external item/gn replacement,
+  own-save echo, stale external snapshot refusal and zero-buffer removal.
+  Real Horizon NBT binary roundtrip/recreated Hosts preserves 7.25 energy,
+  typed host/part/service arrays and facade tag exactly. Negative/nonfinite
+  energy, unsupported center and invalid/non-Int YesNo are refused without
+  mutation. The integration test also confirms stable live energy/node identity
+  across repeated own-save echoes and owner-only edits, and replacement/clamped
+  energy after external gn update. This is not a source recovery proof.
+- Source `GridNode.areTagsEqualIgnoringPlayerId`: **20064 cases PASS**,
+  `docs/node-data-oracle.json`. Verbatim method; missing/empty/p-only data,
+  changed owner, missing/changed non-owner keys and typed-value identity.
+  CompoundTag/value equality uses map/string stubs. Actual Minecraft NBT
+  NaN/nested equality, readiness/destroy/callback/service lifecycle are not run.
+- `grid_glue` consumes loaded host NBT and persists only still-matching center
+  gn data; generic root proxy writer skips cable states. part_storage and
+  node_data are now native modules used by this adapter. Physical CableBus
+  registration/placement/render/selection/collision, side-part node services,
+  facade/part registry codecs and full host save/load remain open. There is
+  no placed CableBus game test at this checkpoint.
+- Final built client world regression `power-_xs22713`: four scenarios PASS
+  (`docs/cable-bus-nbt-power-regression.json`): finite cell → Charger, front-face
+  restriction, creative cell, finite stored/private energy 400 after recipe
+  and exact save/restart. Both own client processes closed. This exercises the
+  existing full-block graph adapter, not placed CableBus or Java/NeoForge world.
+  Earlier same-series regression `power-9d9r73gp` also passed before the final
+  cable-only buffer/type corrections; final proof is the later run above.
+- Integration check initially expected 90 AE after restoring 100/extracting 10
+  into one cable node; it correctly failed with 15, because the source local
+  buffer is capped at 25 AE/node. Source EnergyService.addNode was re-read:
+  it also checks gn.e as TAG_DOUBLE exactly. Decoder now ignores Int/Float/
+  other tag types; added native coverage. The buffer test keeps overcapacity
+  input and checks 25 initial, 15 after extraction, stable own-save/owner-only
+  identity and clamped 25 after external gn.e=55 replacement. The failed run
+  is not accepted as final verification. Initial rustfmt also found a fixture
+  delimiter typo before staging, corrected before any native compilation.
 
 ## Cable core / source oracle / network profiles — 1 ноября 2026
 

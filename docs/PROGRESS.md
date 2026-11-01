@@ -3,9 +3,22 @@
 Цель активна: полный перенос AE2 19.2.18 на Horizon, 1:1, без субагентов.
 Пользователь возобновил goal; текущая работа — CableBus/кабели после EnergyCellBlockItem.
 Цель не уменьшена до текущего набора механик. Все 1429 исходных Java-файлов
-остаются в реестре; сейчас 93 partial, 1336 pending, полностью закрытых нет.
+остаются в реестре; сейчас 96 partial, 1333 pending, полностью закрытых нет.
 
 ## Последний результат
+
+- CableBus saved-host adapter: original cable.id/gn + six side/facade keys,
+  buffered energy/owner persistence и raw unknown data retention. Source
+  node-data equality сверена с Java на 20064 случаях. Owner-only edits не
+  сбрасывают node; external item/other gn changes сбрасывают, собственный save
+  обновляет observed snapshot; live mismatch блокирует stale overwrite.
+  Unsupported side parts не активируют host до переноса их собственных nodes.
+  Physical registration/placement/render и full registry/part lifecycle открыты;
+  source explicit-load events ещё нужно отделить от polling/own-save echoes.
+  120 core / 172 native game / 11 Python и native check/build PASS; реальная
+  typed NBT запись/чтение и связка gn buffers с graph identity проверены.
+  Final built-client power regression power-_xs22713 — четыре сценария PASS,
+  включая exact save/restart; это не placed CableBus test.
 
 - CableBus/cable core: все 85 цветных item profiles; source type/size/variant
   ordering, 17 RGB/tint palettes, flags и connection lengths; raw geometry
@@ -18,8 +31,8 @@
   ограничен восемью каналами. 119 core / 163 native game / 11 Python,
   native check/build и 14-check Controller world regression PASS. Это
   core/native profiles, не размещённые кабели.
-  World CableBus decoder/placement, per-part node lifecycle, NBT, renderer,
-  facades и client host sync остаются следующим обязательным слоем.
+  Native saved-host decoder добавлен следующим слоем; physical placement,
+  per-part lifecycle, full NBT registry codecs, renderer/facades/client sync остаются.
 
 - EnergyCellBlockItem: исходные fixed capacities/rates, отдельный 0.00001
   threshold, inject/extract/simulate/overflow; Charger поддерживает ещё два

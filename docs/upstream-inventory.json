@@ -532,7 +532,7 @@
       "family": "api",
       "path": "src/main/java/appeng/api/ids/AEComponents.java",
       "port": "mixins/ae2/component_registry.rs",
-      "scope": "command registry names for six implemented storage/power components and numeric codecs for stored_energy/energy_capacity; remaining component registrations, full registry-aware codec recovery/network schema pending",
+      "scope": "command registry names for six storage/power components, two numeric codecs and full typed native AE2 item component transport; remaining registrations, full registry-aware codec recovery and external multiplayer/addon API pending",
       "sha256": "a0a1f3c9c00853d7b12a68444d685b66e4213baeaf001d86f20969679bfc8a4b",
       "status": "partial"
     },
@@ -6024,7 +6024,7 @@
       "family": "items",
       "path": "src/main/java/appeng/items/tools/powered/powersink/AEBasePoweredItem.java",
       "port": "mixins/ae2/item_energy.rs",
-      "scope": "component energy defaults/override, threshold, simulate/modulate inject overflow/extract, capacity clamp/multiplier/reset; 400000 unchanged-Java operations; native Charger consumes it; tooltip/bar/reequip/creative-tab and live config supplier pending",
+      "scope": "component energy defaults/override, threshold, simulate/modulate inject overflow/extract, capacity clamp/multiplier/reset; 400000 unchanged-Java operations; native Charger consumes it; native green energy bar and Java rounding; tooltip/reequip/creative-tab and live config supplier pending",
       "sha256": "2594de6d12611838da95440f7f024e1e216bf6563a25a687afb449f3f880aef5",
       "status": "partial"
     },

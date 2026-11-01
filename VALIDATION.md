@@ -3,7 +3,45 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## Powered items / Charger — текущая проверка
+## Component sync / energy bars — текущая проверка
+
+- Standalone **95 PASS**, native **123 PASS**, native library **9 PASS**,
+  fmt/rustfmt/clippy и Python **10 PASS**. Logs:
+  target/component-sync-core-checks.log, target/component-sync-native-tests.json,
+  target/component-sync-native-lib.json. Native check/build PASS:
+  target/component-sync-native-check.json, target/component-sync-native-build.json.
+- --bars Java oracle: **2000 traces / 400000 power/bar operations PASS**,
+  docs/item-energy-view-oracle.json, exact doubles (NaN payload equivalence).
+  Проверяется настоящий AEBasePoweredItem.getBarWidth вместе с energy methods;
+  метод сначала Math.round -> long -> narrowing int -> clamp, не просто clamp ratio.
+  Старый energy-only trace input воспроизводится без изменений (SHA 308cde11...);
+  --bars input SHA dd58ae2e... тоже воспроизводится текущим generator.
+- Первый world screenshot item-bars-ivltb5f9 выявил нулевые AE2 bars на клиенте
+  при правильной энергии на сервере. Причина — horizon network_stack отбрасывал
+  AE2 components. Добавлены send/receive hooks, versioned wire-only envelope,
+  штатный item_data decoder восстанавливает исходные component names/types.
+- Native library packet tests проходят через реальный Slot::write/read и
+  item_sync::from_network: AE2 energy + upgrade + typed unknowns + original
+  custom_data с конфликтующим именем, nested vanilla shulker/bundle, malformed
+  wrapper refusal. Hashed::create стабилен после roundtrip и меняется при изменении
+  stored_energy; исходный/saved stack не получает wire envelope.
+- World **item-bars-6uh8fmi6 PASS**, docs/item-bars-world-smoke.json:
+  pixel-exact RGB checks 0/7/13/7/13 widths, black background, green #00ff00,
+  actual move of componentful half-charged item through ordinary barrel and back,
+  authoritative stored_energy 10000, item count conservation. Screenshot просмотрен:
+  vanilla damaged pickaxe/count 64 сохранили обычный вид. PNG verifier читает
+  реальный framebuffer; старый broken screenshot гарантированно не проходит.
+- World Drive GUI regression **drive-gui-rf9_6dl8 PASS**:
+  filtering/pickup/shift/ordinary barrel isolation/restart после смены wire encoding.
+  Report docs/component-sync-drive-gui.json.
+- Повторный полный charging world **item-charging-5lt44fkz PASS**, включая
+  все 16 items, manual Crank/front, exact conservation и restart/retrieval
+  после введения component transport; docs/component-sync-charging-world.json.
+- Energy tooltip, creative charged variants/reequip, live config, source inventory
+  lifecycle/automation и external multiplayer ещё открыты. This is native Horizon
+  transport; участникам нужен тот же bundle, полный addon registry ещё не перенесён.
+
+## Powered items / Charger — предыдущее подтверждение
 
 - Standalone **94 PASS**, fmt/rustfmt/clippy `-D warnings`, Python **10 PASS**:
   target/item-energy-checks-final.log. Native **121 PASS**:

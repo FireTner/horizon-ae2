@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "cases": 2000,
+  "operations": 400000,
+  "failed_operations": 0,
+  "first_failures": [],
+  "upstream": "db17504a86128fdf3dae31f5fb7a112a646e0b93",
+  "input_sha256": "dd58ae2e7a69f547a491b8a2b2f81efbc36b66760d26e5eeff5669d3ce327741",
+  "source_sha256": {
+    "appeng/items/tools/powered/powersink/AEBasePoweredItem.java": "2594de6d12611838da95440f7f024e1e216bf6563a25a687afb449f3f880aef5",
+    "appeng/api/implementations/items/IAEItemPowerStorage.java": "641275928b0137d12e3d0a908489e2c9cc07f12f118e4006ba94f2bbf57b8f43",
+    "appeng/api/config/AccessRestriction.java": "1d05b65b3f59710ea7c51028b58b4439ef713335a5e6587d6bf3b5bd0ff135a7",
+    "appeng/api/config/Actionable.java": "ce15870e93740fb1a4fbfaa110c3259cf78a7f60015157bd043ed5e0c14c26fb"
+  },
+  "scope": "unchanged AEBasePoweredItem energy methods; simulation/commit, overflow, extract, thresholds, capacity override/removal, multiplier/reset, overcapacity, negative/nonfinite inputs signed zero and energy bar widths; component map and Minecraft/UI infrastructure stubbed",
+  "comparison": "exact f64 bits, treating all NaN payloads as equivalent",
+  "not_covered": [
+    "Minecraft component codecs",
+    "Charger/native world integration",
+    "tool charge rates/upgrades",
+    "bar color/tooltip/creative-tab/reequip behavior",
+    "dynamic config supplier changes during a trace"
+  ]
+}

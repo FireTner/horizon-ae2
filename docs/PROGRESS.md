@@ -6,6 +6,16 @@
 
 ## Последний результат
 
+- Native AE2 component packet bridge сохраняет полную typed component map,
+  original custom_data, nested shulker/bundle и click hashes. Original network
+  projection отбрасывала mod fields; обнаружено по black energy bars на клиенте.
+  Source energy bars теперь 0/7/13 pixels, green; pixel QA и actual componentful
+  menu roundtrip PASS в target/smoke/item-bars-6uh8fmi6. Drive GUI regression
+  target/smoke/drive-gui-rf9_6dl8 PASS. Full charging regression/restart PASS:
+  target/smoke/item-charging-5lt44fkz. 95 core / 123 binary / 9 library tests PASS.
+  Native check/build PASS. Java --bars 400000 operations PASS; базовый energy-only
+  generator input hash сохранён. Tooltip/creative variants/reequip ещё нужны.
+
 - Powered items подключены к Charger: all 16 IDs, source components/rates,
   local/direct-grid/overflow/refill, шесть command component registrations.
   94 core / 121 native / 10 Python PASS, native check/build PASS.
@@ -106,10 +116,10 @@ pinned checkout: target/upstream/{ae2,horizon,horizon-mixins,neoforge}. Original
 и horizon-create не менять. Ресурсы читать из HORIZON_RESOURCES, тестовые saves
 только под target. Все тестовые процессы последнего smoke завершены.
 
-- tools/check.py: fmt, clippy, 94 core tests, 10 tooling tests, inventory check.
-- tools/horizon.py test: 121 native tests (Game + typed NBT); warnings об unused
+- tools/check.py: fmt, clippy, 95 core tests, 10 tooling tests, inventory check.
+- tools/horizon.py test: 123 native tests (Game + typed NBT); warnings об unused
   API остаются до подключения всех потребителей API, не скрыты.
-- tools/horizon.py test --library: 5 tests, в том числе три server-click теста.
+- tools/horizon.py test --library: 9 tests, в том числе три server-click теста.
 - tools/pathing_oracle.py --cases 2000: JDK 21+, default local Homebrew JDK.
 - tools/cells_oracle.py --cases 2000: 572000 exact operations, actual Java class.
 - tools/cells_oracle.py --creative --cases 2000: ещё 572000 exact operations.
@@ -125,7 +135,7 @@ pinned checkout: target/upstream/{ae2,horizon,horizon-mixins,neoforge}. Original
 
 ## Следующие работы
 
-- Item energy bar/tooltip и исходные creative/reequip overrides.
+- Item energy tooltip и исходные creative/reequip overrides.
 - Charger original inv/item lifecycle и native automation filters; исходный
   ChargerRecipes.allowExtract разрешает любой предмет, не являющийся текущим
   recipe input. Не придумывать запрет извлечения всех partially charged tools.

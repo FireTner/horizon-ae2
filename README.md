@@ -68,7 +68,11 @@
   Ядро AEBasePoweredItem сверено с unchanged Java на 400000 операций, а дословный
   Charger.doWork в stub host — ещё на 200000 вызовов. Command registry знает
   шесть поддержанных AE2 component IDs; energy codecs принимают только числа.
-  Workbench callbacks/config reload, energy bar/tooltip и handheld actions ещё нужны.
+  Workbench callbacks/config reload, energy tooltip и handheld actions ещё нужны.
+- Энергия отображается исходной зелёной полосой 0..13 pixels. Полный component
+  map AE2 stacks теперь пересекает native packet sync, включая nested shulker/
+  bundle и контейнерные click hashes; source/saved keys сохраняются. Pixel QA,
+  actual charged-cell menu roundtrip и Drive GUI regression пройдены.
 - Подготовка контента, source-only `.hnmod`, закреплённые исходники и
   проверяемый реестр **всех 1429 Java-файлов** оригинала. В реестре нет
   полностью закрытых классов; 69 отмечены как частично перенесённые.
@@ -105,6 +109,7 @@ python3.12 tools/cells_oracle.py --java-home /path/to/jdk21 --cases 2000
 python3.12 tools/cells_oracle.py --java-home /path/to/jdk21 --creative --cases 2000
 python3.12 tools/cells_oracle.py --java-home /path/to/jdk21 --tools --cases 2000
 python3.12 tools/item_energy_oracle.py --cases 2000
+python3.12 tools/item_energy_oracle.py --bars --cases 2000
 python3.12 tools/charger_oracle.py --cases 2000
 
 python3.12 tools/horizon.py check

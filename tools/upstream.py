@@ -124,7 +124,7 @@ PARTIAL.update({
 
 
 PARTIAL.update({
-    "items/tools/powered/powersink/AEBasePoweredItem.java": ("mixins/ae2/item_energy.rs", "component energy defaults/override, threshold, simulate/modulate inject overflow/extract, capacity clamp/multiplier/reset; 400000 unchanged-Java operations; native Charger consumes it; tooltip/bar/reequip/creative-tab and live config supplier pending"),
+    "items/tools/powered/powersink/AEBasePoweredItem.java": ("mixins/ae2/item_energy.rs", "component energy defaults/override, threshold, simulate/modulate inject overflow/extract, capacity clamp/multiplier/reset; 400000 unchanged-Java operations; native Charger consumes it; native green energy bar and Java rounding; tooltip/reequip/creative-tab and live config supplier pending"),
     "api/implementations/items/IAEItemPowerStorage.java": ("mixins/ae2/item_energy_glue.rs", "built-in component power bridge, WRITE admission and per-item charge rates; external/addon item power capabilities and full item APIs pending"),
     "items/tools/powered/ChargedStaffItem.java": ("mixins/ae2/item_energy.rs", "8000 AE default capacity and 32 AE/t Charger profile only; combat, lightning and item visuals pending"),
     "items/tools/powered/EntropyManipulatorItem.java": ("mixins/ae2/item_energy.rs", "200000 AE default capacity and 800 AE/t Charger profile only; tool/block/entity interactions, permissions, recipes and visuals pending"),
@@ -139,7 +139,7 @@ PARTIAL.update({
 
 
 PARTIAL.update({
-    "api/ids/AEComponents.java": ("mixins/ae2/component_registry.rs", "command registry names for six implemented storage/power components and numeric codecs for stored_energy/energy_capacity; remaining component registrations, full registry-aware codec recovery/network schema pending"),
+    "api/ids/AEComponents.java": ("mixins/ae2/component_registry.rs", "command registry names for six storage/power components, two numeric codecs and full typed native AE2 item component transport; remaining registrations, full registry-aware codec recovery and external multiplayer/addon API pending"),
 })
 
 

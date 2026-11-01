@@ -200,3 +200,19 @@
   с сохранением vanilla IDs. Два energy codecs проверяют numeric NBT, как
   Codec.DOUBLE; generic container/key/fuzzy codecs и packet registrations ещё
   частичные. Arbitrary addon components не объявляются известными автоматически.
+
+- Item energy bar: исходные 13 pixels, always visible и constant green; Java
+  Math.round -> long -> int narrowing -> clamp порядок сохранён, включая NaN и
+  большие values. Отдельные 400000 power/bar operations сверены с unchanged
+  AEBasePoweredItem (tools/item_energy_oracle.py --bars), exact double bits.
+  Count/cooldown decorations используют прежний native painter.
+- Визуальная проверка выявила отсутствие AE2 components на frontend: исходный
+  Horizon network_stack отбрасывал их. ae2_component_sync передаёт полный native
+  component map AE2 stacks в versioned CUSTOM_DATA wire envelope и раскрывает
+  его перед штатным item_data decoding. Сохранённые/server/frontend ItemStacks
+  сохраняют исходные имена/типы; исходный custom_data вложен без конфликтов.
+  Это native Horizon transport. Нужен тот же bundle у участников; external
+  multiplayer/negotiation и полный addon component API ещё требуют проверки.
+  Nested shulker/bundle packets, typed unknowns, collision with user custom_data,
+  malformed wrapper rejection и stable/change-sensitive click hashes проверены
+  native library tests. Envelope не добавляется к исходным или сохранённым stacks.

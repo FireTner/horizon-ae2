@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/item-bars-6uh8fmi6",
+  "scope": [
+    "powered_bars_render_in_native_container",
+    "vanilla_tool_and_stack_render_regression",
+    "componentful_stack_hashes_and_menu_roundtrip"
+  ],
+  "expected_hotbar_bars": [
+    0,
+    7,
+    13,
+    7,
+    13,
+    "vanilla durability",
+    "vanilla count 64"
+  ],
+  "pixel_checks": {
+    "verified_widths": [
+      0,
+      7,
+      13,
+      7,
+      13
+    ],
+    "scale": 2,
+    "bar_color": "#00ff00",
+    "background": "#000000"
+  },
+  "not_covered": [
+    "energy tooltip",
+    "reequip/creative tab",
+    "external multiplayer"
+  ],
+  "visual_review": {
+    "passed": true,
+    "observed": "empty black, half/full green AE2 bars; vanilla durability and stack count remain visible"
+  }
+}

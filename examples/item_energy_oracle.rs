@@ -28,6 +28,7 @@ fn main() {
                         energy.extract(amount, commit)
                     }
                 }
+                "B" => energy.bar_width() as f64,
                 "S" => {
                     energy.set_maximum(next().parse().unwrap());
                     0.0

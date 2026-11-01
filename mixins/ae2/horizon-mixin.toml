@@ -6,6 +6,35 @@ priority = 100
 [compatibility]
 horizon_revision = "aa27eca326db26e999d4e59d7899576016764b1e"
 
+[[module]]
+id = "component-sync"
+file = "crates/horizon-client/src/item_sync.rs"
+name = "ae2_component_sync"
+source = "component_sync.rs"
+visibility = "pub"
+
+[[injection]]
+id = "component-send"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::lan::guest::network_stack"
+helper = "component_send.rs"
+bindings = [
+  { name = "item_id", ty = "&dyn Fn(&str) -> i32", value = "item_id" },
+  { name = "stack", ty = "&Option<crate::items::ItemStack>", value = "s" },
+]
+
+[[injection]]
+id = "component-receive"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::item_sync::components_tag"
+helper = "component_receive.rs"
+bindings = [
+  { name = "stack", ty = "&horizon_protocol::item::Stack", value = "s" },
+  { name = "builtin", ty = "&horizon_protocol::registry::Builtin", value = "builtin" },
+]
+
 [[injection]]
 id = "component-command-registry"
 kind = "HEAD"
@@ -23,6 +52,27 @@ bindings = [
   { name = "id", ty = "&str", value = "id" },
   { name = "value", ty = "&horizon_world::nbt::Tag", value = "t" },
 ]
+
+[[injection]]
+id = "powered-item-decorations"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::Game<'_>::draw_item_decorations"
+helper = "item_decorations.rs"
+bindings = [
+  { name = "game", ty = "&crate::game::Game<'_>", value = "&*self" },
+  { name = "batch", ty = "&mut horizon_client::hud::HudBatch", value = "&mut *batch" },
+  { name = "stack", ty = "&horizon_client::items::ItemStack", value = "stack" },
+  { name = "x", ty = "f32", value = "x" },
+  { name = "y", ty = "f32", value = "y" },
+  { name = "count_text", ty = "&Option<String>", value = "&count_text" },
+]
+
+[[module]]
+id = "item-energy-view"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_item_energy_view"
+source = "item_energy_view.rs"
 
 [[module]]
 id = "item-energy"

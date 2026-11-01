@@ -20,7 +20,11 @@ grid_glue.rs world adapter (currently Charger + three energy-cell kinds + Drive)
 item_energy.rs/item_energy_glue.rs feed all 16 built-in powered items into Charger;
 charger.rs preserves local/direct-grid/overflow/refill order. Command registry hooks
 add only supported component IDs, preserve vanilla types and validate energy numbers.
-Handheld actions, config reload, item energy tooltip/bar and upgrade callbacks remain open.
+item_energy_view.rs implements the source green 13-pixel bar, preserving count/cooldown.
+component_sync.rs lives in the native client library, sends AE2 typed component
+maps through a versioned wire-only envelope and unwraps before normal decoding.
+It must preserve real custom_data, nested items, original saved keys and click hashes.
+Handheld actions, config reload, item energy tooltip and upgrade callbacks remain open.
 mounts.rs/service.rs/drive.rs are consumed by drive_glue.rs and belong in the
 native manifest. Drive currently has ten real cell slots/providers, supports
 all twenty-three built-in basic/portable/creative/tool cell types, original

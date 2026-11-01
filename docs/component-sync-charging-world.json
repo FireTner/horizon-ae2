@@ -1,0 +1,97 @@
+{
+  "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/item-charging-5lt44fkz",
+  "checks": [
+    {
+      "name": "near-full upgraded portable: source-ordered extraction returns overflow without losing energy/components",
+      "state": {
+        "local": 1600.0,
+        "item": 1000.0,
+        "nbt": "8, 73, 7 has the following block data: {HorizonWorking: 0b, proxy: {p: -1}, x: 8, y: 73, Items: [{components: {\"ae2:stored_energy\": 1000.0d, \"ae2:energy_capacity\": 1000.0d, \"ae2:storage_cell_inv\": [{\"#t\": \"ae2:i\", \"#\": 123L, id: \"minecraft:iron_ingot\"}], \"minecraft:custom_data\": {ae2_test: 123456789L}, \"ae2:upgrades\": [{item: {count: 1, id: \"ae2:energy_card\"}, slot: 0}, {item: {count: 1, id: \"ae2:energy_card\"}, slot: 3}]}, count: 1, Slot: 0b, id: \"ae2:portable_item_cell_1k\"}], z: 7, id: \"ae2:charger\", internalCurrentPower: 1600.0d}",
+        "back": 990.0,
+        "front": 0.0,
+        "total": 3590.0
+      }
+    },
+    {
+      "name": "Matter Cannon uses local buffer plus direct ME extraction and conserves 6600 AE",
+      "state": {
+        "local": 1600.0,
+        "item": 5000.0,
+        "nbt": "8, 73, 7 has the following block data: {HorizonWorking: 0b, proxy: {p: -1}, x: 8, y: 73, Items: [{components: {\"ae2:stored_energy\": 5000.0d, \"ae2:energy_capacity\": 5000.0d}, count: 1, Slot: 0b, id: \"ae2:matter_cannon\"}], z: 7, id: \"ae2:charger\", internalCurrentPower: 1600.0d}",
+        "back": 0.0,
+        "front": 0.0,
+        "total": 6600.0
+      }
+    },
+    {
+      "name": "front face remains excluded for item charging",
+      "state": {
+        "local": 0.0,
+        "item": 10.0,
+        "nbt": "8, 73, 7 has the following block data: {HorizonWorking: 0b, proxy: {p: -1}, x: 8, y: 73, Items: [{components: {\"ae2:stored_energy\": 10.0d, \"ae2:energy_capacity\": 1000.0d}, count: 1, Slot: 0b, id: \"ae2:portable_fluid_cell_1k\"}], z: 7, id: \"ae2:charger\", internalCurrentPower: 0.0d}",
+        "back": 0.0,
+        "front": 2000.0,
+        "total": 2010.0
+      }
+    },
+    {
+      "name": "one manual Crank rotation charges a staff by exactly 160 AE",
+      "state": {
+        "local": 0.0,
+        "item": 160.0,
+        "nbt": "8, 73, 7 has the following block data: {HorizonWorking: 0b, proxy: {p: -1}, x: 8, y: 73, Items: [{components: {\"ae2:stored_energy\": 160.0d}, count: 1, Slot: 0b, id: \"ae2:charged_staff\"}], z: 7, id: \"ae2:charger\", internalCurrentPower: 0.0d}",
+        "back": 0.0,
+        "front": 0.0,
+        "total": 160.0
+      }
+    },
+    {
+      "name": "all 16 built-in powered items accept manual insertion and charge to an override without duplication",
+      "state": {
+        "items": [
+          "ae2:charged_staff",
+          "ae2:entropy_manipulator",
+          "ae2:matter_cannon",
+          "ae2:color_applicator",
+          "ae2:wireless_terminal",
+          "ae2:wireless_crafting_terminal",
+          "ae2:portable_item_cell_1k",
+          "ae2:portable_item_cell_4k",
+          "ae2:portable_item_cell_16k",
+          "ae2:portable_item_cell_64k",
+          "ae2:portable_item_cell_256k",
+          "ae2:portable_fluid_cell_1k",
+          "ae2:portable_fluid_cell_4k",
+          "ae2:portable_fluid_cell_16k",
+          "ae2:portable_fluid_cell_64k",
+          "ae2:portable_fluid_cell_256k"
+        ]
+      }
+    },
+    {
+      "name": "partial item energy, capacity override and storage payload survive process restart",
+      "state": {
+        "local": 0.0,
+        "item": 2011.0,
+        "nbt": "8, 73, 7 has the following block data: {HorizonWorking: 0b, proxy: {p: -1}, x: 8, y: 73, Items: [{components: {\"ae2:stored_energy\": 2011.0d, \"ae2:energy_capacity\": 5000.0d, \"ae2:storage_cell_inv\": [{\"#t\": \"ae2:i\", \"#\": 123L, id: \"minecraft:iron_ingot\"}], \"minecraft:custom_data\": {ae2_test: 123456789L}}, count: 1, Slot: 0b, id: \"ae2:portable_item_cell_1k\"}], z: 7, id: \"ae2:charger\", internalCurrentPower: 0.0d}",
+        "back": 0.0,
+        "front": 0.0,
+        "total": 2011.0
+      }
+    },
+    {
+      "name": "manual retrieval retains charged item and nested storage payload",
+      "state": {
+        "inventory": "Player67228 has the following entity data: [{components: {\"ae2:stored_energy\": 2011.0d, \"ae2:energy_capacity\": 5000.0d, \"ae2:storage_cell_inv\": [{\"#t\": \"ae2:i\", \"#\": 123L, id: \"minecraft:iron_ingot\"}], \"minecraft:custom_data\": {ae2_test: 123456789L}}, count: 1, Slot: 0b, id: \"ae2:portable_item_cell_1k\"}]"
+      }
+    }
+  ],
+  "not_covered": [
+    "handheld actions/menus",
+    "upgrade editing/callbacks",
+    "Charger hopper capability",
+    "live config reload",
+    "external multiplayer/Java world oracle"
+  ]
+}

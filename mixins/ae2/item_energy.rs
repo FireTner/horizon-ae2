@@ -100,6 +100,18 @@ impl ItemEnergy {
     pub fn current(&self) -> f64 {
         self.stored.unwrap_or(0.0)
     }
+    /// AEBasePoweredItem.getBarWidth: Java Math.round returns long, then the
+    /// source narrows to int before clamping. Keep that order for huge values.
+    pub fn bar_width(&self) -> i32 {
+        let value = self.current() / self.maximum() * 13.0;
+        let lower = value.floor();
+        let rounded = if value - lower < 0.5 {
+            lower as i64
+        } else {
+            (lower + 1.0) as i64
+        };
+        (rounded as i32).clamp(0, 13)
+    }
     pub fn set_current(&mut self, power: f64) {
         self.stored = if power < MIN_POWER { None } else { Some(power) };
     }
@@ -141,6 +153,23 @@ impl ItemEnergy {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn energy_bar_is_thirteen_pixels_with_java_rounding_narrowing_and_nan_rules() {
+        let mut energy = ItemEnergy::from_components(13.0, None, None);
+        assert_eq!(energy.bar_width(), 0);
+        energy.set_current(0.49999999999999994);
+        assert_eq!(energy.bar_width(), 0);
+        energy.set_current(0.5);
+        assert_eq!(energy.bar_width(), 1);
+        energy.set_current(12.5);
+        assert_eq!(energy.bar_width(), 13);
+        energy.set_current(26.0);
+        assert_eq!(energy.bar_width(), 13);
+        energy.set_current(f64::INFINITY);
+        assert_eq!(energy.bar_width(), 0);
+        energy.set_current(f64::NAN);
+        assert_eq!(energy.bar_width(), 0);
+    }
     #[test]
     fn injection_overflow_and_extraction_simulation_leave_components_untouched() {
         let mut energy = ItemEnergy::from_components(20000.0, None, Some(19990.0));

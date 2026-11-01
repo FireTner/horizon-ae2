@@ -100,6 +100,14 @@ def merge_platform_tags(content, source):
 
 
 def fit(content, jar, platform):
+    # Keep the original atlas extension in the mod's allowed namespace. The
+    # native atlas adapter appends its sources to minecraft:blocks at load time.
+    with zipfile.ZipFile(jar) as archive:
+        atlas_name = "assets/minecraft/atlases/blocks.json"
+        if atlas_name in archive.namelist():
+            path = content / "assets/ae2/atlases/cable.json"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(archive.read(atlas_name))
     merge_platform_tags(content, platform)
     items = content / "data/ae2/horizon/item"
     missing = sorted(name for name in UNSTACKABLE if not (items / f"{name}.json").is_file())
@@ -118,6 +126,14 @@ def fit(content, jar, platform):
         "template": "minecraft:iron_block",
         "properties": {"hardness": 6, "explosion_resistance": 6, "requires_tool": False},
     })
+    write_json(blocks / "cable_bus.json", {
+        "template": "minecraft:glass", "item": False,
+        "properties": {"light": 0, "hardness": 2.2, "explosion_resistance": 11,
+                       "requires_tool": False, "map_color": 0, "sounds": "minecraft:glass"},
+    })
+    # CableBus quads are generated from its parts, never the glass template model.
+    write_json(content / "assets/ae2/blockstates/cable_bus.json", {"variants":{"":{"model":"ae2:block/cable_bus_empty"}}})
+    write_json(content / "assets/ae2/models/block/cable_bus_empty.json", {"elements":[]})
     states = content / "assets/ae2/blockstates"
     # A dispenser supplies six-facing placement and a block entity. Its menu
     # and inventory are intercepted; template redstone remains a parity gap.

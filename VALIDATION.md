@@ -1,923 +1,166 @@
-# Проверка переноса
+# Verification evidence
 
-Последняя проверка: 2 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
-AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
+Last updated: 2 November 2026. Development host: macOS arm64, Rust 1.99.1,
+Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Cable geometry builders — 2 ноября 2026
+## Current native CableBus stage
 
-- **122 core / 11 Python PASS**, fmt/rustfmt, clippy -D warnings и source/
-  item-limit audits PASS (`target/cable-render-checks.log`). Source inventory
-  1429 files: 102 partial / 1327 pending / 0 complete; не процент runtime parity.
-- **24405 Java cases / 467940 quads / 9358800 float fields PASS**:
-  `docs/cable-render-oracle.json`, outputs/input under target/cable-render-oracle.
-  4000 raw CubeBuilder cases, 10965 piece cases, 9440 composite model cases;
-  exhaustive 64 same-type connection masks × five types × 17 colors, plus
-  mixed-neighbor/attachments/core override/straight, every face/adjacency,
-  UV rotations/flips/custom rects, channel boundaries/overflow, constrained
-  distance boundaries/int overflow and three affine atlas rectangles.
-  Exact float bits, texture IDs, quad order, vertex color/fullbright, face/cull
-  metadata сравнивались построчно. Hashes и stubs/limits в committed report.
-- Java CubeBuilder/CableBuilder/CableCoreType/SmartCableTextures unchanged;
-  QuadEmitter.square и cable-only CableBusBakedModel methods дословные.
-  Stub MutableQuadViewImpl captures pre-pack emitter values. Packed vanilla
-  normals/AO/shading, actual atlas/GPU, world render-state collection, attachment/
-  facade models, particles и caches остаются открытыми. Cull metadata не равна
-  face culling готовых source BakedQuads. No native/game render proof claimed.
-- New geometry rules пока library-only; native manifest/consumed payloads не
-  менялись. Native check/build/172 game/14 library/7 assets tests и world smokes
-  здесь заново не запускались; прежние native evidence относятся к d6ca047.
-- Apache-2.0 notice для embedded Fabric QuadEmitter.square сохранён отдельно
-  в LICENSES/Fabric-Apache-2.0, original FabricMC attribution — NOTICE.md.
-  Первый javac probe обнаружил missing uv declaration в stub interface, добавлена;
-  source Java не менялся. Оба последующих сравнения (18965 и 24405) PASS.
+- Standalone verification: formatting, Clippy with warnings denied, 122 Rust
+  tests, 11 Python tests, English documentation check, source inventory and all
+  58 source stack-limit registrations pass.
+- Native check and fast-profile build pass. The game adapter suite passes 172
+  tests. The native library suite passes 16 tests, including visual wire
+  roundtrip/malformed payload rejection, arbitrary saved-field preservation,
+  32 CableBus states, appended block-entity type and foreign shape mappings.
+- The isolated world check registers all 32 states and 85 center IDs, confirms
+  a real client outline/raycast hit, powers a Charger across five cables, splits
+  unlike colors, reconnects through transparent cable, and survives save/restart.
+- The separate power regression passes finite/creative supply, front-face refusal
+  and finite cell/Charger energy conservation across restart.
 
-## CableBus saved-host / node data — 2 ноября 2026
+This checkpoint covers command-created center-only hosts. Contextual movement
+and piston shape hooks compile, but all physical movement/direct-query behaviors
+have not been proven in a source game. Full AO/lighting, facades, side parts,
+survival placement/drop, source lifecycle and external multiplayer remain open.
+The quad-builder oracle does not prove the GPU. The native screenshot was visually reviewed after fixing the quad-batch
+vertex contract. See [CableBus world report](docs/cable-world-smoke.json). No
+complete Java/NeoForge world or screenshot comparison is claimed.
 
-- **120 core / 172 native game / 11 Python PASS**, fmt/rustfmt, clippy
-  -D warnings, source/item-limit audits, native check/build PASS. Evidence:
-  `target/cable-bus-nbt-checks.log`,
-  `target/cable-bus-nbt-native-integration-tests-final.json`,
-  `target/cable-bus-nbt-native-integration-{check,build}-final.json` (cargo_exit 0).
-  Native build сохраняет unused API/toolchain rust-objcopy/libLLVM warnings.
-  Library/assets payloads не менялись, их прежние 14/7 tests не запускались.
-- Native codec tests cover every one of 85 cable center IDs, reading gn.e
-  instead of root proxy.e, raw side/facade retention, strict unsupported-side
-  refusal, owner-only identity retention, external item/gn replacement,
-  own-save echo, stale external snapshot refusal and zero-buffer removal.
-  Real Horizon NBT binary roundtrip/recreated Hosts preserves 7.25 energy,
-  typed host/part/service arrays and facade tag exactly. Negative/nonfinite
-  energy, unsupported center and invalid/non-Int YesNo are refused without
-  mutation. The integration test also confirms stable live energy/node identity
-  across repeated own-save echoes and owner-only edits, and replacement/clamped
-  energy after external gn update. This is not a source recovery proof.
-- Source `GridNode.areTagsEqualIgnoringPlayerId`: **20064 cases PASS**,
-  `docs/node-data-oracle.json`. Verbatim method; missing/empty/p-only data,
-  changed owner, missing/changed non-owner keys and typed-value identity.
-  CompoundTag/value equality uses map/string stubs. Actual Minecraft NBT
-  NaN/nested equality, readiness/destroy/callback/service lifecycle are not run.
-- `grid_glue` consumes loaded host NBT and persists only still-matching center
-  gn data; generic root proxy writer skips cable states. part_storage and
-  node_data are now native modules used by this adapter. Physical CableBus
-  registration/placement/render/selection/collision, side-part node services,
-  facade/part registry codecs and full host save/load remain open. There is
-  no placed CableBus game test at this checkpoint.
-- Final built client world regression `power-_xs22713`: four scenarios PASS
-  (`docs/cable-bus-nbt-power-regression.json`): finite cell → Charger, front-face
-  restriction, creative cell, finite stored/private energy 400 after recipe
-  and exact save/restart. Both own client processes closed. This exercises the
-  existing full-block graph adapter, not placed CableBus or Java/NeoForge world.
-  Earlier same-series regression `power-9d9r73gp` also passed before the final
-  cable-only buffer/type corrections; final proof is the later run above.
-- Integration check initially expected 90 AE after restoring 100/extracting 10
-  into one cable node; it correctly failed with 15, because the source local
-  buffer is capped at 25 AE/node. Source EnergyService.addNode was re-read:
-  it also checks gn.e as TAG_DOUBLE exactly. Decoder now ignores Int/Float/
-  other tag types; added native coverage. The buffer test keeps overcapacity
-  input and checks 25 initial, 15 after extraction, stable own-save/owner-only
-  identity and clamped 25 after external gn.e=55 replacement. The failed run
-  is not accepted as final verification. Initial rustfmt also found a fixture
-  delimiter typo before staging, corrected before any native compilation.
+## Verified source and rule layers
 
-## Cable core / source oracle / network profiles — 1 ноября 2026
+- Cable quad builders: 24,405 Java cases, 467,940 quads, 9,358,800 float fields;
+  unchanged builder/texture classes and verbatim square/model methods. Exact
+  float bits, textures, colors/fullbright, face/cull metadata and order match.
+  Sprite atlas and pre-pack emission are controlled stubs; packed normals/AO,
+  actual GPU, world collection, attachments/facades and caches are separate work.
+- Cable profiles/shapes/payload: 278,956 cases with unchanged API/storage classes
+  and verbatim cable methods. Geometry compares raw box calls. Base-part prefix,
+  world services, neighbor queries, registries and full host packets are stubbed.
+- Node-data equality: 20,064 cases with a verbatim GridNode method. Tag equality
+  is a map/string substitute; actual typed NBT roundtrip and graph identity are
+  tested natively. Readiness/destruction/service events are not covered by that
+  Java oracle.
+- Finite cell item power: 100,000 operations; base powered-item/bar regression:
+  400,000 operations. Original methods preserve double bits, thresholds, overflow
+  and simulation, with declared component/world stubs.
+- Controller/finite-cell visual oracles and pathing, energy, storage, basic,
+  creative and tool-cell traces retain their exact input/source hashes and
+  limitations in the machine-readable reports below.
 
-- **119 core / 163 native game / 11 Python PASS**, fmt/rustfmt, clippy
-  -D warnings и pinned source/item-limit audits PASS. Root/tooling:
-  `target/cable-all-checks.log`, final package-tooling:
-  `target/cable-tooling-final.log`. Native check/test:
-  `target/cable-native-{check,tests,build}.json`, cargo_exit 0. Fast build PASS;
-  сохраняются warnings об unused будущих API и toolchain rust-objcopy/libLLVM. Library/assets
-  payloads не менялись; это не новый запуск их прежних 14/7 tests.
-- **278956 Java cases PASS**, `docs/cable-oracle.json`: 36 type pairs,
-  2312 palette/tint/color pairs, 216608 raw shape cases, 20000 visual channel
-  cases, 20000 suffix packet cases, 20000 stateful CableBusStorage operations.
-  Unchanged API enums/AEColor/CableBusStorage и verbatim method fragments;
-  hashes/stubs/limits сохранены в отчёте. Shape cases включают каждый connection
-  mask/filter, normal/dense neighbor widths, оба dense box modes, missing parts,
-  fractional/invalid connection lengths и NaN. Packet cases проверяют порядок
-  direction bytes, external override, missing node, old-state reset и change flag.
-  Full AEBasePart prefix/Minecraft packets, NBT, renderer, lifecycle и
-  Java/NeoForge world этим oracle не доказываются.
-- Network binding принимает cable center profiles, source color compatibility
-  и exposed-face masks. Тесты подтверждают recolor без замены node ID, split/
-  reconnect закрытой грани, source dense flags и
-  twelve-drive dense trunk с normal-eight bottleneck. Это native/core test
-  profiles; в игровом мире CableBus ещё не зарегистрирован/подключён.
-- World regression `controller-5_celrs8` — **14 checks PASS**,
-  `docs/cable-controller-regression.json`: all 18 block states, exact 3 AE/tick
-  conservation, Controller-powered real Charger recipe, six geometries,
-  conflict/recovery at seven/eight bound, indirect-controller conflict и
-  exact energy save/restart. Client processes завершены. Это regression старых
-  full-block kinds, не CableBus world test и не полный Java/NeoForge oracle.
-- Staging macOS: rsync сохраняет mtime неизменившихся файлов вместо fresh
-  extraction timestamps. Два повторных stages: в каждом 3715 unchanged files,
-  0 retimed unchanged, 0 changed content (`target/stage-mtime-check.json`).
-  Повторный cached native check cargo_exit 0 (`target/stage-cache-native-check.json`).
-  Новый cable module затем компилировался и прошёл native tests; изменения
-  содержимого по-прежнему попадают в staged payload.
+## Previous native and world checkpoints
 
-## EnergyCellBlockItem power / models / placement / drop — 1 ноября 2026
+The CableBus NBT checkpoint passed 120 standalone tests, 172 native game tests,
+11 Python tests and native check/build. Earlier unchanged library/assets payloads
+had 14 library and seven asset-model tests. The geometry-only checkpoint passed
+122 standalone and 11 Python tests; its 84 previous native mixin files and native
+manifest were unchanged, so no new engine or game run was claimed for that step.
 
-- **111 core / 156 native game / 14 native library / 7 native assets / 11 Python
-  PASS**; fmt/rustfmt, clippy -D warnings, source audits и native check/build PASS.
-  Native game: `target/energy-cell-item-native-identity-final.json`; library:
-  `target/energy-cell-item-native-library-final.json`; assets:
-  `target/energy-cell-item-native-assets-final.log`; check/build:
-  `target/energy-cell-item-native-identity-{check,build}.json`.
-  Core/tooling: `target/energy-cell-item-all-checks-final.log`.
-- Два finite block items используют исходные 200000/1600000 AE и 800/1600 rates,
-  WRITE charging, threshold 0.00001 вместо AEBasePoweredItem 0.0001; capacity
-  override/upgrades игнорируются, но сохраняются. Нет унаследованного зелёного
-  13-pixel bar. **100000 original Java power operations PASS**:
-  `docs/energy-cell-item-oracle.json`. Семь методов включены дословно, components
-  и block profile — stubs; AEBlocks constructors и InitItemModelsProperties
-  проверены отдельно. Прежний AEBasePoweredItem/bar oracle: **400000 operations
-  PASS**, `docs/energy-cell-item-base-regression.json`. Это не world oracle.
-- Item models используют source float current/max с thresholds .2/.4/.6/.8,
-  а не placed-block quarters/+0.01. Official Minecraft 1.21.1 client/mappings
-  повторно проверены SHA-1; просмотрен BakedOverride.test bytecode fcmpg/ifge:
-  NaN проходит predicates и выбирает последний model. Hashes в oracle report,
-  javap под `target/energy-cell-item-oracle/`. Render-only bridge сохраняет
-  NaN/±Infinity, которые обычный JSON renderer view терял. Сам ItemStack,
-  typed components, count/click hashes/packet/save не меняются. Actual resolver
-  test покрывает оба profiles/all five models, capacity override, чужие fields
-  и special numbers; native stack_view test проверяет отсутствие mutation.
-- EnergyCellBlockEntity import/exportSettings(DISMANTLE_ITEM): stored_energy
-  импортируется в реальной placement до shrink, с setStored threshold/cap.
-  В первый matching loot stack копируется только положительный local stored
-  energy, без proxy.e. Native Pending сохраняет matching/at-most-once policy.
-  Live storage snapshot guard перед player/Level resource drop видит уже
-  потраченную в этом тике энергию и не затирает external NBT replacement.
-  Реальная cell placement также сбрасывает старый node identity, даже если
-  position/kind/saved NBT совпали после same-tick removal; core test проверяет
-  новую node ID и отсутствие унаследованного расхода. General block/chunk/command
-  identity/event lifecycle остаётся открытым. Другие loot metadata сохраняются.
-- **World energy-cell-item-z5e22fr2 — 13 checks PASS**:
-  `docs/energy-cell-item-world-smoke.json`. Оба items: real Charger reaches fixed
-  maximum despite capacity=1/energy card, точный overflow/conservation и custom
-  component retention. Затем действительно заряженный item устанавливается и
-  добывается в survival. Zero/tiny/exact MIN/cap clamp, `/setblock air destroy`,
-  count-two placement/drop и десять render variants проверены. Native GUI
-  screenshot просмотрен. Renderer не добавляет block_state в реальные stacks;
-  все ten componentful items переживают restart точно. Отдельный charged dense
-  block после restart и добычи возвращает **333333 AE**.
-- **Charging item-charging-k25cy3dn PASS**, все прежние 16 profiles, local/grid/
-  overflow/conservation, front, Crank, components/restart/retrieval:
-  `docs/energy-cell-item-charging-regression.json`.
-  Content hmod build/check PASS, SHA-256
-  `32dd198615b5729de3975d631c99f55735f01a904ed9afe0151215821fae951c`.
-  `target/energy-cell-item-content-{build.log,check.json}`. No resource fallback.
-- Исправленные invocations: Arc<str>/LevelDimension API и Context без Default;
-  cancellable helper требует lexical return type StackView. Один shell job без
-  fail-fast продолжил проверку старой stage после отказа planner; этот run не
-  принят как доказательство текущего кода, финальная цепочка fail-fast прошла.
-  Первые world fixtures не подбирали spawned Charger item и ожидали pretty SNBT
-  вместо compact. После restart immediate tp+break отправлял mining до server
-  position update; focused run с barrier подтвердил exact drop, затем полная
-  matrix повторно прошла с wait и обязательным actual-air assertion.
-- **83 partial / 1346 pending / 0 complete**. Complete tooltip/base naming/
-  ownership/settings, external energy capabilities, все pick/loot-command/
-  unloaded/saved-BE/explosion paths и полный Java/NeoForge/multiplayer lifecycle
-  ещё открыты. Native finite block power malformed/nonfinite recovery отличается
-  от source; renderer-specific fix не объявляется решением всех numeric codecs.
-  Unused API warnings и rust-objcopy/libLLVM diagnostics сохранены; успешные
-  Cargo exits и actual game подтверждены отдельно. Свои клиенты закрыты;
-  player resources/saves, original engine/Create этой работой не менялись.
-  Goal активен, полного 1:1 ещё нет. No push/install/deployment.
+Actual isolated worlds have exercised Charger recipes/powered items, finite and
+creative grid power, Drive inventories/screens/automation/backends, comparators,
+Controller forms/conflicts/drain, cell fullness, item models, placement/drops,
+component transport, stack limits, platform predicates and save/restart. These
+scenarios establish only their recorded checks, not the entire mod.
 
-## Energy Cell fullness / comparator — 1 ноября 2026
+World power-_xs22713 verified finite cell -> Charger, front-face exclusion,
+creative power and exact energy across recipe/save/restart. World
+controller-5_celrs8 passed 14 checks including 18 states, exact 3 AE/tick idle,
+a real powered Charger, geometry/conflicts and restart. World
+energy-cell-item-z5e22fr2 passed 13 checks for charging, finite-cell item models,
+placement/drop boundaries and exact restart energy. Reports list exclusions.
 
-- **108 core / 151 native game / 13 native library / 11 Python PASS**.
-  fmt/rustfmt, clippy -D warnings, source audits и native check/build PASS.
-  `target/energy-cell-all-checks-final.log`,
-  `target/energy-cell-native-{game,check,build}-final.json`,
-  `target/energy-cell-native-library-second.json`. Library payload после этого
-  не менялся; финальные game changes повторно прошли native tests/check/build.
-- `block_states.rs` расширяет только четыре owned full-block declarations:
-  Controller 18, finite energy cells по пять, creative один. Native loaders
-  проверяют согласованность 9 JSON/6 NBT, vanilla IDs, preceding/following blocks,
-  foreign door/button/custom shapes, renderer models всех четырёх AE2 blocks и
-  energy-cell-only pack без Controller. Финальные cells используют source cube
-  glassProps: hardness 2.2, resistance 11, no required tool, map color NONE,
-  glass sounds. Dispenser inventory/facing/triggered больше не наследуются.
-- **100000 source cases / 200000 method comparisons PASS**:
-  `docs/energy-cell-visual-oracle.json`. Дословные getAnalogOutputSignal и
-  getStorageLevelFromFillFactor; local energy/max и Mth — minimal Java host.
-  Есть оба capacities, fullness/comparator boundaries, nextafter и IEEE/narrowing
-  cases. Это не world/NeoForge/TickManager oracle. Initial finite cell load
-  дополнительно воспроизводит setStored MIN_AMOUNT < 0.000001; Controller не
-  получает чужой threshold. Source jars/classes/exports остаются в target.
-- **World energy-cell-display-6loo8yw4 — 40 checks PASS**:
-  `docs/energy-cell-world-smoke.json`. Все десять finite states доступны;
-  0/tiny/quarter/full boundaries дают source fullness и настоящий comparator/dust.
-  Existing circuit сохраняется во всех AE2 mutation cases. Controller drain
-  пересекает fullness threshold; 20000 -> 40000 AE меняет signal 2 -> 3 при
-  неизменном fullness 0. Creative — property-free/no analog; vanilla barrel
-  control остаётся 1. Dense 800000 AE/fullness 2/signal 8 переживает restart точно.
-- **Charging item-charging-474fwc4q PASS**: все 16 ранее подключённых powered
-  profiles, source-ordered local/grid/overflow/conservation, front, Crank,
-  components, restart/retrieval. `docs/energy-cell-charging-regression.json`.
-- Original blockstates и одиннадцать block models трёх cells побайтно сверены
-  с pinned jar (14 файлов): `target/energy-cell-model-source-check.json`.
-  Content hmod build/check PASS, SHA-256
-  `fa3a65acf72fbc7e4a88a9c8e04298e9fa39e8fd043ca48d54a73450712da513`.
-  `target/energy-cell-content-{build.log,check.json}`. Runtime fallback запрещён
-  в smoke; original resources не меняются. Исправленный screenshot preview
-  просмотрен: видны исходные модели разных fullness levels и circuit.
-  Полная lighting/material parity не объявляется.
-- Исправленные invocations: initial mixin target требовал exact trait-method ID;
-  native compile выявил отсутствие IntoIterator для &mut BlockEntities (использован
-  get_mut по owned positions). Два world runs остановились на vanilla control:
-  populated barrel читался, но dust оставался 0. Focused fixture подтвердил 1
-  после перестройки всего circuit, как в существующем comparator smoke. AE2
-  notification cases по-прежнему не перестраивают comparator/dust. Первоначальная
-  камера screenshot оказалась вне cleared area; preview исправлен в owned world.
-- **80 partial / 1349 pending / 0 complete**. Exact TickManager/onReady/event
-  scheduling, chunk/drop/spatial lifecycle, item stored_energy placement/drop,
-  EnergyCellBlockItem charging/tooltips/models, charged creative variant и
-  external energy API остаются открытыми. Adapter использует server post_tick
-  и block-ticking area; это не полный source lifecycle. Native unused-API и
-  rust-objcopy/libLLVM diagnostics сохранены; Cargo exit 0 и actual game PASS
-  подтверждены. Goal активен, полного 1:1 ещё нет. No push/install/deployment.
+Native fast builds can report unused future APIs and rust-objcopy/libLLVM
+warnings. A zero Cargo exit plus game verification is not described as a
+warning-free build. Launcher installation/rebuild, external multiplayer, joint
+Create gameplay and full Java/NeoForge world parity remain separate requirements.
 
-## ME Controller / native state registration — 1 ноября 2026
+## Verification failures and interpretation
 
-- **106 core / 148 native game / 12 native library / 11 Python PASS**;
-  fmt/rustfmt, clippy -D warnings, source audits, native check/build PASS.
-  Core: `target/controller-core-checks-final.log`; native game/check:
-  `target/controller-native-{tests,check}-final.json`; library:
-  `target/controller-native-library-final.json`; fast build:
-  `target/controller-native-build-second.json`. Native unused-API/rust-objcopy
-  libLLVM diagnostics не скрывались; Cargo exit 0 и actual game PASS подтверждены.
-- Controller: public 8000 AE, priority 0 (IAEPowerStorage default), idle 3,
-  CANNOT_CARRY | DENSE_CAPACITY, реальные controller positions и original NBT.
-  Core проверяет 12 consumers с тремя controllers против ad-hoc eight, seven/
-  eight bound, indirect-controller conflict, storage simulation и точный idle.
-- Resource adapter разворачивает один cube row в 18 настоящих state/type states.
-  Согласованы 9 JSON и 6 NBT tables, defaults/render/rotation/collision mappings;
-  vanilla IDs/rows неизменны. Library fixture содержит preceding block, following
-  door и foreign button с custom shapes; проверяет реальные Assets и renderer
-  StateModels loaders для Controller, door и button. Content build/check PASS:
-  `target/controller-content-{build.log,check.json}`; hmod SHA-256
-  `ab35a03fd5196dbf026f1f419bc3738c01d48e3b1411bcd403fc4ca8cc7669bf`.
-- **4000 source visual cases / 8000 top-level comparisons PASS**:
-  `docs/controller-visual-oracle.json`, `target/controller-visual-oracle-final.log`.
-  getControllerType/isController и updateState/checkController включены дословно;
-  world/power/conflict dependencies stubbed (ready, loaded, grid present). Есть
-  все 64 neighbour masks и signed-coordinate extremes. Это не ControllerValidator
-  и не Java/NeoForge world oracle. Jars/classes/исходные exports остаются в target.
-- **World controller-pz6q6dun PASS**, `docs/controller-world-smoke.json`:
-  18 variants, empty offline, cap 8000, все column/interior types, powered conflict,
-  width 8 -> 7 recovery и controllers через non-controller node. Idle: 874 ->
-  781 AE за 31 tick, ровно 3/tick. Real Charger: 4997 -> 3262 за 45 ticks,
-  ровно 1600 recipe + 135 idle. Restart сохраняет total internal+proxy без refill.
-  `controller-connected.png` просмотрен: original textures/geometry отображаются;
-  full material/emissive parity отдельно не доказана.
-- **Charging item-charging-8r8yerow PASS**: все 16 powered profiles, overflow/
-  conservation, front, Crank, components/restart/retrieval.
-  `docs/controller-charging-regression.json`. **Drive GUI drive-gui-nrm5z8ej PASS**:
-  filters/shifts/main-before-hotbar, vanilla isolation и restart.
-  `docs/controller-drive-gui-regression.json`.
-- Исправленные failed invocations: initial Java harness не импортировал nested
-  enum; первый world выявил production model schema без named и resource fallback
-  (теперь renderer loader покрыт тестом, launch запрещает fallback); второй world
-  выявил fixture air/minecraft:air assertion. GUI regression отказал на visible-
-  face query контрольного barrel; fixture получил chunk-load barrier и явную
-  frontal pose, все assertions сохранены. Финальные relevant проверки прошли.
-  Все свои клиенты завершены, player resources/saves и original engine repos не менялись.
-- **78 partial / 1351 pending / 0 complete** из 1429 files. Menu, external power
-  funnel/capabilities, immediate shape/onReady/listener order, grid merge priority/
-  identity, full chunk/drop/spatial lifecycle и lighting/materials ещё открыты.
-  Status/type вычисляются server post_tick adapter. Текущий этап завершён;
-  goal приостановлен по просьбе пользователя для тестирования. Scope полного
-  1:1 порта не уменьшен. No push/install/deployment.
+An early native CableBus integration test incorrectly expected 90 AE after
+restoring 100 and extracting 10 into one node. The source buffer capacity is
+25 AE/node, so the correct remainder is 15. Source reinspection also established
+that restored node energy must be Double-typed. Both are covered by subsequent
+native tests. Failed runs are not accepted as evidence for the final tree.
 
-## Drive/Charger comparator — предыдущее подтверждение
+Some early mixin probes exposed exact target-ID/return-type requirements and a
+Java stub interface declaration omission. These were corrected in the adapters
+or stubs; pinned original sources were not changed. Build/test success must
+always refer to the actual final source, not a stale staged tree or old binary.
 
-- **101 core / 143 native game / 11 Python PASS**, fmt/rustfmt/clippy -D warnings,
-  source audits и pinned native check/build PASS. Final evidence:
-  `target/inventory-signal-core-checks-final.log`,
-  `target/inventory-signal-native-{tests,check,build}-final.json`.
-  Library payload не менялся: последние 9 library tests здесь не повторялись.
-  Source inventory после регистрации новых partial contracts: 1429 files,
-  **76 partial / 1353 pending / 0 complete**; финальный audit проверен отдельно.
-- Портирован InternalInventory -> ContainerAdapter analog contract только для
-  двух native hosts: source 10/1 slots, slot limit one, ordered float32 sum,
-  division, Mth.lerpDiscrete. Нет выдуманного clamp для source-loaded overstack.
-  1024 Drive occupancy masks проверяют все размещения и игнорирование padding;
-  source count range и air/zero/legacy fallback/malformed original — отдельные tests.
-- Для проверки формулы получены official Mojang Minecraft 1.21.1 client/mappings
-  с SHA-1 проверкой. JDK21 javap просмотрены AbstractContainerMenu comparator,
-  Container stack minimum, Mth.lerpDiscrete и ItemStack.isEmpty. Source artifacts,
-  method-section hashes и AE2 source hashes записаны в
-  `docs/inventory-signal-source-audit.json`. Jars/classes/mappings остаются в target,
-  в Git/пакет не включаются. Это bytecode inspection, не Java/NeoForge world oracle.
-- **World inventory-signal-0l2hpc17 PASS**: реальные comparator + adjacent dust,
-  Charger empty/raw ingredient/powered/air, все 11 уровней Drive 0..10 occupied,
-  direct source count-two и malformed gate с заполненным native echo.
-  Existing comparator обновляется после hopper insert/extract для обоих hosts,
-  manual Charger insert/extract и Drive GUI shift insert/extract. Vanilla barrel
-  остаётся 0/1/8/15. Full Drive сигнал 15 сохраняется после restart.
-  Matrix: `docs/inventory-signal-world-smoke.json`, transcripts/logs по её `logs`.
-- Первый world run отказал из-за ошибочной ориентации comparator fixture
-  (input смотрел на dust). Исправлена только ориентация тестовой цепи;
-  второй прогон прошёл. После air guard повторно прошли native test/check/build
-  и финальный world с дополнительными GUI/air assertions. Все свои клиенты закрыты.
-- Strict malformed policy, comparator других AE2 hosts, распространение
-  source-loaded signals >15 через все redstone components и полный lifecycle/
-  world oracle остаются открытыми. Native warnings (unused APIs и rust-objcopy
-  libLLVM diagnostic) сохранены; Cargo exit 0 и actual game PASS подтверждены.
-  Goal активен. Player resources/saves и оригинальные engine repos не менялись.
-
-## Default item stack limits — предыдущее подтверждение
-
-- Перенесены default max-stack properties всех 275 carried item definitions:
-  **58 limit one**, **217 limit 64**. Подготовка сохраняет template и остальные
-  поля; неполный carry без требуемой регистрации отклоняется до замены output.
-  `tools/item_stack_limits.py --check` сверяет таблицу с pinned AEItems factories,
-  EncodedPatternItemBuilder, WrappedGenericStack и наследованием десяти tool
-  классов (15 зарегистрированных tiered tools). Static report/hashes:
-  `docs/item-stack-source-audit.json`. Это не Java runtime properties oracle.
-- **98 standalone**, **11 Python** PASS, fmt/rustfmt, clippy -D warnings,
-  source inventory audit и pinned Horizon check PASS. Логи:
-  `target/item-stack-core-checks.log`, `target/item-stack-native-check.json`.
-  Rust payload не менялся: native test/build и library tests повторно не
-  запускались; использован ранее проверенный fast client (135 game / 9 library).
-  Source inventory: 1429 files, **73 partial / 1356 pending / 0 complete**.
-- Fresh pinned jar content carry/preparation, hmod build/check PASS:
-  `target/item-stack-content.log`, `target/item-stack-content-build.log`,
-  `target/item-stack-content-check.json`. Hmod SHA-256:
-  `31ff7623db77160182e661461b613d5d8321efc233f05f1002052bd963444b41`.
-  Первый вызов checker с directory вместо archive отказал; build из mod folder
-  и проверка фактического `.hmod` затем прошли. Никакие player resources не менялись.
-- **World item-stacks-oad53z4_ PASS**: все 58 unstackable items через настоящие
-  hoppers и 3 stackable controls. Source-loaded count 3 раскладывается как
-  1/1/1, обычные controls остаются count 3. Full hopper не принимает шестой
-  предмет; exact counts, energy 777 и unknown component 99L переживают restart.
-  Player give также создаёт три отдельных portable cells и один stack blank patterns.
-  Полная matrix/log path: `docs/item-stack-world-smoke.json`.
-- **Charger regression charger-automation-rn68d0mn PASS** с новым строгим
-  assertion destination counts `[1,1,1]` после извлечения portable stack:
-  `docs/item-stack-charger-regression.json`.
-  **Drive GUI regression drive-gui-xrbuwn6s PASS**: filters, authoritative shifts,
-  vanilla isolation, count conservation и restart:
-  `docs/item-stack-drive-gui-regression.json`. Все тестовые клиенты завершены.
-- Component-specific max-stack overrides, остальные item properties/behaviours,
-  comparator fullness и полный порт остаются открытыми. Goal возобновлён;
-  данный этап не объявляет ни один Java-класс завершённым. No push/deployment.
-
-## Контрольная точка Charger automation перед паузой — предыдущее подтверждение
-
-- Повторно проверён код `322cc27`: standalone **98 PASS**, native game
-  **135 PASS**, Python tooling **10 PASS**. fmt/rustfmt, clippy `-D warnings`,
-  source inventory audit, pinned Horizon check и fast build прошли.
-  Логи этой контрольной точки: `target/charger-automation-checkpoint-core.log`,
-  `target/charger-automation-checkpoint-native-{tests,check,build}.json`;
-  Cargo logs указаны внутри JSON. Library payload не менялся, его тесты
-  в этой точке не повторялись (последнее подтверждение — 9 PASS).
-- Новый isolated Charger world smoke **PASS**:
-  `docs/charger-automation-world-smoke.json`, полный transcript и game logs
-  находятся по пути `logs` в отчёте. Проверены реальные hopper/dropper,
-  все шесть сторон, все 16 powered items, recipe tag admission независимо
-  от поддержки result components, source overstack без потери компонентов,
-  failed-pull rollback, немедленный original inv flush и malformed gate/restart.
-- Drive regression **PASS**: `docs/charger-automation-drive-regression.json`.
-  Реальные hopper/dropper, фильтры/лимит десяти слотов, все грани, offline,
-  failed pull с сохранением компонентов, full remainder и restart.
-  Запущен исходный smoke через generated wrapper в target с единственной
-  заменой control endpoint на собственный `work/control.json` (Unix path limit).
-  Все клиенты обоих smoke завершены. Пользовательские saves/options/resources
-  и оригинальные engine repositories не изменялись.
-- Исходный пакет теперь включает Charger automation smoke и JSON-отчёты
-  игровых проверок для воспроизведения. Item catalog max-stack, comparator
-  fullness, general capabilities и полный Charger lifecycle остаются открытыми.
-  Ни один из 1429 Java-файлов не объявлен полностью перенесённым: 71 partial,
-  1358 pending. Подробные ограничения сохраняются в PARITY.
-- После изменения упаковки повторно прошли **10 Python tests**, включая
-  deterministic source bundle: `target/charger-automation-checkpoint-tooling-final.log`.
-- Native сборка успешна, но не warning-free: есть unused future API warnings
-  и диагностика rust-objcopy о недостающем libLLVM.dylib. Cargo exit status 0
-  подтверждён отдельно от фактического запуска и игровых assertions.
-- Пользователь запросил приостановить goal после этого этапа для тестирования.
-  Новые функциональные этапы не начинались; push/deployment не выполнялись.
-
-## Charger native automation — предыдущее подтверждение (`322cc27`)
-
-- Standalone **98 PASS**, native game **135 PASS**, Python tooling **10 PASS**.
-  `cargo check --locked`, fmt, clippy `-D warnings`, tests, source audit,
-  pinned Horizon check и fast build прошли. Native library tests отдельно не
-  повторялись: library payload не изменён. Все invocations, exit statuses и
-  timestamps находятся в `target/benchmark-report.md`, logs —
-  `target/benchmark-logs/`. Source inventory: 1429 Java files, 71 partial,
-  ни один класс не объявлен полностью перенесённым.
-- `charger-automation-etmv64a5` **PASS**: настоящие hoppers/droppers со всех
-  шести сторон, limit one и remainder; реальный tag ingredient с unsupported
-  result components; recipe input удерживается; все 16 powered items принимаются;
-  empty powered item без рецепта извлекается сразу, powered recipe input ждёт
-  current >= maximum. Internal wrapped stack не извлекается.
-- Source-loaded count 3 извлекается без потери; failed pull возвращает исходный
-  count, energy 777 и custom component. Полное извлечение сразу сохраняет `inv.item0: {}`.
-  Malformed original count zero блокирует insert/pull даже с полным powered
-  native echo; restart удерживает блокировку, explicit source repair снимает её.
-  Ordinary barrel/hopper сохраняют обычную вставку stack 3.
-- Drive regression `drive-automation-k59ctwm5` **PASS**: фильтры/десять слотов,
-  все стороны, offline, full remainder, components, failed pull и restart.
-  Запущена копия исходного smoke под `target/` с единственной адаптацией control
-  socket suffix `.sock` → `.json`, чтобы endpoint тоже оставался в собственном
-  глубоком target path и не превышал Unix SUN_LEN.
-- Всего **4 failed validation invocations**, затем исправлены: native helper
-  return-type spelling; Charger harness Unix socket length; неверное ожидание
-  destination slot layout; unloaded setup chunk. Runtime automation assertions
-  последнего прогона прошли. Первый successful native test/build был повторён
-  после добавления исходного exposed-handler wrapped-stack guard.
-- Отдельно выявлено существующее расхождение item catalog: native hopper может
-  объединить portable cells в count 3, хотя Java AEItems задаёт `stacksTo(1)`.
-  Тест подтверждает точный total count и компоненты, а не destination max-stack
-  parity. Native comparator fullness также ещё использует item stack max вместо
-  исходного inventory slot limit. Оба ограничения записаны в PARITY.
-- General capability API, addon power/ingredients/conditions, full config,
-  destruction/chunk paths и Java/NeoForge world oracle остаются открытыми.
-  Это проверка конкретного automation adapter, не полного Charger parity.
-  Все тестовые клиенты завершены; пользовательские миры, ресурсы и оригинальные
-  engine repositories не изменялись. Push/publication/deployment не выполнялись.
-
-## Shared source inventory codec — предыдущее подтверждение
-
-- Standalone **95 PASS**, native **130 PASS**, Python **10 PASS**, fmt/rustfmt,
-  clippy -D warnings, source inventory audit и native check/build PASS.
-  Logs: target/inventory-codec-core-checks.log,
-  target/inventory-codec-native-tests.json, target/inventory-codec-native-check.json,
-  target/inventory-codec-native-build.json. Library source не менялся;
-  его последние **9** packet/menu tests подтверждены предыдущим этапом.
-- inventory_codec общий для Drive/Charger: optional stack, nonpositive count
-  refusal до Horizon clamp, count-one omission, source/native echo precedence.
-  Blocked original не заменяется новым native echo. Положительный count>1 из
-  прямой source NBT загрузки сохраняется: BaseInv load вызывает setItemDirect,
-  ограничения обычной вставки не применяются к этому setter.
-- World **drive-inventory-hkskab5i PASS**, docs/drive-inventory-world-smoke.json:
-  source count-zero остаётся raw и не монтируется (drain 2.015625 AE/tick);
-  native echo заменён на 4k, но original не затёрт и не разблокирован;
-  restart удерживает blocked состояние, explicit repair монтирует original data;
-  loaded count-two сохраняется и даёт один cell idle drain, 2.515625 AE/tick.
-  Все измерения привязаны к фактическим game ticks и power snapshots.
-- Charger regression **charger-inventory-3zuq22ud PASS**:
-  original-format load, live charge/no stale echo, source replacement,
-  malformed retention/repair, native migration, restart/retrieval и recipe output.
-  docs/shared-codec-charger-regression.json.
-- Drive GUI regression **drive-gui-ife9_u0f PASS**:
-  normal limit-one/filter/pickup/shift, vanilla barrel isolation и restart.
-  docs/shared-codec-gui-regression.json.
-- Все тестовые клиенты этого этапа завершены. Нет изменений в оригинальных
-  Horizon/Create repos, пользовательских saves/options или установке модов.
-- Открыты полные registry-aware codecs, missing/malformed recovery, migrations,
-  capabilities/automation/drop lifecycle и остальной полный порт. Strict malformed
-  retention — временная политика, не доказательство source recovery parity.
-
-## Charger original inventory — предыдущее подтверждение
-
-- Standalone **95**, native **127**, Python **10** PASS; fmt/rustfmt/clippy,
-  inventory audit и native check/build PASS. Logs target/charger-inventory-*.json,
-  target/charger-inventory-core-checks.log. Native library payload не менялся;
-  прежние **9** packet/menu tests остаются подтверждением последнего его изменения.
-- `inv.item0` hydrate/persist, original update precedence, stale native/source
-  echoes, legacy native Items migration, malformed count-zero preservation and
-  blocking until repair; default count=1 omitted and direct count=2 preserved.
-  General Horizon decoder clamps zero to one; adapter checks before decoding.
-- World **charger-inventory-jb66r9mi PASS**:
-  original-format portable energy 1234 + local 777 -> 2011, nested contents retained;
-  explicit original replacement to Staff, local 500 -> final 1500 without reversion;
-  invalid count zero survives ticks/manual extraction, explicit repair clears;
-  native Items migration -> source inv, restart/retrieval retain Color energy 777;
-  original certus input -> charged result in inv.item0, exactly 1600 AE consumed.
-  docs/charger-inventory-world-smoke.json.
-- Full charging regression **item-charging-zoi_dbzl PASS**: all 16 types,
-  conservation/Crank/front/restart/retrieval after original inventory integration.
-  docs/charger-inventory-charging-regression.json.
-- Working uses transient data, legacy HorizonWorking NBT removed. Native Items
-  is a transport mirror of the same slot. Count-one omission/empty-stack shape
-  checked against Mojang's documented format (linked in PARITY).
-- Full Minecraft malformed/missing recovery, all legacy migrations, hopper/
-  capabilities and destruction/explosion/drop paths remain open. Malformed inv
-  policy is stricter than source parseOptional recovery and explicitly temporary.
-
-## Component sync / energy bars — предыдущее подтверждение
-
-- Standalone **95 PASS**, native **123 PASS**, native library **9 PASS**,
-  fmt/rustfmt/clippy и Python **10 PASS**. Logs:
-  target/component-sync-core-checks.log, target/component-sync-native-tests.json,
-  target/component-sync-native-lib.json. Native check/build PASS:
-  target/component-sync-native-check.json, target/component-sync-native-build.json.
-- --bars Java oracle: **2000 traces / 400000 power/bar operations PASS**,
-  docs/item-energy-view-oracle.json, exact doubles (NaN payload equivalence).
-  Проверяется настоящий AEBasePoweredItem.getBarWidth вместе с energy methods;
-  метод сначала Math.round -> long -> narrowing int -> clamp, не просто clamp ratio.
-  Старый energy-only trace input воспроизводится без изменений (SHA 308cde11...);
-  --bars input SHA dd58ae2e... тоже воспроизводится текущим generator.
-- Первый world screenshot item-bars-ivltb5f9 выявил нулевые AE2 bars на клиенте
-  при правильной энергии на сервере. Причина — horizon network_stack отбрасывал
-  AE2 components. Добавлены send/receive hooks, versioned wire-only envelope,
-  штатный item_data decoder восстанавливает исходные component names/types.
-- Native library packet tests проходят через реальный Slot::write/read и
-  item_sync::from_network: AE2 energy + upgrade + typed unknowns + original
-  custom_data с конфликтующим именем, nested vanilla shulker/bundle, malformed
-  wrapper refusal. Hashed::create стабилен после roundtrip и меняется при изменении
-  stored_energy; исходный/saved stack не получает wire envelope.
-- World **item-bars-6uh8fmi6 PASS**, docs/item-bars-world-smoke.json:
-  pixel-exact RGB checks 0/7/13/7/13 widths, black background, green #00ff00,
-  actual move of componentful half-charged item through ordinary barrel and back,
-  authoritative stored_energy 10000, item count conservation. Screenshot просмотрен:
-  vanilla damaged pickaxe/count 64 сохранили обычный вид. PNG verifier читает
-  реальный framebuffer; старый broken screenshot гарантированно не проходит.
-- World Drive GUI regression **drive-gui-rf9_6dl8 PASS**:
-  filtering/pickup/shift/ordinary barrel isolation/restart после смены wire encoding.
-  Report docs/component-sync-drive-gui.json.
-- Повторный полный charging world **item-charging-5lt44fkz PASS**, включая
-  все 16 items, manual Crank/front, exact conservation и restart/retrieval
-  после введения component transport; docs/component-sync-charging-world.json.
-- Energy tooltip, creative charged variants/reequip, live config, source inventory
-  lifecycle/automation и external multiplayer ещё открыты. This is native Horizon
-  transport; участникам нужен тот же bundle, полный addon registry ещё не перенесён.
-
-## Powered items / Charger — предыдущее подтверждение
-
-- Standalone **94 PASS**, fmt/rustfmt/clippy `-D warnings`, Python **10 PASS**:
-  target/item-energy-checks-final.log. Native **121 PASS**:
-  target/item-energy-native-tests.json. Native check/build PASS:
-  target/item-energy-native-check.json, target/item-energy-native-build.json.
-  Native unused API и прежний rust-objcopy/libLLVM warning остаются видимыми.
-- **2000 traces / 400000 energy operations PASS**, docs/item-energy-oracle.json:
-  unchanged AEBasePoweredItem и API classes, component map/game/UI — stubs.
-  Exact double bits (NaN payload equivalence), overflow/simulate/commit/extract,
-  thresholds, capacity override/multiplier/reset, signed zero/nonfinite/negative.
-- **2000 traces / 200000 Charger calls PASS**, docs/charger-oracle.json:
-  дословный doWork из pinned class в stub host, unchanged AEBasePoweredItem,
-  StoredEnergyAmount/PowerMultiplier. Exact double bits, working flag и оба
-  grid request values. Проверены source local-first/grid/overflow/refill,
-  config factors/multipliers, variable tick intervals, no/empty grid и overfull item.
-  Полный Charger superclass/NeoForge/world/grid dispatch не запускаются;
-  recipe finder всегда null, RNG/recipe branch этим oracle не проверяются.
-- Native tests покрывают defaults/rates всех 16 IDs, two-slot wireless и raw
-  energy card count, original capacity override без вызова change callback,
-  preservation upgrades/storage/custom components, malformed numeric refusal,
-  idempotent command registry и numeric command energy codecs.
-- Изолированный world **item-charging-vjhsnfav PASS**:
-  near-full portable с двумя energy cards: local 1600 + grid 1000 + item 990
-  -> local 1600 + grid 990 + item 1000; nested contents сохранены.
-  Cannon получает 5000 AE, из 6600 AE остаётся ровно 1600 в local buffer.
-  Front exclusion, один Crank -> ровно 160 AE в Staff, все 16 manual insert/
-  charging hosts, partial stored_energy 2011 + capacity override + contents после
-  restart и manual retrieval PASS. Report: docs/item-charging-world-smoke.json.
-- Первый world run выявил отсутствующую command component registration.
-  Добавлены шесть supported AE2 IDs, с предварительной загрузкой vanilla type
-  IDs до AE2 augmentation (исходный hydration условен по пустому списку).
-  Два numeric component codecs проверяются в horizon-command. Не заявляются
-  registration/полные codecs остальных AE2/addon компонентов.
-- Открыты: energy tooltip/bar/creative tab/reequip overrides, live config,
-  upgrade editing/callbacks, Charger hopper filters/capability и полное original
-  inv/item/drop lifecycle. Handheld firing/painting/terminal actions не перенесены.
-
-## Upgrade components — предыдущее подтверждение
-
-- Standalone **87 PASS**, fmt/rustfmt/clippy `-D warnings`, Python **10 PASS**:
-  target/upgrades-checks-final.log. Native **110 PASS**:
-  target/upgrades-native-tests.json, cargo_exit 0. Native compilation check PASS:
-  target/upgrades-native-check.json.
-- Canonical `slot/item` component, sparse slots, per-host inventory size,
-  unsupported card ignoring, per-slot count instead of item stack count,
-  clamped installed count versus raw energy-card iteration; void simulate/commit,
-  сохранение upgrades после записи contents и malformed component retention.
-  Старые flat upgrade fixtures исправлены; прежние тесты не доказывали этот codec.
-- Первый native regression test поймал count clamp общего Horizon decoder:
-  `count:0` становился одним предметом. Adapter теперь отклоняет nonpositive
-  count до декодирования; повторный полный native run прошёл.
-- Native build PASS, target/upgrades-native-build.json; unused API warnings и
-  прежний rust-objcopy/libLLVM warning не скрыты, cargo_exit 0.
-- Изолированный мир **drive-upgrades-o7q_ih7r PASS**, docs/upgrade-world-smoke.json:
-  оригинальные slot/item upgrades двух ячеек сохранены после offline/save/restart,
-  contents 123 iron/1000 water и точный drain 3.515625 AE/tick не изменились.
-  World test проверяет retention, не операции терминала/редактирование карт.
-- Источники сверки: pinned AEComponents.UPGRADES, ItemUpgradeInventory,
-  UpgradeInventory.updateUpgradeInfo, InitUpgrades и AppEngInternalInventory.
-  Java cell oracles используют stub upgrades и этим изменением не расширены.
-  Workbench/writer/listeners, addon registration и полная эквивалентность
-  Minecraft malformed/duplicate component recovery ещё не проверены.
-
-## Storage backends двух инструментов — предыдущее подтверждение
-
-- Standalone **85 PASS**, fmt/rustfmt/clippy `-D warnings` и Python **10 PASS**,
-  target/tool-checks-final.log. Native **105 PASS**, target/tool-native-tests-final.json.
-  Проверены capacities 4032/16128 для одного типа, 27 component variants у Color,
-  blacklist before void, old-content extraction, source recipe first-match,
-  реальные Ingredient/tag lookups, known conditions и отказ при unknown/not.
-- Codec tests проверяют required admission context, nonempty tool nesting,
-  private stored_energy retention, roundtrip и zero-count handler rejection.
-  Tool CellLayout задаёт source bytes/type/drain явно; внутренний Tier marker
-  используется только для codec identity, не показывается как свойство tool.
-- **2000 tool traces / 572000 операций PASS**, docs/tool-cell-oracle.json.
-  Компилируются unchanged BasicCellInventory/CellState; profiles и callback
-  blacklist — stubs. Сверяется настоящий restricted Rust backend. Actual Java
-  tool admission methods, world/recipe ordering/reload этим oracle не проверены.
-  Basic/portable regression с новым wrapper: ещё 572000 PASS.
-- Native build/check PASS: target/tool-native-build.json,
-  target/tool-native-check-final.json. Ранний compiler error выявил Arc<Value>
-  у CustomRecipe.json; adapter использует настоящий object view, pins сохранены.
-- World smoke PASS: target/smoke/drive-tools-yj8oapg3, отчёт docs/tool-world-smoke.json.
-  Matter Cannon с 123 iron nuggets + Color Applicator с 1000 red dye,
-  собственная энергия каждого 1234 AE, original inv/Items, front/offline и restart.
-  Точный расход Drive/channel + оба tools — **3.015625 AE/tick**. Полные world
-  terminal admission/transfer ещё не проверены; соответствующие фильтры — core/native tests.
-- В Drive теперь 23 встроенных handlers. Handheld charge/use/shoot/paint,
-  dynamic render/API, reload invalidation, unknown addon conditions/class handlers
-  и RecipeManager ordering ties остаются открытыми. Source inventory:
-  **59 partial / 1370 pending**, complete нет. Свои test processes завершены.
-
-## Общие теги платформы — предыдущая проверка
-
-- Generated c tags берутся из чистого pinned NeoForge checkout 863802b6dfdb1d5e48c2fda093ed9d01df0f4cd9.
-  Version mapping: official 21.1.169 changelog → PR 2245 → merge commit;
-  ссылки и точный pin в upstream.lock.json/NOTICE.md. AE2/engine pins сохранены.
-- **461 tags**: 241 item, 115 block, 12 fluid, 82 worldgen, 6 enchantment,
-  5 entity_type. 15 совпадающих путей AE2 накладываются поверх platform layer;
-  explicit replace сохраняется. Старые три ручных списка удалены.
-  Source SHA-256 каждого файла и лицензия: docs/platform-tags-report.json;
-  LGPL-2.1 text присутствует в content/data/ae2/licenses/neoforge-lgpl-2.1.txt.
-- Standalone **81 PASS**, fmt/clippy и Python **10 PASS**. Новые tests проверяют
-  overlay/replace, optional entries/order, provenance/licence и отказ при dirty
-  platform checkout без замены предыдущего generated output.
-  Полный лог target/platform-checks-final.log.
-- Content prepare/build/check PASS: target/platform-content-final.log,
-  target/platform-content-build-final.log, target/platform-content-check-final.json.
-  File name лицензии приведено к lowercase для native package path contract.
-  Native check PASS: target/platform-native-check.json. Rust runtime не менялся;
-  прежние **97 native binary + 5 native library** tests относятся к тому же коду.
-- Real world smoke PASS: target/smoke/platform-tags-kwyjn5mu, копия отчёта
-  docs/platform-tags-world-smoke.json. Через настоящие `/execute if/unless items`
-  проверены семь item tags, включая original AE2 ender_dust: **14 positive /
-  14 negative** checks до/после restart. Свои процессы завершены.
-- Это проверка common tag data и native layering. Membership всех тегов/registry,
-  NeoForge API/events/recipe condition semantics и all survival crafting остаются
-  открытыми. Source inventory: 57 partial / 1372 pending, complete нет.
-
-## Creative storage backend — предыдущая проверка
-
-- Standalone **81 PASS**, fmt/rustfmt/clippy `-D warnings` и Python **8 PASS**,
-  target/creative-checks-final.log. Native **97 PASS**,
-  target/creative-native-tests-final.json. Общий backend enum сохраняет прежние
-  finite правила и добавляет creative configured-key storage.
-- CreativeCellInventory.java и CellState.java компилируются неизменёнными:
-  **2000 traces / 572000 операций PASS**, docs/creative-cell-oracle.json.
-  Проверяются simulate/commit insert/extract, per-key listing cap Integer.MAX_VALUE,
-  preferred, nested/empty rules, TYPES_FULL, zero drain и reopen. Key/config
-  infrastructure stubbed; hash iteration, actual component codecs и UI не проверены.
-- BasicCellInventory повторно сверён с исходным CellState: ещё **572000 PASS**,
-  docs/cells-oracle.json. Native тесты также проверяют component codec, первые
-  63 nullable config slots/лишние entries, empty nesting, реальный Network/StorageService
-  mount, извлечение 10^12, zero disk drain, packed status и offline unmount.
-- Native build и check PASS: target/creative-native-build.json,
-  target/creative-native-check-final.json. Warnings про unused API и strip toolchain
-  остаются; engine/source pins сохранены.
-- World smoke PASS: target/smoke/drive-creative-djhqrho5, отчёт
-  docs/creative-world-smoke.json. В slot 0 — mixed iron/water config, в slot 9 —
-  пустая creative cell; общий Drive/channel drain **2.015625 AE/tick**, без disk
-  overhead. Config, offline и restart сохранены. Этот smoke не извлекает ресурсы
-  через ещё отсутствующий terminal; mount/extract подтверждает native test выше.
-- Portable regression на новом enum: PASS, target/smoke/drive-portable-fi8or0cv.
-  Exact drain, содержимое, private energy и restart сохранились.
-- Source inventory: **57 partial / 1372 pending**, complete нет. Creative tooltip
-  image/shift list, Workbench/config writer, descriptions и полный handler/item API
-  остаются открытыми. Тестовые клиенты завершены.
-
-## Portable storage backend и original cell oracle — предыдущая проверка
-
-- Standalone **78 PASS**, fmt/rustfmt/clippy `-D warnings` и Python **8 PASS**;
-  target/portable-checks-final.log. Native **91 PASS**, target/portable-native-tests.json.
-  Новые тесты покрывают все десять portable profiles, половину bytes, сохранённый
-  overhead, item limits 54/45/36/27/18, fluid 18 и 0.5 AE/tick; codec сохраняет
-  stored_energy/energy_capacity и отклоняет подмену basic/portable identity.
-- **2000 Java traces / 572000 операций PASS**, zero mismatches:
-  docs/cells-oracle.json. BasicCellInventory.java копируется и компилируется
-  неизменённым; infrastructure, exact partition matcher и cell descriptors stubbed.
-  Сверяются insert/extract simulate/commit, byte/type metadata, every-key counts,
-  exact whitelist/inverter/distribution/void, nested/blacklist callbacks и reopen.
-  Actual fuzzy matcher, Minecraft component/upgrade validation и world/NeoForge
-  этим oracle не проверяются. Profile source hashes включены отдельно.
-- Native build PASS: target/portable-native-build.json; native check:
-  target/portable-native-check-final.json. Engine pin сохранён.
-- World smoke PASS: target/smoke/drive-portable-6xwx3vus, копия отчёта
-  docs/portable-world-smoke.json. Portable item 256k + fluid 1k в slots 0/9
-  потребляют вместе с Drive/channel ровно **3.015625 AE/tick**; проверены front
-  isolation, offline/restart и содержимое 123 iron/1000 water. После restart тот
-  же расход. Все значения stored_energy у обоих дисков (inv и Items mirror)
-  во всех трёх записанных состояниях проверены отдельно: ровно 1234 AE.
-- Перенесён storage backend и capacity tooltip. Handheld terminal/menu,
-  зарядка/применение/разборка, energy tooltip и color/LED не объявляются готовыми.
-  Source inventory: **54 partial / 1375 pending**, complete нет.
-- Basic-cell regression на новом клиенте: PASS, target/smoke/drive-317pf1x_.
-  Exact basic idle costs, original inv, front/offline и restart сохранены.
-
-## Drive automation — предыдущая проверка
-
-- Native **87 PASS**: два новых теста проверяют настоящий используемый insert
-  helper, component identity, stacked remainder, occupied/rejected/zero inputs.
-  Отчёт target/drive-automation-native-tests.json. Standalone **76 + 8 Python** PASS.
-- Native build PASS: target/drive-automation-native-build.json. Final native
-  check — target/drive-automation-native-check-final.json.
-- Game smoke PASS: target/smoke/drive-automation-0pywd8ek, копия отчёта
-  docs/drive-automation-smoke.json. Настоящие hoppers покрывают up + четыре
-  горизонтальные стороны, dropper — нижнюю сторону. Front ME исключён только
-  для сети: item insertion там разрешён, как в AEBaseInvBlockEntity.
-- Stone отвергается; offline insert/extract сохраняет cell component с 123 iron.
-  Неудачный pull в hopper с пятью несовместимыми стеками возвращает тот же диск.
-  Стек из шести cells заполняет пять свободных слотов по одной штуке и оставляет
-  одну в источнике: десять физических slots и скрытый transport padding соблюдены.
-  Full Drive и remainder пережили restart. Свои процессы smoke закрывает.
-- Повторный GUI smoke после automation hooks: PASS,
-  target/smoke/drive-gui-jb_ak94l; Drive shift/filter, vanilla barrel и restart.
-- Перед slot mutation — flush живых ячеек, container changed сразу обновляет
-  mounts. World mutation через terminal и dirty backend ещё не проверяется этим
-  smoke: терминал не реализован. General external capability/симуляция и Create
-  integration, all chunk/drop paths остаются открытыми.
-
-## Drive GUI — предыдущая проверка
-
-- Standalone: **76 PASS**, fmt/rustfmt/clippy `-D warnings` PASS, Python **8 PASS**,
-  inventory **51 partial / 1378 pending**, complete нет. Лог target/drive-gui-final-checks.log.
-- Native binary tests: **85 PASS**, target/drive-gui-native-tests.json.
-  Native library tests: **5 PASS**, target/drive-gui-library-second.json;
-  три из них вызывают настоящий server menu click engine с реальным Items catalog.
-  Проверены reject/cap=1, drag, hotbar swap, forward shift order, hidden padding
-  и actor/window metadata isolation; ни один resource test не пропущен.
-- Native build PASS: target/drive-gui-native-build.json; final check:
-  target/drive-gui-native-check-final.json. Ранее при планировании выявлены
-  ограничения HEAD/RETURN для функций с closures и syntactic helper result types;
-  новая интеграция использует поддерживаемые HEAD hooks, engine pin не менялся.
-- Game GUI smoke PASS: target/smoke/drive-gui-4o68o5bf, копия отчёта
-  docs/drive-gui-smoke.json. Original drive.png осмотрен на screenshot:
-  176x201, два столбца/пять строк, правильное положение inventory и текста.
-  Проверены pickup/shift, отказ stone, порядок main inventory перед hotbar,
-  сохранение предметов и restart; следующая vanilla barrel сохраняет свои правила.
-- Повторный backend smoke на клиенте с GUI: PASS,
-  target/smoke/drive-kvmdpegz. Exact idle costs, original inv.item0/item9,
-  counts 123/1000, front isolation и restart снова прошли.
-- Не закрыты: priority button/subscreen, ghost icons, специальные bulk actions
-  AEBaseMenu, external multiplayer, hopper access и runtime chassis/LED renderer.
-  GUI принимает все 23 исходных built-in типа ячеек; storage backend подключает
-  только десять basic item/fluid cells. Native warnings о неиспользованных API
-  и toolchain strip warning остаются видимыми. Тестовые процессы завершены.
-
-## StorageService и Drive backend — предыдущая проверка
-
-- Standalone: **74 PASS**, fmt/clippy с `-D warnings` и Python **8 PASS**.
-- Native: **85 PASS**, в том числе полное подключение mounts/service/drive,
-  original inv codec, offline/online remount, network merge/split и отсутствие
-  mounts в отброшенном сервисе при сохранённом external capability handle.
-  Отчёт `target/drive-native-tests-integration.json`.
-- Native build PASS: `target/drive-native-build.json`. Check актуального дерева:
-  `target/drive-native-check-final.json`; лог standalone: target/drive-final-checks.log.
-- Drive world smoke PASS: `target/smoke/drive-5dq1vz2t/result.json`, копия
-  отчёта docs/drive-world-smoke.json. Точный расход за 26 тиков:
-  empty — 52.40625 AE (2 + 2/128 за тик); item 1k + fluid 4k — 91.40625 AE
-  (2 + 0.5 + 1 + 2/128). После restart повторяется тот же расход.
-- Исходный inv.item0/item9 загружен и сохранён, количества 123 iron и 1000
-  water сохранены. Front не подключается, отключение не стирает диски.
-  Первый smoke ошибочно был запущен до окончания build и закономерно не увидел
-  новый backend; он завершился, повторный запуск выполнен после cargo_exit=0.
-- Видимая housing использует исходный drive_base. Screenshot осмотрен:
-  runtime chassis/LEDs ещё отсутствуют. Меню не открывается; GUI, terminal
-  transfers, filtered automation, полный chunk/drop/multiplayer ещё не проверены.
-- StorageService cache/watchers имеют Rust-проверки, но пока не Java oracle.
-  Java storage oracle ниже относится только к NetworkStorage.
-- Source inventory: 1429 файлов, **46 partial / 1383 pending**, complete нет.
-- Charger power regression после новой Dimension/Drive интеграции: PASS,
-  `target/smoke/power-wkijuezf`; finite/creative/front/restart снова проверены.
-  Content build: target/drive-content-build.log. Все тестовые клиенты завершены.
-
-## Энергосервис и full-block world adapter — предыдущая проверка
-
-- Standalone: **63 PASS**, clippy с `-D warnings` PASS, fmt PASS.
-- Native: **64 PASS**, check/build PASS. Отчёты:
-  `target/energy-native-tests.json`, `target/energy-native-build.json`.
-- Python: **8 PASS**; source inventory: 1429 файлов, 40 partial/1389 pending,
-  полностью закрытых классов нет.
-- `tools/smoke_power.py`: PASS, `target/smoke/power-6r_xgmd1/result.json`.
-  Finite cell 2000 AE завершает charged crystal и оставляет суммарно 400 AE;
-  front Charger не соединяется; creative питает без crank. Save/restart
-  сохраняет 1600 AE Charger + 400 AE finite cell, затем рецепт расходует 1600.
-- Повторный `tools/smoke.py` (ручной crank): PASS,
-  `target/smoke/charger-1ta7ucsr`. Тестовые клиенты завершены.
-- Контент пересоздан с original normal/dense recipes, actual hmod build PASS,
-  лог `target/power-content-build.log`. Static fullness пока 0.
-- В новом адаптере изменение NBT/блоков внутри тика учитывается перед записью.
-  Неизменённый NBT не восстанавливает извлечённую за этот тик энергию.
-- Java energy oracle: single-grid **1000 traces / 202028 операций PASS**,
-  overlay **1000 traces / 260147 операций PASS**. EnergyService,
-  EnergyOverlayGrid, GridEnergyStorage и StoredEnergyAmount компилируются
-  без изменений из pinned source; game/event/collection infrastructure stubbed.
-  Хэши и область: docs/energy-oracle.json, docs/energy-overlay-oracle.json.
-  Выявлен и исправлен сброс генератора отдельного overlay при чужом link change;
-  удаление активного генератора очищает его до следующего start tick.
-- NetworkStorage: **2000 Java traces / 410882 операции PASS**, точное сравнение
-  целых чисел после каждой операции. Сверены priorities, preferred passes,
-  duplicate mounts, callback queues, self-recursion, listing delay. Host bins
-  и key/counter infrastructure — заглушки; cells/provider lifecycle/security
-  и world Drive этим oracle не проверяются. Отчёт: docs/mounts-oracle.json.
-- Native test/build относятся к фактически подключённым модулям. mounts.rs
-  пока не входит в native manifest и проверен standalone/oracle.
-  Лог актуальных standalone проверок: target/mounts-final-checks.log.
-  Full lifecycle, chunk/dimension/multiplayer, все остальные nodes, addon stores
-  и client visuals перечислены в PARITY как незавершённые.
-
-Воспроизведение: `source target/local-env.sh`, затем Python 3.12
-`tools/check.py`, `tools/horizon.py test` и `tools/smoke_power.py --ctl
-"$HORIZON_CTL" --resources "$HORIZON_RESOURCES"`.
-
-## Предыдущий слой: ключи, ячейки и ME-pathing — история
-
-- Standalone core: **38 тестов**, включая 11 topology/pathing tests,
-  component-aware keys, signed counters, restore и fuzzy partitions.
-- Native adapter: **29 тестов PASS**; `tools/horizon.py test` проверяет codec в настоящем Horizon,
-  включая NBT Byte/Int, unknown component tags, большие signed количества,
-  nested-cell restriction и атомарный отказ от повреждённых данных.
-  Итоговые числа и полный stdout — `target/horizon-test.log`.
-- Native `check` и `build`: PASS. Новые compiler warnings относятся к ещё
-  неиспользуемым методам API до подключения Drive/энергосети; warnings не скрыты.
-- Original-Java oracle: **2000/2000 совпадений**, ноль расхождений в totals и
-  на каждом node/connection. Оригинальный `PathingCalculation.java` компилируется
-  без изменений; pathing-методы GridNode/GridConnection извлекаются из pinned
-  source. Отчёт с hash исходников: `docs/pathing-oracle.json`.
-- Oracle не запускает Minecraft/NeoForge: infrastructure/services заменены
-  заглушками. Это rule-level evidence только для связных controller-online
-  графов с одинаковым порядком входных узлов и связей. Ad-hoc/conflict/long chains
-  покрыты Rust-тестами, не этим Java oracle.
-- Повторный игровой smoke на новом клиенте: PASS; свежие логи
-  `target/smoke/charger-5i2a_704/`. Tooltip hook компилируется, но визуальная
-  проверка hover/цветов/локализаций в окне ещё не выполнена.
-- Python tooling tests: 8 PASS. Полный реестр: 1429 файлов, 33 partial,
-  1396 pending; законченных классов по-прежнему нет.
-
-Воспроизведение:
+## Reproduction
 
 ```sh
 python3.12 tools/check.py
+python3.12 tools/horizon.py check
 python3.12 tools/horizon.py test
-python3.12 tools/pathing_oracle.py --java-home /path/to/jdk21 --cases 2000
+python3.12 tools/horizon.py test --library
+python3.12 tools/horizon.py build
+python3.12 tools/cable_render_oracle.py --java-home /path/to/jdk21
 ```
 
-JDK в этой сессии: установленный Homebrew OpenJDK 21.0.12.1; системные Java/Rust
-не устанавливались и не перенастраивались. Для engine check/build используются
-собственные pinned checkout в target/upstream.
+Smoke tools require prepared game resources, horizon-ctl and a built client;
+see README.md and each tool's --help. They use owned isolated target directories
+and close their own processes. Native packages are rebuilt after tests, checked
+with the real package validator, and compared byte-for-byte with committed source.
+Game assets/jars/exports/binaries/worlds are excluded from Git.
 
-## Первый игровой срез — история проверок
+## Recorded report index
 
-| Проверка | Результат |
-|---|---|
-| `tools/check.py`: cargo fmt, rustfmt всех injected файлов, clippy `-D warnings`, unit tests, Python regression tests, inventory check | PASS: 18 Rust + 8 Python tests |
-| Случайная последовательность insert/extract | 10 000 операций, проверка сохранения количества, лимита типов и байтов на каждом шаге |
-| Jar AE2 19.2.18 | Modrinth KDnFUmMm, размер 8236552, SHA-512 соответствует upstream.lock.json |
-| Source inventory | 1429 Java-файлов с SHA-256; 11 partial, 1418 pending; ни один класс не объявлен полностью готовым |
-| `horizon-port-pack check` | PASS; ограничения carry сохранены в docs/baseline-port-pack.json |
-| Подготовка из jar + prepared 26.3 | PASS; рецепты Charger/Crank восстановлены, subfolder IDs remap записан, коллизии проверяются |
-| `cargo-horizon-mod build` контента и `check ae2.hmod` | PASS, registries API 0.2 |
-| `tools/horizon.py check` | PASS, native Charger/Crank adapter компилируется в самом Horizon; compiler warnings отсутствуют |
-| `tools/horizon.py build` | PASS, fast profile, запускаемый arm64-клиент |
-| Source-only `ae2-0.1.0.hnmod` | PASS: два запуска packager дают идентичные bytes; реальный Horizon package checker принимает архив, exact pins совпадают |
-| Одновременный mixin plan с horizon-create | PASS: 20 injections, 8 modules; только планирование, не совместная игровая проверка |
-| `tools/smoke.py` | PASS: новый изолированный мир, полный цикл Charger/Crank, извлечение, перезапуск, slot + ненулевые AE сохранены |
+Machine-readable reports preserve detailed historical evidence after the English
+consolidation of this document. PASS below reflects an explicit report flag;
+Recorded means an audit/metadata/report whose scope must be read directly.
 
-В `fast` build были предупреждения **toolchain**: `rust-objcopy` не смог удалить
-debug info, потому что установленная копия инструмента не находит libLLVM.dylib.
-Cargo завершился с кодом 0, клиент запустился и прошёл игровые проверки. Системный
-Rust/LLVM не менялся. Это не основание заявлять «build без предупреждений».
-
-## Наблюдалось в игре (первый этап)
-
-Запуск offscreen на Apple M5/Metal, отдельные `game-dir` и `HORIZON_HOME` под
-target; никакие пользовательские миры/options не использовались.
-
-1. Из двух certus quartz crystals ровно один вставляется по клику в Charger;
-   второй остаётся у игрока. Реальный slot содержит count 1.
-2. Wooden Crank над Charger: после первого завершённого оборота NBT содержит
-   160.0 AE, после девятого — 1440.0. После десятого начинается recipe work.
-3. Slot становится `ae2:charged_certus_quartz_crystal`, count 1; энергия — 0.0.
-   Нет выдачи предмета в обход рецепта: результат найден в таблице `ae2:charger`.
-4. Пустая рука извлекает предмет как item entity перед машиной; slot пуст.
-5. После вставки второго обычного кристалла и одного оборота: slot raw crystal,
-   энергия 160.0. Save → exit → новый процесс клиента: оба значения сохранены.
-6. Дополнительная ручная проверка: заряженный кристалл в slot пережил отдельный
-   restart; crank rotation/charge/hits отсутствуют в сохранённом NBT, как в Java.
-
-Воспроизводимый сценарий:
-
-```sh
-python3.12 tools/smoke.py --ctl /path/to/horizon-ctl --resources /path/to/prepared/26.3
-```
-
-Успешный запуск этой сессии: `target/smoke/charger-0i9l4qgu/` — result.json,
-commands.json, два игровых лога и charger.png. Ручные пробы — `target/run/`.
-Каждый запуск smoke создаёт новый каталог и завершает свои процессы.
-Контрольные логи сборки: target/horizon-check.log, target/horizon-build.log.
-
-Не проверены: полный world-level Java/NeoForge oracle, launcher install/rebuild, LAN/dedicated с
-вторым игроком, полный совместный запуск с Create, automation/capabilities,
-survival progression, chunk unload/dimensions, статистика/FX/анимации. Ядра
-storage/energy протестированы отдельно и ещё не подключены к ME-предметам/сети.
-Конкретные расхождения остаются в docs/PARITY.md.
+| Report | Status | Selected measurements |
+| --- | --- | --- |
+| [baseline-port-pack.json](docs/baseline-port-pack.json) | Recorded | See report scope and limits |
+| [cable-bus-nbt-power-regression.json](docs/cable-bus-nbt-power-regression.json) | PASS | See report scope and limits |
+| [cable-controller-regression.json](docs/cable-controller-regression.json) | PASS | checks: 14 |
+| [cable-oracle.json](docs/cable-oracle.json) | PASS | cases: 278,956 |
+| [cable-render-oracle.json](docs/cable-render-oracle.json) | PASS | cases: 24,405; quads: 467,940; float_fields: 9,358,800 |
+| [cells-oracle.json](docs/cells-oracle.json) | PASS | cases: 2,000; operations: 572,000 |
+| [charger-automation-drive-regression.json](docs/charger-automation-drive-regression.json) | PASS | See report scope and limits |
+| [charger-automation-world-smoke.json](docs/charger-automation-world-smoke.json) | PASS | checks: 8 |
+| [charger-inventory-charging-regression.json](docs/charger-inventory-charging-regression.json) | PASS | checks: 7 |
+| [charger-inventory-world-smoke.json](docs/charger-inventory-world-smoke.json) | PASS | checks: 5 |
+| [charger-oracle.json](docs/charger-oracle.json) | PASS | cases: 2,000; operations: 200,000 |
+| [component-sync-charging-world.json](docs/component-sync-charging-world.json) | PASS | checks: 7 |
+| [component-sync-drive-gui.json](docs/component-sync-drive-gui.json) | PASS | See report scope and limits |
+| [controller-charging-regression.json](docs/controller-charging-regression.json) | PASS | checks: 7 |
+| [controller-drive-gui-regression.json](docs/controller-drive-gui-regression.json) | PASS | See report scope and limits |
+| [controller-visual-oracle.json](docs/controller-visual-oracle.json) | PASS | cases: 4,000; top_level_method_comparisons: 8,000 |
+| [controller-world-smoke.json](docs/controller-world-smoke.json) | PASS | checks: 14 |
+| [creative-cell-oracle.json](docs/creative-cell-oracle.json) | PASS | cases: 2,000; operations: 572,000 |
+| [creative-world-smoke.json](docs/creative-world-smoke.json) | PASS | See report scope and limits |
+| [drive-automation-smoke.json](docs/drive-automation-smoke.json) | PASS | See report scope and limits |
+| [drive-gui-smoke.json](docs/drive-gui-smoke.json) | PASS | See report scope and limits |
+| [drive-inventory-world-smoke.json](docs/drive-inventory-world-smoke.json) | PASS | See report scope and limits |
+| [drive-world-smoke.json](docs/drive-world-smoke.json) | PASS | See report scope and limits |
+| [energy-cell-charging-regression.json](docs/energy-cell-charging-regression.json) | PASS | checks: 7 |
+| [energy-cell-item-base-regression.json](docs/energy-cell-item-base-regression.json) | PASS | cases: 2,000; operations: 400,000 |
+| [energy-cell-item-charging-regression.json](docs/energy-cell-item-charging-regression.json) | PASS | checks: 7 |
+| [energy-cell-item-oracle.json](docs/energy-cell-item-oracle.json) | PASS | operations: 100,000 |
+| [energy-cell-item-world-smoke.json](docs/energy-cell-item-world-smoke.json) | PASS | checks: 13 |
+| [energy-cell-visual-oracle.json](docs/energy-cell-visual-oracle.json) | PASS | cases: 100,000; top_level_method_comparisons: 200,000 |
+| [energy-cell-world-smoke.json](docs/energy-cell-world-smoke.json) | PASS | checks: 40 |
+| [energy-oracle.json](docs/energy-oracle.json) | PASS | cases: 1,000; operations: 202,028 |
+| [energy-overlay-oracle.json](docs/energy-overlay-oracle.json) | PASS | cases: 1,000; operations: 260,147 |
+| [inventory-signal-source-audit.json](docs/inventory-signal-source-audit.json) | Recorded | See report scope and limits |
+| [inventory-signal-world-smoke.json](docs/inventory-signal-world-smoke.json) | PASS | See report scope and limits |
+| [item-bars-world-smoke.json](docs/item-bars-world-smoke.json) | PASS | See report scope and limits |
+| [item-charging-world-smoke.json](docs/item-charging-world-smoke.json) | PASS | checks: 7 |
+| [item-energy-oracle.json](docs/item-energy-oracle.json) | PASS | cases: 2,000; operations: 400,000 |
+| [item-energy-view-oracle.json](docs/item-energy-view-oracle.json) | PASS | cases: 2,000; operations: 400,000 |
+| [item-stack-charger-regression.json](docs/item-stack-charger-regression.json) | PASS | checks: 8 |
+| [item-stack-drive-gui-regression.json](docs/item-stack-drive-gui-regression.json) | PASS | See report scope and limits |
+| [item-stack-source-audit.json](docs/item-stack-source-audit.json) | Recorded | See report scope and limits |
+| [item-stack-world-smoke.json](docs/item-stack-world-smoke.json) | PASS | See report scope and limits |
+| [mounts-oracle.json](docs/mounts-oracle.json) | PASS | cases: 2,000; operations: 410,882 |
+| [node-data-oracle.json](docs/node-data-oracle.json) | PASS | cases: 20,064 |
+| [pathing-oracle.json](docs/pathing-oracle.json) | PASS | cases: 2,000 |
+| [platform-tags-report.json](docs/platform-tags-report.json) | Recorded | See report scope and limits |
+| [platform-tags-world-smoke.json](docs/platform-tags-world-smoke.json) | PASS | checks: 7 |
+| [portable-world-smoke.json](docs/portable-world-smoke.json) | PASS | See report scope and limits |
+| [shared-codec-charger-regression.json](docs/shared-codec-charger-regression.json) | PASS | checks: 5 |
+| [shared-codec-gui-regression.json](docs/shared-codec-gui-regression.json) | PASS | See report scope and limits |
+| [tool-cell-oracle.json](docs/tool-cell-oracle.json) | PASS | cases: 2,000; operations: 572,000 |
+| [tool-world-smoke.json](docs/tool-world-smoke.json) | PASS | See report scope and limits |
+| [upgrade-world-smoke.json](docs/upgrade-world-smoke.json) | PASS | See report scope and limits |

@@ -445,6 +445,31 @@ impl Network {
             .and_then(|s| self.energy.service(s))
             .is_some_and(EnergyService::is_powered)
     }
+    pub fn cable_visual(&self, pos: Pos) -> Option<super::ae2_cable::VisualState> {
+        let node = self.nodes.get(&pos)?;
+        let Kind::Cable(cable) = node.snapshot.kind else {
+            return None;
+        };
+        let grid_node = self.graph.node(node.id)?;
+        let mut state = super::ae2_cable::VisualState::default();
+        for id in grid_node.connections() {
+            let connection = self.graph.connection(*id)?;
+            if let Some(side) = connection.direction(node.id) {
+                state.connections |= 1 << side as u8;
+                state.channels[side as usize] = if self.is_powered(pos) {
+                    i32::from(cable.kind.visual_channels(
+                        connection.used_channels() as i32,
+                        grid_node.max_channels(ChannelMode::Default) as i32,
+                        ChannelMode::Default,
+                        true,
+                    ))
+                } else {
+                    0
+                };
+            }
+        }
+        Some(state)
+    }
     pub fn node_service(&self, pos: Pos) -> Option<(ServiceId, NodeId)> {
         let node = self.nodes.get(&pos)?;
         Some((node.service?, node.id))

@@ -721,3 +721,123 @@ bindings = [
   { name = "view", ty = "&crate::game::machines::View", value = "view" },
   { name = "slot", ty = "usize", value = "slot" },
 ]
+
+
+[[module]]
+id = "cable-native-grid"
+file = "crates/horizon-client-render/src/lib.rs"
+name = "ae2_grid"
+source = "grid.rs"
+
+[[module]]
+id = "cable-native-cable"
+file = "crates/horizon-client-render/src/lib.rs"
+name = "ae2_cable"
+source = "cable.rs"
+
+[[module]]
+id = "cable-native-cube_builder"
+file = "crates/horizon-client-render/src/lib.rs"
+name = "ae2_cube_builder"
+source = "cube_builder.rs"
+
+[[module]]
+id = "cable-native-cable_render"
+file = "crates/horizon-client-render/src/lib.rs"
+name = "ae2_cable_render"
+source = "cable_render.rs"
+
+[[module]]
+id = "cable-native-cable_view"
+file = "crates/horizon-client-render/src/lib.rs"
+name = "ae2_cable_view"
+source = "cable_view.rs"
+visibility = "pub"
+
+[[injection]]
+id = "cable-world-geometry"
+kind = "HEAD"
+target = "horizon_client::game::Game<'_>::entity_geometry"
+helper = "cable_geometry_hook.rs"
+bindings = [
+ {name="game",ty="&mut crate::game::Game<'_>",value="&mut *self"},
+ {name="camera",ty="glam::DVec3",value="camera"},
+ {name="out",ty="&mut Vec<horizon_client::mesher::Vertex>",value="&mut out"},
+]
+[[injection]]
+id = "cable-outline"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::Game<'_>::outline_boxes"
+helper = "cable_outline_hook.rs"
+bindings = [
+ {name="game",ty="&crate::game::Game<'_>",value="&*self"},
+ {name="pos",ty="[i32;3]",value="pos"},
+]
+[[injection]]
+id = "cable-collision"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client_render::collisions::<SceneCollisions<'_,'_> as BlockCollisionWorld>::context_shape"
+helper = "cable_collision_hook.rs"
+bindings = [
+ {name="scene",ty="&crate::collisions::SceneCollisions<'_, '_>",value="&*self"},
+ {name="pos",ty="horizon_core::position::BlockPos",value="p"},
+]
+[[injection]]
+id = "cable-piston-shape"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client_render::collisions::<SceneCollisions<'_,'_> as PistonCollisionWorld>::collision_shape"
+helper = "cable_piston_shape_hook.rs"
+bindings = [
+ {name="scene",ty="&crate::collisions::SceneCollisions<'_, '_>",value="&*self"},
+ {name="pos",ty="[i32;3]",value="p"},
+]
+
+[[injection]]
+id = "cable-atlas-sources"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client_render::atlas_sources::atlases"
+helper = "cable_atlas_hook.rs"
+bindings = [{name="root",ty="&Path",value="root"}]
+
+[[module]]
+id = "cable-sync"
+file = "crates/horizon-client/src/lib.rs"
+name = "ae2_cable_sync"
+source = "cable_sync.rs"
+visibility = "pub"
+
+[[injection]]
+id = "cable-entity-type"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::lan::chunks::block_entity_type"
+helper = "cable_entity_type_hook.rs"
+bindings = [{name="name",ty="&str",value="name"}]
+
+[[injection]]
+id = "cable-entity-tag"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::lan::chunks::entity_tag"
+helper = "cable_entity_tag_hook.rs"
+bindings = [{name="entity",ty="&BlockEntity",value="entity"}]
+
+[[injection]]
+id = "cable-for-block"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::remote::Game<'_>::sync_block_entity"
+helper = "cable_for_block_hook.rs"
+bindings = [{name="game",ty="&mut crate::game::Game<'_>",value="&mut *self"}, {name="pos",ty="(i32,i32,i32)",value="pos"}, {name="state",ty="horizon_world::registry::BlockStateId",value="state"}]
+
+[[injection]]
+id = "cable-decode"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::remote::Game<'_>::remote_block_entity_data"
+helper = "cable_decode_hook.rs"
+bindings = [{name="game",ty="&mut crate::game::Game<'_>",value="&mut *self"}, {name="pos",ty="[i32;3]",value="pos"}, {name="kind",ty="i32",value="kind"}, {name="tag",ty="&Tag",value="tag"}]

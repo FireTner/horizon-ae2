@@ -14,6 +14,7 @@ SOURCE = ROOT / "target/upstream/ae2"
 
 # A partial implementation never marks a whole Java class as ported.
 PARTIAL = {
+    "block/networking/CableBusBlock.java": ("mixins/ae2/block_states.rs", "source 32 light/waterlogged states and center-only native render/outline/contextual collision; survival placement/drop, all direct queries/fluid/part lifecycle pending"),
     "client/render/cablebus/CubeBuilder.java": ("mixins/ae2/cube_builder.rs", "all cube/quad UV/flip/rotation/color/fullbright geometry; native packed vertices/normals/AO/GPU integration pending"),
     "client/render/cablebus/CableBuilder.java": ("mixins/ae2/cable_render.rs", "five-type core/straight/connection/constrained geometry, sprite/channel selection and source color state; native atlas/GPU/world integration pending"),
     "client/render/cablebus/CableCoreType.java": ("mixins/ae2/cable_render.rs", "source core mapping and 17 texture color suffixes; native renderer/atlas registration pending"),

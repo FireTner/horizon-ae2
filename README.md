@@ -1,241 +1,157 @@
-# Applied Energistics 2 для Horizon
+# Applied Energistics 2 for Horizon
 
-Полное портирование [Applied Energistics 2](https://github.com/AppliedEnergistics/Applied-Energistics-2)
-на Minecraft Horizon. Цель — поведение, предметы, интерфейсы, графика и сохранения
-**1:1 с выбранной версией AE2**. Это начало переноса; полноценной ME-сети пока нет.
+A native Rust port of [Applied Energistics 2](https://github.com/AppliedEnergistics/Applied-Energistics-2)
+for Minecraft Horizon. The goal is full 1:1 behavior, content, interfaces,
+rendering, persistence, and networking with the pinned AE2 release.
+The full port is in progress.
 
-Эталон: **AE2 19.2.18, NeoForge, Minecraft 1.21.1**, тег `neoforge/v19.2.18`,
-коммит `db17504a86128fdf3dae31f5fb7a112a646e0b93`. Выбрана та же ветка Minecraft,
-что и в соседнем horizon-create. Horizon: **26.3**, коммит `aa27eca`; mixins:
-`3f99a5c`. Переход на другую версию оригинала — отдельное явное решение.
+The GitHub repository is named `ae2-create`; the mod ID is `ae2`. This project
+ports AE2 to Horizon and does not require Create.
 
-Используется тот же подход, что в horizon-create: Java служит спецификацией,
-правила переписываются на Rust, native mixins подключают их к закреплённой
-копии движка, ресурсы подготавливаются из оригинального jar. JVM не нужна.
+## Pinned versions
 
-Что уже написано:
+| Component | Version / revision |
+| --- | --- |
+| AE2 | 19.2.18, NeoForge, Minecraft 1.21.1 |
+| AE2 source | `db17504a86128fdf3dae31f5fb7a112a646e0b93`, `neoforge/v19.2.18` |
+| Horizon | 26.3, `aa27eca326db26e999d4e59d7899576016764b1e` |
+| horizon-mixins | `3f99a5c60dfa311cc365524c44ae2fd799bfa1de`, schema 6 |
+| NeoForge common tags | 21.1.169, `863802b6dfdb1d5e48c2fda093ed9d01df0f4cd9` |
 
-- Геометрия кабелей: source CubeBuilder/CableBuilder для всех пяти типов и
-  17 цветов, straight/core/internal/external connections, UV, vertex colors и
-  fullbright channel overlays. 24405 Java cases / 467940 quads совпали, включая
-  float bits. Это готовые правила построения геометрии; native GPU, world
-  render-state collection, attachments/facades и physical host ещё нужны.
-- Ядро CableBus: пять типов кабелей × 17 цветов, исходные flags, tint palette,
-  connection lengths, raw shape boxes, visual channels и cable payload; sparse
-  storage центра/шести частей/фасадов. Network binding принимает cable profiles,
-  учитывает цвета/закрытые грани и сохраняет node identity при перекраске.
-  Java oracle: 278956 случаев. Native adapter читает source cable.id/cable.gn
-  и сохраняет buffered energy с проверкой live snapshot; owner-only edits не
-  пересоздают node. Side/facade данные пока сохраняются raw; unsupported side
-  parts не активируют host. Physical registration/placement, registry codecs,
-  renderer и полный lifecycle ещё нужны; кабелей в игровом мире пока нет.
-- Предметы Energy/Dense Cell используют исходные fixed capacity/rates и threshold,
-  заряжаются в Charger; ёмкость и upgrades не подменяют их block profile. Item
-  models переключаются по исходным float fifths, без зелёного powered-item bar и
-  без изменения сохранённых компонентов. При установке/дропе переносится local
-  stored_energy; полные base settings/tooltip/capabilities и lifecycle ещё нужны.
-- Energy/Dense Cell используют исходные пять `fullness` states и модели,
-  отдельную double-формулу компаратора по локальному запасу энергии и отложенные
-  уведомления в ticking chunks. Creative Cell имеет одно состояние без analog
-  output. Item/drop energy components и полный TickManager lifecycle ещё нужны.
-- ME Controller подключён к сети: public 8000 AE, 3 AE/tick, исходные node flags,
-  многоблочная проверка, каналы и original NBT. Зарегистрированы все 18 state/type
-  состояний и исходные column/interior модели. 4000 сравнений визуальных правил
-  с Java и world power/shape/conflict/restart прошли. Network Status Menu,
-  external power capabilities и полный event/chunk/spatial lifecycle ещё нужны.
-- Компараторы Drive/Charger: source slot limit 1, реальные 10/1 slots,
-  исходная float32 арифметика, обновления от hopper/manual/GUI и restart.
-  Обычные контейнеры сохраняют native поведение. Другие AE2 comparator hosts
-  и полный Java/NeoForge world oracle ещё нужны.
-- Исходные размеры стопок предметов: 58 unstackable registrations с лимитом 1,
-  остальные 217 carried item definitions — 64. Сверка с pinned factories/builder
-  и проверка всех 58 через hopper, full destination, components/restart и inventory.
-  Остальные свойства и действия предметов продолжают переноситься.
-- Ядро обычных ячеек хранения всех пяти размеров: байты, типы, округление,
-  симуляция, извлечение, точные/fuzzy фильтры, inverter/equal distribution/void.
-  Добавлены компонентные item/fluid keys, GenericStack, signed KeyCounter и
-  native codec исходных компонентов ячеек. Tooltip использует реальные значения,
-  локализацию и цвета оригинала. **Drive backend и базовый экран подключены;
-  priority UI, специальные действия меню и терминал ещё не перенесены.**
-- `StoredEnergyAmount`, EnergyService и per-node buffer: приоритеты хранилищ,
-  симуляция, события, power delay, overlay/passive rules. В мире подключены
-  обычная/плотная/творческая energy cell, Charger, Drive и Controller. CableBus/QuartzFiber parts
-  и остальные устройства пока не подключены. Правила сервиса и overlay сверены
-  с Java: 2000 сценариев, 462175 операций, без расхождений.
-- Первый игровой срез Charger + Wooden Crank: один предмет, рецепт из
-  таблицы игры, энергия в NBT, оборот 18 тиков/160 AE, проверка раз в 10 тиков,
-  порог 1599 AE и завершение при randomFloat > 0.8. Charger получает до 800 AE
-  за doWork из настоящего сетевого сервиса и не подключается передней гранью.
-- Ядро ME-графа: топология, controller validation, ad-hoc, три очереди
-  pathfinding, bottlenecks, multiblock и compressed channels. На **2000 схемах**
-  значения всех узлов/соединений совпали с исполняемым оригинальным Java-кодом
-  при одинаковом порядке входных узлов/связей. World/power adapter подключает
-  шесть full-block kinds, включая Controller и Drive; CableBus и другие consumers ещё нужны.
-- Ядро `NetworkStorage`: приоритеты, два прохода вставки, очереди mount/unmount
-  и защита от рекурсии; 2000 сценариев / 410882 операции совпали с Java.
-  StorageService подключает десять дисков Drive, priority/online mounts,
-  ленивый кэш и подписки; диски сохраняются в исходном `inv.itemN`. В игре
-  проверены точный расход энергии, item/fluid cells и restart. GUI Drive показывает
-  исходную текстуру и десять filtered slots: pickup/shift, drag/hotbar rules,
-  сохранение и изоляция от обычных контейнеров проверены. Priority UI,
-  динамический рендер и терминалы ещё не перенесены.
-- Drive automation: native hoppers/droppers вставляют ячейки со всех шести
-  сторон, соблюдают фильтр/лимит и сохраняют компоненты при извлечении и отказе.
-  Полный Drive оставляет лишнюю ячейку в источнике; offline и restart проверены.
-  Внешний capability API и совместимость с Create ещё не проверены.
-- Backend десяти portable item/fluid cells: половина ёмкости, исходные
-  type limits и 0.5 AE/tick на диск, codec/tooltip и mounts Drive. Обычные и
-  переносные профили сверены с исходным BasicCellInventory: 2000 сценариев,
-  572000 операций без расхождений. Handheld UI/применение ещё не перенесены; Charger charging подключена.
-- Creative cell backend: configured keys, unlimited insert/extract, исходный
-  listing cap, статус и нулевой расход диска; Drive online/offline mounts,
-  codec и restart. Ещё 2000 Java сценариев/572000 операций PASS. Tooltip image,
-  Workbench и полный item API пока не перенесены.
-- Tool storage backends: Matter Cannon (512 bytes/1 type) и Color Applicator
-  (2048 bytes/27 types), исходные recipe/tag admission rules, 0.5 idle drain,
-  сохранение энергии и разрешённое nesting заполненных tools. Drive подключает
-  все 23 встроенных storage handlers. Charger charging подключена; handheld shooting/painting ещё нужны.
-- Исходные upgrade container components читаются как `slot/item`, с разными
-  slot/card limits обычных, portable и tool cells. Количество установленных
-  карт считается по слотам и ограничивается host. Workbench/upgrade writer,
-  callbacks и addon registry ещё не перенесены.
-- Энергия всех 16 powered items в Charger: original stored_energy/capacity,
-  per-item rates/energy cards, local-first/grid/overflow и общее пополнение буфера.
-  Ядро AEBasePoweredItem сверено с unchanged Java на 400000 операций, а дословный
-  Charger.doWork в stub host — ещё на 200000 вызовов. Command registry знает
-  шесть поддержанных AE2 component IDs; energy codecs принимают только числа.
-  Workbench callbacks/config reload, energy tooltip и handheld actions ещё нужны.
-- Энергия отображается исходной зелёной полосой 0..13 pixels. Полный component
-  map AE2 stacks теперь пересекает native packet sync, включая nested shulker/
-  bundle и контейнерные click hashes; source/saved keys сохраняются. Pixel QA,
-  actual charged-cell menu roundtrip и Drive GUI regression пройдены.
-- Charger сохраняет исходный `inv.item0`, синхронизирует native Items echo,
-  записывает slot edits сразу и держит working transient. Source updates,
-  malformed retention, native-save migration и restart проверены. Full recovery,
-  native hopper/dropper automation подключена; capabilities и все drop paths ещё открыты.
-- Общий source inventory codec Drive/Charger проверяет count до native clamp,
-  сохраняет optional/default форму и защищает blocked original от изменения echo.
-  Прямой positive count из NBT сохраняется отдельно от limit-one обычной вставки.
-  Проверены block/unblock/restart, точный drain и регрессии обоих устройств/GUI.
-- Подготовка контента, source-only `.hnmod`, закреплённые исходники и
-  проверяемый реестр **всех 1429 Java-файлов** оригинала. В реестре нет
-  полностью закрытых классов; 71 отмечены как частично перенесённые.
-- Подготовка также переносит 461 исходный общий тег NeoForge из pinned source,
-  с лицензией/хэшами и порядком platform → AE2. World item predicates и restart
-  проверены. Три прежних ручных списка заменены исходными данными платформы.
+See [upstream.lock.json](upstream.lock.json) and
+[compatibility.json](compatibility.json). Java is the behavioral specification;
+ported gameplay runs as native Rust and does not require a JVM.
 
-Полный объём и последовательность работ: [docs/PLAN.md](docs/PLAN.md).
-Текущие отличия: [docs/PARITY.md](docs/PARITY.md).
-Фактически выполненные проверки: [VALIDATION.md](VALIDATION.md).
+## Implemented layers
 
-## Работа с проектом
+- Component-aware item/fluid keys and storage backends for all 23 built-in
+  basic, portable, creative, Matter Cannon, and Color Applicator cell profiles.
+- ME topology, controller validation, channel routing, energy services,
+  storage mounting, priorities, simulation/commit, and merge/split rules.
+- Native Charger, energy cells, Drive, and Controller. These include original
+  inventories and energy persistence, power/channel gating, a ten-slot Drive
+  screen, automation, and comparator behavior for the supported hosts.
+- Charging for 16 powered-item profiles and both finite energy-cell items;
+  original item energy bars, cell item models, and finite-cell placement/drop
+  energy transfer along the implemented lifecycle paths.
+- Cable types, colors, channel visuals, multipart storage, center NBT parsing,
+  reload identity, source-derived cable quad builders, and native center-only
+  CableBus states, rendering, selection, contextual collision and visual transport.
+- Original assets and recipes prepared from the pinned AE2 jar, plus the pinned
+  NeoForge common tags. Carried data is not evidence of implemented gameplay.
 
-Нужны Rust 1.99.1, Python 3.12, Git, закреплённые checkout Horizon и
-horizon-mixins. Инструменты не меняют исходный checkout Horizon и игровые данные.
+The source inventory tracks all 1,429 Java files. A partially ported class or a
+visible item does not establish complete feature parity. Read
+[PARITY.md](docs/PARITY.md) for concrete boundaries and
+[PROGRESS.md](docs/PROGRESS.md) for the current checkpoint.
+
+## Layout
+
+| Path | Purpose |
+| --- | --- |
+| `mixins/ae2/` | Shared Rust rules, native adapters, and source injection manifest |
+| `src/lib.rs` | Engine-independent rules used by standalone tests |
+| `tools/` | Pinned source/content preparation, staging, packaging, oracles, game checks |
+| `examples/` | Rust drivers used by differential Java comparisons |
+| `docs/` | Scope, parity boundaries, source inventory, and verification reports |
+| `target/` | Ignored sources, jars, content, staged engine, builds, and isolated worlds |
+
+Original Horizon, horizon-mixins, Create, installed game resources, player saves,
+and launcher settings are not edited by the port tooling.
+
+## Development setup
+
+Use the Rust toolchain in [rust-toolchain.toml](rust-toolchain.toml), Python 3.12,
+Git, and a JDK 21 for the Java differential oracles. Native Horizon builds also
+need its documented platform graphics/build dependencies and separately prepared
+26.3 game resources.
 
 ```sh
 python3.12 tools/upstream.py fetch
 python3.12 tools/upstream.py fetch-jar
 python3.12 tools/upstream.py fetch-engines
 python3.12 tools/upstream.py fetch-platform
-python3.12 tools/upstream.py audit --check
-cargo fmt --all --check
-cargo clippy --all-targets --locked -- -D warnings
-cargo test --locked
-python3.12 tools/test_tooling.py
-
-# Rule-level oracle, нужен JDK 21+; игровые зависимости заменены заглушками.
-python3.12 tools/pathing_oracle.py --java-home /path/to/jdk21 --cases 2000
-python3.12 tools/energy_oracle.py --java-home /path/to/jdk21 --cases 1000
-python3.12 tools/energy_oracle.py --java-home /path/to/jdk21 --overlay --cases 1000
-python3.12 tools/mounts_oracle.py --java-home /path/to/jdk21 --cases 2000
-python3.12 tools/cells_oracle.py --java-home /path/to/jdk21 --cases 2000
-python3.12 tools/cells_oracle.py --java-home /path/to/jdk21 --creative --cases 2000
-python3.12 tools/cells_oracle.py --java-home /path/to/jdk21 --tools --cases 2000
-python3.12 tools/item_energy_oracle.py --cases 2000
-python3.12 tools/item_energy_oracle.py --bars --cases 2000
-python3.12 tools/charger_oracle.py --cases 2000
-
-python3.12 tools/horizon.py check
-python3.12 tools/horizon.py build
-python3.12 tools/horizon.py test --library
+python3.12 tools/check.py
 ```
 
-Контент: `horizon-port-pack` из той же версии движка и подготовленные ресурсы
-Horizon 26.3. Jar загружается с Modrinth и проверяется по SHA-512 из lock-файла.
+Set these variables to your own paths when running native development tools:
+
+```sh
+export HORIZON_CHECKOUT=/path/to/pinned/horizon
+export HORIZON_MIXINS=/path/to/pinned/horizon-mixins
+export HORIZON_RESOURCES=/path/to/prepared/26.3
+export HORIZON_PORT_PACK=/path/to/horizon-port-pack
+export HORIZON_MOD_TOOL=/path/to/cargo-horizon-mod
+export HORIZON_CTL=/path/to/horizon-ctl
+export JAVA_HOME=/path/to/jdk21
+```
+
+`target/local-env.sh`, when present, is an ignored machine-local convenience file;
+it is not a portable setup script. Never point build output or smoke worlds at
+an installed game or a player save.
+
+Prepare content from the verified jar into a new owned target tree:
 
 ```sh
 python3.12 tools/prepare_content.py \
   --jar target/jars/appliedenergistics2-19.2.18.jar \
-  --resources /path/to/prepared/26.3 \
-  --port-pack /path/to/horizon-port-pack
+  --resources "$HORIZON_RESOURCES" \
+  --port-pack "$HORIZON_PORT_PACK"
+python3.12 tools/horizon.py check
+python3.12 tools/horizon.py test
+python3.12 tools/horizon.py build
+```
 
-# Сначала использовать отдельный тестовый game-dir и HORIZON_HOME.
-HORIZON_HOME="$PWD/target/run/home" HORIZON_NO_AUDIO=1 \
-  target/horizon-cargo/fast/horizon-client \
-  --world AE2Dev --creative \
-  --game-dir "$PWD/target/run/game" \
-  --resources /path/to/prepared/26.3 \
-  --dev-mod "$PWD/target/content/ae2"
+Build the data archive with `$HORIZON_MOD_TOOL build` from `target/content/ae2`.
+Consult each tool's `--help` for its exact interface. Content preparation starts
+from the original jar; repeatedly fitting an already merged content tree is not
+supported.
 
+## Verification
+
+```sh
+python3.12 tools/check.py
+python3.12 tools/cable_render_oracle.py --java-home "$JAVA_HOME"
+python3.12 tools/node_data_oracle.py --java-home "$JAVA_HOME"
+python3.12 tools/smoke_power.py \
+  --ctl "$HORIZON_CTL" --resources "$HORIZON_RESOURCES"
+```
+
+[VALIDATION.md](VALIDATION.md) distinguishes standalone rules, Java stub-host
+oracles, native compilation/tests, and actual isolated game scenarios. Java
+oracles do not execute the entire Minecraft/NeoForge mod. Native compilation
+does not establish correct gameplay or rendering.
+
+## Packaging
+
+```sh
 python3.12 tools/package.py
-
-# Воспроизводимый игровой smoke: новый мир, затем restart и проверка NBT.
-python3.12 tools/smoke.py --ctl /path/to/horizon-ctl \
-  --resources /path/to/prepared/26.3
-python3.12 tools/smoke_power.py --ctl /path/to/horizon-ctl \
-  --resources /path/to/prepared/26.3
-python3.12 tools/smoke_drive.py --ctl /path/to/horizon-ctl \
-  --resources /path/to/prepared/26.3
-python3.12 tools/smoke_drive_gui.py --ctl /path/to/horizon-ctl \
-  --resources /path/to/prepared/26.3
-python3.12 tools/smoke_drive_automation.py --ctl /path/to/horizon-ctl \
-  --resources /path/to/prepared/26.3
-python3.12 tools/smoke_charger_automation.py --ctl /path/to/horizon-ctl \
-  --resources /path/to/prepared/26.3
-python3.12 tools/smoke_drive.py --portable --ctl /path/to/horizon-ctl \
-  --resources /path/to/prepared/26.3
-python3.12 tools/smoke_drive.py --creative --ctl /path/to/horizon-ctl \
-  --resources /path/to/prepared/26.3
-python3.12 tools/smoke_drive.py --tools --ctl /path/to/horizon-ctl \
-  --resources /path/to/prepared/26.3
-python3.12 tools/smoke_platform_tags.py --ctl /path/to/horizon-ctl \
-  --resources /path/to/prepared/26.3
-python3.12 tools/smoke_item_charging.py --ctl /path/to/horizon-ctl \
-  --resources /path/to/prepared/26.3
+"$HORIZON_MOD_TOOL" check target/ae2-0.1.0.hnmod --json
 ```
 
-`target/ae2-0.1.0.hnmod` содержит исходники native-мода и лицензии, без
-Minecraft/AE2 assets. Контент хранится отдельно в `target/content/ae2`.
-Установка/пересборка через launcher ещё требует отдельной проверки.
+The deterministic `.hnmod` contains the native source bundle, pins, licenses,
+and corresponding port source. The `.hmod` contains separately prepared data
+and assets. Both have mod ID `ae2` and must match the pinned engine/tooling.
+Launcher installation/rebuild and external multiplayer are separate checks;
+local built-client smoke tests do not imply they have passed.
 
-`fetch-engines` создаёт независимые закреплённые checkout под `target/upstream`;
-существующие чужие репозитории не меняет. На этой машине пути к установленным
-инструментам и ресурсам также записаны в игнорируемый `target/local-env.sh`.
-`fetch-platform` закрепляет исходники generated c tags NeoForge 21.1.169;
-prepare_content.py требует этот чистый checkout (параметр `--platform`).
+## Remaining scope
 
-```text
-mixins/ae2/     правила, Horizon-адаптер, manifest и маленькие helpers
-  keys.rs      компонентные ключи, fuzzy, signed counters
-  storage.rs   ячейки и их ограничения
-  cells.rs     native NBT/component codec, cell persistence, tooltip
-  grid.rs      ME topology/pathing
-  power.rs     EnergyService / per-node buffer / overlay rules
-  mounts.rs    NetworkStorage priorities, queues и recursion guard
-  service.rs   StorageService providers/cache/watchers
-  drive.rs     ten-cell provider, idle drain, status
-  drive_glue.rs native Drive slots, mounts, original inv persistence
-  network.rs   full-block connections, split/merge и перенос энергии
-  grid_glue.rs server level hooks, NBT и per-dimension state
-src/lib.rs     те же правила как тестируемая библиотека
-tools/         подготовка, инвентаризация, сборка, упаковка и проверки
-docs/          план всего переноса, список отличий, исходный реестр
-target/        игнорируемые исходники, jar, контент, сборки и тестовый мир
-```
+The complete port still requires native cable/part/facade lifecycle and client
+integration, terminals, ME Chest and other hosts, crafting CPUs/jobs, patterns,
+networks and tunnels, external capabilities, security/ownership, wireless,
+spatial I/O, tools and menus, missing machine recipes, survival progression,
+world generation, visual/audio effects, addon APIs, and complete save/load,
+chunk/dimension, multiplayer, and platform behavior. The detailed plan is in
+[PLAN.md](docs/PLAN.md).
 
-Код, производный от AE2: LGPL-3.0-or-later; уведомление MIT для производных
-правил API — LICENSES/AE2-API-MIT. Build tooling: MIT.
-Модели/текстуры AE2: CC BY-NC-SA 3.0; они не входят в репозиторий или `.hnmod`.
-Подробности и авторство: [NOTICE.md](NOTICE.md). Проект не является официальным
-портом Team Applied Energistics, Horizon, Mojang или Microsoft.
+## Licensing
+
+Derived AE2 behavior is LGPL-3.0-or-later; its API carries the original MIT
+notice. Fabric-derived square-coordinate rules retain their Apache-2.0 notice.
+Adapted tooling keeps its MIT notice. See [NOTICE.md](NOTICE.md), [LICENSE](LICENSE),
+and [LICENSES](LICENSES).
+
+AE2 assets are extracted locally from the original jar. They are not included
+in this source repository. This project is not affiliated with Team Applied
+Energistics, Horizon, Mojang, or Microsoft.

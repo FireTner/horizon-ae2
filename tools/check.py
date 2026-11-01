@@ -12,6 +12,7 @@ def run(*args):
 
 
 if __name__ == "__main__":
+    run(sys.executable, "tools/check_docs.py")
     run("cargo", "fmt", "--all", "--check")
     run("rustfmt", "--edition", "2024", "--check",
         *map(str, sorted((ROOT / "mixins/ae2").glob("*.rs"))))

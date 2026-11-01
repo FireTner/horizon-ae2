@@ -1,135 +1,93 @@
-# Полный перенос AE2
+# Full AE2 port plan
 
-Эталон и граница версии зафиксированы в upstream.lock.json. Требование 1:1
-сохраняется для всех этапов; временные ограничения не становятся спецификацией.
-Нельзя закрывать этап по одному успешному крафту или по количеству скопированных
-ресурсов. В docs/upstream-inventory.json перечислены каждый Java-файл, его
-SHA-256, подсистема и фактический объём начатого переноса.
+The target is the complete pinned AE2 release with 1:1 behavior on Horizon.
+Temporary implementation limits do not redefine the specification. Source
+coverage is tracked in `upstream-inventory.json`; neither a partial class nor
+carried assets count as a complete feature.
 
-## Архитектура
+## Architecture
 
-- Правила Rust не зависят от Horizon. Инвентари, энергохранилища, граф сети,
-  рецепты, задания автокрафта и доступ к миру разделяются маленькими контрактами.
-- Адаптер Horizon отвечает за authoritative server, жизненный цикл измерений,
-  чанки, компоненты/NBT, сообщения, ввод и рендер. Состояние не должно смешиваться
-  между мирами, измерениями или игроками.
-- Данные/модели/текстуры берутся из jar той же версии; carry-отчёт показывает
-  ограничения движка, а не степень переноса Java. Исходный baseline сохранён
-  в baseline-port-pack.json: 78 блоков + 275 предметов в data carry, 24 блока
-  без шаблона, 42 block entity, 39 меню, 55 экранов, 6 типов рецептов требуют кода.
-- Сначала сравнение с Java и unit-тестами, затем интеграция и тесты в игре.
-  Для доказательства 1:1 нужен Java/NeoForge oracle на закреплённой версии.
-  Rule-level Java oracle уже проверяет pathing, энергию/overlay и network storage;
-  world/NeoForge oracle ещё нужен, его нельзя заменять названием теста.
+Engine-independent Rust rules cover keys, inventories, power, topology, storage,
+recipes, and eventually crafting/security. Native adapters own authoritative
+world access, identity/readiness, chunks/dimensions, components, messages, input,
+rendering, and saves. The original Java code remains the specification.
 
-## Этапы и критерии завершения
+Sources, assets, tools, and platform tags are pinned independently. Work only in
+this repository and owned ignored exports. Preserve component-aware key identity,
+long counts, byte rounding, simulation/commit, overflow, callbacks, partitions,
+nesting restrictions, energy conservation, channels, and permissions.
 
-1. **Воспроизводимость и первый игровой срез (начат).** Pin источников/движка,
-   перечень всего кода, подготовка контента и native bundle; capacity ячеек,
-   energy amount, ручной Charger. Закрытие: launcher install и isolated game
-   тесты сохранения/загрузки, слотов, ручного привода; устранённые либо явно
-   оставленные незакрытыми API gaps. Это не полноценная ME-система.
-2. **Ключи, компоненты и сохранение.** AEKey/AEItemKey/AEFluidKey, GenericStack,
-   KeyCounter, сравнение компонентов, partition/fuzzy, вложенные ячейки,
-   upgrade inventory, data component codecs и миграции, creative/portable cells,
-   Cell Workbench. Проверки: NBT roundtrip, миллионы предметов, сложные компоненты,
-   полные ячейки, фильтры, перезагрузка и запрет потери/дублирования.
-Текущий связующий слой перед закрытием ME-графа: cable core/source oracle и
-server profiles и native saved-host parsing cable.id/gn уже перенесены.
-Следом — physical CableBus host/registration с full part/facade codecs,
-one-node-per-part identity/readiness, placement/partial
-break, renderer/collision/selection и update packets. Только после game/restart/
-chunk/color/dense tests можно считать кабели подключёнными в мире. Профили
-в изолированном binding не заменяют этот слой.
+## Completion requirements
 
-Для physical host сохранить source states light_level=0..15 × waterlogged,
-не кодировать type/color/connection masks вымышленными block properties.
-Source CableBusBlock — dynamicShape; статический iron/cube template не заменяет
-коллизии. В pinned Horizon нужны оба пути Game.outline_boxes/clip_ray и
-client-render SceneCollisions.context_shape, затем render-state/BE renderer.
-CableBuilder/CubeBuilder rules и cable-only composition уже сверены с Java;
-нужно подключить их quads/UV к реальному native renderer и atlas. texture suffix берётся из enum name,
-поэтому TRANSPARENT использует transparent, хотя item registryPrefix — fluix.
+1. **Reproducible toolchain and delivery.** Source/jar/engine pins, inventory,
+   licensed content preparation, deterministic native/data packages, real launcher
+   installation/rebuild, and isolated game verification. Joint Create planning
+   alone does not prove coexistence in a running game.
+2. **Keys, components, and persistence.** Item/fluid keys, counters, fuzzy matching,
+   generic stacks, upgrade inventories, registry/component codecs, migrations,
+   missing-content recovery, creative/portable/tool cells, Cell Workbench,
+   and all save/load and nesting paths.
+3. **ME graph and multipart hosts.** Grid/node/connection/service events, colors,
+   cable bus parts/facades, chunk boundaries, merge/split, ad-hoc and controller
+   channels, dense/smart cables, multiblocks, ownership, readiness, security,
+   visual indicators, priorities, and exact lifecycle ordering.
+4. **Energy and machines.** Watchers/overlays/config, multipliers and rates,
+   Energy Acceptor, cells, generators, Vibration Chamber, Charger, Inscriber,
+   upgrades, inventories/sides, offline behavior, power capabilities, effects,
+   and all supported recipes. The capability layer must permit Create integration.
+5. **Storage and terminals.** Complete Drive, ME Chest, storage buses, public/private
+   caches, priorities, view cells, terminal menus/search/sorting, item/fluid
+   interactions, storage monitor, handheld terminals, and addon providers.
+6. **Autocrafting.** Patterns, Pattern Provider, Molecular Assembler, crafting CPUs,
+   planning/calculation, storage reservation, simulation, dispatch, completion,
+   cancellation, failures, restart, crafting links, and terminal interfaces.
+7. **Other networks and services.** P2P, tunnels, quantum bridge, wireless access,
+   security terminals/biometric cards, spatial I/O, formation/annihilation planes,
+   interfaces, import/export buses, level emitters, and redstone settings.
+8. **Items, world content, and integration.** Tools and weapons, painting, batteries,
+   wireless devices, upgrades/configuration, disassembly, creative variants,
+   world generation, growth, entities, explosions, achievements, guidebook,
+   audio/animation/particles, rendering, tags, recipes, addons, and platform APIs.
+9. **Full validation and maintenance.** Java/NeoForge world-level evidence, complete
+   survival progression, chunk/dimension/unload/restart stress, multiplayer,
+   coexistence with Create, performance, resource reload, compatibility, and
+   release/install documentation.
 
-3. **ME-граф.** Grid/Node/Connection/Storage/Service, сетевые события, цвета,
-   CableBus/части/фасады, соединения на границах чанков, merge/split, ad-hoc,
-   pathfinding, dense/обычные/умные кабели и каналы, контроллерные структуры,
-   security/ownership и сетевые индикации. Сценарии из ChannelTests,
-   QnbTestPlots и памяти оригинала; не заменять лимиты общим числом устройств.
-4. **Энергия и первые машины.** EnergyService, реальные storage events,
-   PowerMultiplier/конфиг, Energy Acceptor, Energy/Dense/Creative Cell,
-   Vibration Chamber, Crystal Resonance Generator, Charger tools/network branch,
-   Inscriber, upgrades, стороны/инвентари, работа при отключении питания.
-   Общий item/fluid/energy capability adapter должен позволять интеграцию с Create.
-5. **Хранение и терминалы.** StorageService/mounts/priorities, Drive (10 слотов),
-   ME Chest, storage bus, view cells, терминалы предметов/жидкостей, поиск,
-   сортировка, отрисовка, тени/ghost slots, ручной/shift/drag ввод, синхронизация
-   и отслеживание содержимого. Проверки: одновременные клиенты, смена приоритета,
-   отключение/перенос диска, компоненты, отказ сети без потери предметов.
-6. **Ввод/вывод и части.** Import/Export Bus, Interface, IO Port, Level Emitter,
-   Formation/Annihilation Plane, redstone режимы, fuzzy/crafting/capacity/speed
-   cards, P2P для ME/items/fluids/energy/redstone/light и прочих upstream типов,
-   subnetworks, quantum bridges, wireless access/terminals/boosters, memory card,
-   network tool. Все типы частей из upstream parts входят в объём.
-7. **Автокрафт 1:1.** Crafting/processing/smithing/stonecutting patterns,
-   Pattern Encoding Terminal, substitutions, fuzzy recipes, планирование/циклы/
-   остатки/недостаток ресурсов, Crafting CPU multiblock и storage/co-processors,
-   Pattern Provider, Molecular Assembler, ожидание processing outputs, monitor,
-   отмена/перезапуск/перезагрузка. Сравнение с AutoCraftingTestPlots и
-   InvalidPatternTestPlot, включая failed jobs, без выдачи ресурсов из ничего.
-8. **Мир и остальные механики.** Метеориты/компас/sky stone/прессы, кварцевые
-   почки и их деградация, рост кристаллов/ускорители, fluix-преобразования,
-   decorative sets, Sky Stone Tank, Condenser/matter balls/singularities,
-   Tiny TNT, entropy manipulator, staff/cannon/color applicator, остальные
-   инструменты, предметы, loot/advancements/теги/рецепты и команды оригинала.
-9. **Spatial.** Pylon multiblock, spatial cells/IO, anchors, region swaps,
-   entities, block entities и жидкости, spatial dimension, загрузка чанков,
-   сохранение и безопасный отказ. Нужны механизмы движка, не визуальная имитация.
-10. **Клиент и внешняя совместимость.** Все GUI/tooltip/HUD, dynamic models,
-    анимации, sounds/particles, guidebook/GuideME, hotkeys, recipe viewer hooks,
-    конфиг/локализации/accessibility, multi-player authority/permissions и
-    integration-пакеты оригинала. Для Java API — эквивалентный native контракт,
-    JVM-бинарная совместимость не предполагается.
-11. **Приёмка 1:1.** Source inventory без необъяснённых pending, oracle traces
-    по подсистемам, survival progression от метеорита до автокрафта/spatial,
-    локальная игра и dedicated/LAN с минимум двумя клиентами, restart/chunk
-    unload/dimension travel, upgrade/migration старых тестовых миров, совместный
-    запуск с horizon-create, perf/large networks, воспроизводимая сборка и установка.
+## Current connection layer: CableBus
 
-AEKey/GenericStack/component persistence и GridNode/Connection/Pathing уже
-начаты: native codec проверен в Horizon, pathing сверён на 2000 входах с
-оригинальным Java. Энергетический сервис и первый world adapter уже подключают Charger и три
-energy cells; finite/creative power и restart проверены в игре.
-StorageService и Drive basic-cell backend уже подключены: online/priority mounts,
-idle/channel costs и исходный inv persistence проверены, в том числе restart.
-Controller тоже подключён: public storage 8000 AE/idle 3, source node flags,
-controller positions и настоящий channel pathing. Native state adapter регистрирует
-исходные 18 state/type combinations и original models; geometry/power/conflict/
-restart проверены в мире, visual methods — в 4000 verbatim Java cases.
-Network Status Menu, external energy funnel/capabilities, full ready/shape/event
-timing и chunk/spatial lifecycle остаются частью полного переноса Controller.
-Energy/Dense Cell получили исходные fullness states 0..4 и original models,
-double local-energy comparator и deferred notifications в block-ticking chunks.
-Creative Cell — один property-free state без analog output. Предметы конечных cells
-получили исходную зарядку, fifth-based модели и stored_energy placement/first-drop
-через snapshot guard; complete tooltip/base settings, все loot/chunk/explosion
-пути, точный TickManager/readiness lifecycle и внешние capabilities ещё открыты.
-Drive GUI уже показывает original layout и десять filtered cell slots; серверные
-pickup/drag/hotbar/shift правила и игровой restart проверены. Следующий слой —
-priority UI, special bulk actions, внешний capability API и полный lifecycle сохранения,
-ME Chest, затем terminal UI; CableBus и полные ownership/events остаются открытыми.
-Native hoppers/droppers уже соблюдают cell filters/лимит 1 и pre-extraction flush;
-all-face, failed transfer, full Drive и restart smoke прошли.
-Portable item/fluid cells уже используют отдельные half-byte/type/drain профили
-в Drive, исходные компоненты и capacity tooltip. Original BasicCellInventory
-oracle: 2000 traces/572000 операций PASS; handheld UI/charge/use/disassembly
-остаются открытыми. Creative backend уже подключён к Drive, сверён с original
-Java и проверен native integration/world persistence. Matter Cannon и Color
-Applicator storage backends тоже подключены: capacities/type limits, source recipe/tag
-admission, nested storage и private-energy retention. Следующие части этих items —
-charging/use/painting/shooting, capability/API и live recipe/tag reload.
-Для их recipes/tag predicates уже восстановлены исходные c tags зависимости
-NeoForge 21.1.169. 461 файла с provenance/licence, overlay/replace тестами и
-world item-predicate/restart smoke; остальные API/conditions платформы ещё нужны.
-Рендер и сетевое
-состояние Charger/Crank остаются открытыми задачами первого этапа.
+Cable profiles, center NBT, owner-ignoring node-data comparison, and cable-only
+quad construction have source-derived implementations and differential tests.
+Native physical-host integration is the current stage. Keep the original 32
+`light_level`/`waterlogged` states. Color, type, connections, and channels belong
+to parts and their client state, not invented block properties.
+
+Required native paths include outline/raycast, contextual movement, piston and
+other direct collision queries, block support/occlusion, chunk/light updates,
+renderer/atlas access, client synchronization, and source selection/partial break.
+A static glass/core shape cannot replace dynamic connected cable geometry.
+
+`CubeBuilder` and `CableBuilder` preserve quad order, float32 operations, UV
+flips/rotations, fullbright layers, dense channel groups, and source vertex-color
+state. Their emitter cull metadata is not ready-model face culling. The source
+uses `transparent` texture suffixes but `fluix` item prefixes.
+
+The world collector must resolve neighbor connection types through the source
+variant/size minimum, supply real graph channels/power, identify adjacent cable
+buses, and handle forced cores and attachment requirements. Side parts need their
+own grid nodes/services; one center node must not impersonate an entire host.
+
+Full part/facade registries, visual packets, direct recoloring, source explicit
+BE-load events, readiness/ownership, facade collision, partial removal, drops,
+fluid/light interactions, and all lifecycle paths remain completion requirements.
+
+## Evidence discipline
+
+Record source paths/hashes and exact transferred methods, then test boundaries
+and state transitions. Compare against executable original Java where practical.
+Identify every stub and excluded scope. Verify actual native engine integration
+and isolated game behavior separately. A feature is complete only when behavior,
+client state, persistence, edge cases, and server authority all match.
+
+All repository documentation must be written in English. Keep documents focused
+on the current project contract and evidence; retain machine-readable reports
+for detailed historical results.

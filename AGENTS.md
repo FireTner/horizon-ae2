@@ -1,6 +1,9 @@
 # Applied Energistics 2 for Horizon
 
 User requirement: complete 1:1 parity with the pinned AE2, not an AE2-like replacement.
+All README files and repository documentation must be written exclusively in English.
+The user explicitly authorized creating and publishing the public GitHub repository
+MILLIUMMUSIC/ae2-create with gh. Keep game assets/builds/worlds out of Git.
 Work without subagents. Read README.md, docs/PLAN.md, docs/PARITY.md,
 upstream.lock.json and compatibility.json before editing.
 
@@ -25,18 +28,21 @@ registry/facade codecs and full save/load recovery are still pending. Owner p-on
 edits preserve identity; external part-item ID or other gn edits reset it. This
 NBT load path differs from direct painting's in-place recolor. Persist only a
 still-matching observed center, and update the observed gn after our own save.
-Physical CableBus registration/placement, per-part nodes/readiness, facade
-collision, renderer/selection/partial breaking and client host sync remain open.
+Native center-only registration/render and outline/contextual movement hooks are
+implemented; survival placement, per-part nodes/readiness, facades, all direct
+collision callers, partial breaking, drops and full source packet synchronization remain open.
 Future physical states must be source light_level/waterlogged (32), not invented
 color/type/connection properties. CableBuilder texture names use enum names:
 TRANSPARENT texture suffix is transparent, whereas the item ID prefix is fluix.
-cube_builder.rs/cable_render.rs are standalone geometry rules until the native
-renderer consumes them; leave them out of the manifest meanwhile. They preserve
+cube_builder.rs/cable_render.rs now feed cable_view.rs in the native render
+library. Center-only CableBus uses 32 source light/waterlogged states. They preserve
 source float32 operation order, UV flips/rotations, dense +3/4 wrapping, sprite
 suffixes and smart machine-cap vertex-color retention. Quad.cull records emitter
 metadata only: original cable BakedQuads are returned unculled, not by face.
 RenderState expects already resolved source connection types/core/channel inputs;
-world collection, attachment/facade quads, packed normals/AO and GPU remain open.
+The collector uses actual graph visual counts and source neighbor minima.
+Native center visuals use a wire-only transport in the same bundle. Attachment/facade
+quads, packed normals/AO, full lighting and the complete source packet remain open.
 Preserve FabricMC Apache-2.0 attribution for QuadEmitter.square coordinate rules.
 glue.rs owns Horizon types. Only modules actually consumed by the adapter belong
 in horizon-mixin.toml. keys.rs, storage.rs and cells.rs feed the native cell
@@ -131,7 +137,8 @@ by unit tests. Log meaningful engine gaps and known deviations in docs/PARITY.md
 Do not report a partial class or a carried resource as complete feature parity.
 
 All generated/intermediate files stay under target/. Update VALIDATION.md with
-what actually ran, including limits. No automatic push, publication or deployment.
+what actually ran, including limits. Publication and pushing require explicit user
+authorization; the public ae2-create creation/push is authorized above.
 
 During the active full-port goal, check account usage with the Codex app tool
 about every five minutes. The user reset quota and reinstated an automatic stop:

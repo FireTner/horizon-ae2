@@ -5,8 +5,8 @@
       "pending": 248
     },
     "block": {
-      "partial": 7,
-      "pending": 47
+      "partial": 8,
+      "pending": 46
     },
     "blockentity": {
       "partial": 11,
@@ -1957,8 +1957,10 @@
     {
       "family": "block",
       "path": "src/main/java/appeng/block/networking/CableBusBlock.java",
+      "port": "mixins/ae2/block_states.rs",
+      "scope": "source 32 light/waterlogged states and center-only native render/outline/contextual collision; survival placement/drop, all direct queries/fluid/part lifecycle pending",
       "sha256": "f22f593021b2da7d60ccff4efe9adfce815093895d24fcbab4af9b20f72b54e7",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "block",

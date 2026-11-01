@@ -35,13 +35,18 @@ pub(super) fn build(
     }
     let _guard = BuildGuard;
     let result = (|| {
-        for (_, block) in &declarations {
-            if block.template != "minecraft:iron_block"
+        for (kind, block) in &declarations {
+            let template = if *kind == Definition::CableBus {
+                "minecraft:glass"
+            } else {
+                "minecraft:iron_block"
+            };
+            if block.template != template
                 || block.shapes.is_some()
                 || !block.default_state.is_empty()
             {
                 return Err(format!(
-                    "AE2 state adapter requires its pinned single-row iron template: {}",
+                    "AE2 state adapter requires its pinned single-row template: {}",
                     block.id
                 )
                 .into());
@@ -63,6 +68,7 @@ pub(super) fn build(
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Definition {
     Controller,
+    CableBus,
     EnergyCell,
     DenseEnergyCell,
     CreativeEnergyCell,
@@ -71,6 +77,7 @@ impl Definition {
     fn from_block(id: &str) -> Option<Self> {
         match id {
             "ae2:controller" => Some(Self::Controller),
+            "ae2:cable_bus" => Some(Self::CableBus),
             "ae2:energy_cell" => Some(Self::EnergyCell),
             "ae2:dense_energy_cell" => Some(Self::DenseEnergyCell),
             "ae2:creative_energy_cell" => Some(Self::CreativeEnergyCell),
@@ -80,6 +87,7 @@ impl Definition {
     fn block(self) -> &'static str {
         match self {
             Self::Controller => ae2_controller::BLOCK,
+            Self::CableBus => "ae2:cable_bus",
             Self::EnergyCell => "ae2:energy_cell",
             Self::DenseEnergyCell => "ae2:dense_energy_cell",
             Self::CreativeEnergyCell => "ae2:creative_energy_cell",
@@ -88,6 +96,7 @@ impl Definition {
     fn variants(self) -> usize {
         match self {
             Self::Controller => ae2_controller::VARIANTS,
+            Self::CableBus => 32,
             Self::CreativeEnergyCell => 1,
             _ => 5,
         }
@@ -95,6 +104,9 @@ impl Definition {
     fn properties(self, index: usize) -> Value {
         match self {
             Self::Controller => properties(index),
+            Self::CableBus => {
+                json!({"light_level":(index/2).to_string(),"waterlogged":(index%2==1).to_string()})
+            }
             Self::CreativeEnergyCell => json!({}),
             _ => json!({"fullness": index.to_string()}),
         }
@@ -105,6 +117,9 @@ impl Definition {
                 json!({"state":{"named":ae2_controller::STATES}, "type":{"named":ae2_controller::TYPES}})
             }
             Self::CreativeEnergyCell => json!({}),
+            Self::CableBus => {
+                json!({"light_level":{"integer":[0,15]},"waterlogged":{"named":["false","true"]}})
+            }
             _ => json!({"fullness":{"integer":[0,4]}}),
         }
     }
@@ -115,6 +130,13 @@ impl Definition {
                 ["type", ae2_controller::TYPES]
             ]),
             Self::CreativeEnergyCell => json!([]),
+            Self::CableBus => json!([
+                [
+                    "light_level",
+                    (0..16).map(|i| i.to_string()).collect::<Vec<_>>()
+                ],
+                ["waterlogged", ["false", "true"]]
+            ]),
             _ => json!([["fullness", ["0", "1", "2", "3", "4"]]]),
         }
     }
@@ -254,6 +276,21 @@ fn expand(root: &Path, definitions: &[Definition]) -> Result<()> {
         }
         outputs.push((name, nbt::write_named(&named, Limits::tables())?));
     }
+    if definitions.contains(&Definition::CableBus) {
+        let mut report = read_json(root, "registries.json")?;
+        let entries = report["minecraft:block_entity_type"]["entries"]
+            .as_object_mut()
+            .ok_or("no block entity type registry")?;
+        if !entries.contains_key("ae2:cable_bus") {
+            let next = entries
+                .values()
+                .filter_map(|v| v["protocol_id"].as_u64())
+                .max()
+                .map_or(0, |n| n + 1);
+            entries.insert("ae2:cable_bus".into(), json!({"protocol_id":next}));
+        }
+        outputs.push(("registries.json", serde_json::to_vec(&report)?));
+    }
     // Validate/encode every table before changing any of the owned files. The
     // engine writes its resource stamp only after this whole build succeeds.
     for (name, bytes) in outputs {
@@ -268,6 +305,9 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
             layout.rows(&mut doc["states"])?;
             for i in 0..layout.kind.variants() {
                 doc["states"][layout.first + i][4]["properties"] = layout.kind.properties(i);
+                if layout.kind == Definition::CableBus {
+                    doc["states"][layout.first + i][2] = json!(i % 2 == 1);
+                }
             }
             layout.remap(&mut doc["defaults"]);
         }
@@ -277,8 +317,19 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
             for (id, row) in rows.iter_mut().enumerate().skip(layout.first) {
                 row["id"] = json!(id);
             }
-            for row in &mut rows[layout.first..layout.first + layout.kind.variants()] {
+            for (i, row) in rows[layout.first..layout.first + layout.kind.variants()]
+                .iter_mut()
+                .enumerate()
+            {
                 row["block_entity"] = json!(true);
+                if layout.kind == Definition::CableBus {
+                    row["emission"] = json!(i / 2);
+                    row["full_collision"] = json!(false);
+                    row["render_shape"] = json!("INVISIBLE");
+                    row["outline"] = json!([[0.375, 0.375, 0.375, 0.625, 0.625, 0.625]]);
+                    row["outline_edges"] = json!([]);
+                    row["push"] = json!("BLOCK");
+                }
             }
         }
         "block-behaviours.json" => {
@@ -288,7 +339,10 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
                 let flags = row[1].as_u64().ok_or("no behaviour flags")?;
                 row[1] = json!(
                     flags
-                        | if layout.kind != Definition::CreativeEnergyCell {
+                        | if !matches!(
+                            layout.kind,
+                            Definition::CreativeEnergyCell | Definition::CableBus
+                        ) {
                             u64::from(horizon_world::level::data::state_flags::ANALOG_OUTPUT)
                         } else {
                             0
@@ -339,6 +393,20 @@ fn rewrite_nbt(layout: Layout, tag: &mut Tag) -> Result<usize> {
     let Tag::Compound(compound) = tag else {
         return Ok(0);
     };
+    let mut cable_shape = None;
+    if layout.kind == Definition::CableBus
+        && compound.contains_key(&JavaString::from("cached_shapes"))
+    {
+        if let Some(Tag::List(shapes)) = compound.get_mut(&JavaString::from("shapes")) {
+            let shape =
+                horizon_core::geometry::VoxelShape::from_box(horizon_core::geometry::Aabb::new(
+                    horizon_core::geometry::Vec3::new(0.375, 0.375, 0.375),
+                    horizon_core::geometry::Vec3::new(0.625, 0.625, 0.625),
+                ))?;
+            cable_shape = Some(shapes.len() as i32);
+            shapes.push(super::encode_shape(&shape));
+        }
+    }
     let mut changed = 0;
     for (key, value) in compound.iter_mut() {
         match (key.to_string_lossy().as_str(), value) {
@@ -376,7 +444,7 @@ fn rewrite_nbt(layout: Layout, tag: &mut Tag) -> Result<usize> {
             }
             ("cached_shapes", Tag::IntArray(rows)) if rows.len() == layout.old_len => {
                 changed += 1;
-                let original = rows[layout.first];
+                let original = cable_shape.unwrap_or(rows[layout.first]);
                 rows.splice(
                     layout.first..=layout.first,
                     std::iter::repeat_n(original, layout.kind.variants()),
@@ -448,6 +516,10 @@ mod tests {
             &[
                 ("aaa_before", json!({"template":"minecraft:glass"})),
                 (
+                    "cable_bus",
+                    json!({"template":"minecraft:glass", "item":false}),
+                ),
+                (
                     "controller",
                     json!({"template":"minecraft:iron_block","properties":{"hardness":6,"requires_tool":false}}),
                 ),
@@ -491,6 +563,23 @@ mod tests {
             .enumerate()
             .filter(|(_, r)| r[0] == ae2_controller::BLOCK)
             .collect();
+        let registry_before = read_json(&base, "registries.json").unwrap();
+        let registry_after = read_json(&out, "registries.json").unwrap();
+        let prior = registry_before["minecraft:block_entity_type"]["entries"]
+            .as_object()
+            .unwrap();
+        for (key, value) in prior {
+            assert_eq!(
+                &registry_after["minecraft:block_entity_type"]["entries"][key],
+                value
+            );
+        }
+        assert!(
+            registry_after["minecraft:block_entity_type"]["entries"]["ae2:cable_bus"]["protocol_id"]
+                .as_u64()
+                .unwrap() >= prior.len() as u64
+        );
+        assert_eq!(rows.iter().filter(|r| r[0] == "ae2:cable_bus").count(), 32);
         assert_eq!(controller.len(), 18);
         for (i, (_, row)) in controller.iter().enumerate() {
             assert_eq!(row[4]["properties"], properties(i));
@@ -566,7 +655,7 @@ mod tests {
             .collect();
         assert_eq!(shaped.len(), 24);
         for (i, (id, _)) in shaped.iter().enumerate() {
-            assert_eq!(mapping[*id] as usize, shapes.len() - 24 + i);
+            assert_eq!(mapping[*id] as usize, shapes.len() - 25 + i);
         }
         // Run the actual loaders too: all of the tables must agree, not merely
         // their lengths in a hand-written fixture.
@@ -592,11 +681,9 @@ mod tests {
             &mut sprites,
         )
         .unwrap();
-        for (id, row) in rows
-            .iter()
-            .enumerate()
-            .filter(|(_, row)| Definition::from_block(row[0].as_str().unwrap()).is_some())
-        {
+        for (id, row) in rows.iter().enumerate().filter(|(_, row)| {
+            Definition::from_block(row[0].as_str().unwrap()).is_some() && row[0] != "ae2:cable_bus"
+        }) {
             let _ = row;
             assert!(
                 !models

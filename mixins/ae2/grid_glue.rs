@@ -114,6 +114,19 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
             let Some(BlockEntity::Mod(be)) = game.world.block_entities.get_mut(&(x, y, z)) else {
                 continue;
             };
+            if let Some(visual) = state.network.cable_visual(persisted.pos) {
+                let mut data = vec![
+                    horizon_client_render::ae2_cable_view::MAGIC,
+                    i32::from(visual.connections),
+                ];
+                data.extend(visual.channels);
+                if be.data != data {
+                    be.data = data;
+                    if let Some(log) = &mut game.world.block_log {
+                        log.push((x, y, z));
+                    }
+                }
+            }
             if be.id == super::ae2_cable_bus::BLOCK
                 && state
                     .cables

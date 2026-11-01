@@ -17,6 +17,7 @@ struct Dimension {
     network: Network,
     drives: super::ae2_drive_glue::Drives,
     chargers: super::ae2_charger_inventory::Inventories,
+    cells: super::ae2_energy_cell_glue::Displays,
 }
 static NETWORKS: Mutex<BTreeMap<String, Dimension>> = Mutex::new(BTreeMap::new());
 
@@ -91,6 +92,7 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
         state.drives.reconcile(&mut state.network);
         state.drives.end_tick();
         state.drives.persist(game);
+        // Energy writes are now saved; comparator reads must see those values.
         states
     };
     let controllers: Vec<_> = states
@@ -149,6 +151,13 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
         game.native_set_block_property_with(pos, "state", model, flags);
         game.native_set_block_property_with(pos, "type", kind, flags);
     }
+    let cell_updates = NETWORKS
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .get_mut(dimension)
+        .map(|state| state.cells.collect(game))
+        .unwrap_or_default();
+    super::ae2_energy_cell_glue::apply(game, cell_updates);
 }
 pub(super) fn extract(
     dimension: &str,

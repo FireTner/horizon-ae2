@@ -15,6 +15,10 @@
 
 Что уже написано:
 
+- Energy/Dense Cell используют исходные пять `fullness` states и модели,
+  отдельную double-формулу компаратора по локальному запасу энергии и отложенные
+  уведомления в ticking chunks. Creative Cell имеет одно состояние без analog
+  output. Item/drop energy components и полный TickManager lifecycle ещё нужны.
 - ME Controller подключён к сети: public 8000 AE, 3 AE/tick, исходные node flags,
   многоблочная проверка, каналы и original NBT. Зарегистрированы все 18 state/type
   состояний и исходные column/interior модели. 4000 сравнений визуальных правил

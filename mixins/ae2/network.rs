@@ -52,6 +52,16 @@ impl Kind {
         }
     }
     fn energy_node(self, amount: f64) -> EnergyNode {
+        // EnergyCellBlockEntity.loadTag calls StoredEnergyAmount.setStored,
+        // rather than the constructor's direct assignment. Preserve its
+        // MIN_AMOUNT threshold even when this is the first loaded snapshot.
+        let amount = if matches!(self, Self::EnergyCell | Self::DenseEnergyCell)
+            && amount < super::ae2_energy::MIN_AMOUNT
+        {
+            0.0
+        } else {
+            amount
+        };
         let store = match self {
             Self::Controller => Some(Store::finite(
                 amount.clamp(0.0, self.capacity()),
@@ -402,6 +412,27 @@ impl Network {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn finite_cell_initial_load_uses_set_stored_threshold_without_touching_controller() {
+        for kind in [Kind::EnergyCell, Kind::DenseEnergyCell] {
+            let small = kind.energy_node(super::super::ae2_energy::MIN_AMOUNT / 2.0);
+            assert_eq!(small.store.unwrap().amount(), 0.0);
+            let exact = kind.energy_node(super::super::ae2_energy::MIN_AMOUNT);
+            assert_eq!(
+                exact.store.unwrap().amount(),
+                super::super::ae2_energy::MIN_AMOUNT
+            );
+        }
+        assert_eq!(
+            Kind::Controller
+                .energy_node(0.0000005)
+                .store
+                .unwrap()
+                .amount(),
+            0.0000005
+        );
+    }
     fn snapshot(pos: Pos, kind: Kind, stored: f64) -> Snapshot {
         Snapshot {
             pos,

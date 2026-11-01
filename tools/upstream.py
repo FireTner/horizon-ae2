@@ -178,6 +178,14 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "block/networking/EnergyCellBlock.java": ("mixins/ae2/energy.rs", "five original fullness states, double local-energy comparator, original models and glassProps; native finite-cell notifications; creative-tab charged variant and full item/API lifecycle pending"),
+    "block/networking/CreativeEnergyCellBlock.java": ("mixins/ae2/block_states.rs", "single property-free block entity state, source glassProps and no analog output; full item/drop/lifecycle/material parity pending"),
+    "blockentity/networking/EnergyCellBlockEntity.java": ("mixins/ae2/energy_cell_glue.rs", "public finite stores, original internalCurrentPower, four-step display and deferred comparator/fullness notifications in block-ticking chunks; pure visual/comparator Java oracle; original TickManager/event/readiness ordering, dismantle components and full lifecycle pending"),
+    "blockentity/networking/CreativeEnergyCellBlockEntity.java": ("mixins/ae2/power.rs", "infinite provider, max priority, full-block node binding and original property-free model; full managed-node lifecycle/material parity pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

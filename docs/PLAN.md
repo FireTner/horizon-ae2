@@ -91,6 +91,10 @@ controller positions и настоящий channel pathing. Native state adapter
 restart проверены в мире, visual methods — в 4000 verbatim Java cases.
 Network Status Menu, external energy funnel/capabilities, full ready/shape/event
 timing и chunk/spatial lifecycle остаются частью полного переноса Controller.
+Energy/Dense Cell получили исходные fullness states 0..4 и original models,
+double local-energy comparator и deferred notifications в block-ticking chunks.
+Creative Cell — один property-free state без analog output. Item/drop stored_energy,
+точный TickManager/readiness lifecycle и внешние capabilities остаются открытыми.
 Drive GUI уже показывает original layout и десять filtered cell slots; серверные
 pickup/drag/hotbar/shift правила и игровой restart проверены. Следующий слой —
 priority UI, special bulk actions, внешний capability API и полный lifecycle сохранения,

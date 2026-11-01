@@ -1,12 +1,23 @@
 # Текущая точка полного переноса
 
-Полный перенос AE2 19.2.18 на Horizon, 1:1, без субагентов приостановлен
-по просьбе пользователя после завершения текущего этапа ME Controller,
-для совместного тестирования. Продолжение — после явного возобновления goal.
+Цель активна: полный перенос AE2 19.2.18 на Horizon, 1:1, без субагентов.
+Пользователь возобновил goal после контрольной точки ME Controller.
 Цель не уменьшена до текущего набора механик. Все 1429 исходных Java-файлов
-остаются в реестре; сейчас 78 partial, 1351 pending, полностью закрытых нет.
+остаются в реестре; сейчас 80 partial, 1349 pending, полностью закрытых нет.
 
 ## Последний результат
+
+- Energy/Dense Cell: исходные пять fullness states, original models и double
+  comparator только по local stored power. Creative Cell — одно состояние без
+  analog output; dispenser/facing/triggered behaviour убрано у всех трёх cells.
+  Отложенные notifications/pending NBT учитывают block-ticking chunks; callbacks
+  выполняются после освобождения NETWORKS. Initial load воспроизводит source
+  MIN_AMOUNT. 108 core / 151 native game / 13 native library / 11 Python PASS;
+  source visual oracle — 100000 cases / 200000 comparisons PASS. World
+  energy-cell-display-6loo8yw4 — 40 checks PASS, включая real comparator/dust,
+  same-fullness analog changes, Controller drain и exact restart.
+  Charging item-charging-474fwc4q regression PASS. Полный TickManager/lifecycle,
+  item/drop energy components, item models/tooltip и capabilities ещё нужны.
 
 - Controller world backend и real state registry: 8000 public AE/default storage
   priority 0, idle 3, CANNOT_CARRY/DENSE_CAPACITY, controller positions в настоящем

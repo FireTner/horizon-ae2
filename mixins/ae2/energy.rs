@@ -112,9 +112,45 @@ pub fn display_level(fill_factor: f64) -> u8 {
     (4.0 * (fill_factor + 0.01).clamp(0.0, 1.0)).floor() as u8
 }
 
+/// EnergyCellBlock.getAnalogOutputSignal. This uses double arithmetic, unlike
+/// the float inventory signal. The node's private grid buffer is not included.
+pub fn cell_signal(current: f64, maximum: f64) -> i32 {
+    let value = current / maximum * 14.0;
+    let integer = value as i32;
+    let floor = if value < integer as f64 {
+        integer.wrapping_sub(1) // Minecraft Mth.floor(double), including narrowing.
+    } else {
+        integer
+    };
+    floor.wrapping_add(i32::from(current > 0.0))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn cell_signal_is_independent_of_four_step_display_and_uses_double_boundaries() {
+        for maximum in [200000.0, 1600000.0] {
+            assert_eq!(cell_signal(0.0, maximum), 0);
+            assert_eq!(cell_signal(f64::MIN_POSITIVE, maximum), 1);
+            assert_eq!(cell_signal(maximum / 2.0, maximum), 8);
+            assert_eq!(cell_signal(maximum, maximum), 15);
+            assert_eq!(cell_signal(maximum * 2.0, maximum), 29);
+            for i in 1..14 {
+                let current = maximum / 14.0 * i as f64;
+                let below = f64::from_bits(current.to_bits() - 1);
+                assert_eq!(
+                    cell_signal(current, maximum),
+                    (current / maximum * 14.0).floor() as i32 + 1
+                );
+                assert_eq!(
+                    cell_signal(below, maximum),
+                    (below / maximum * 14.0).floor() as i32 + 1
+                );
+            }
+        }
+    }
 
     #[test]
     fn simulation_never_changes_storage_or_events() {

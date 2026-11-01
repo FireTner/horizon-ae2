@@ -39,6 +39,10 @@ class ContentTests(unittest.TestCase):
         content.write_json(carried / "assets/ae2/blockstates/drive.json", {
             "variants": {f"facing={face},spin=0": {"model": "ae2:block/drive"} for face in content.FACINGS}
         })
+        for name in ("energy_cell", "dense_energy_cell"):
+            content.write_json(carried / f"assets/ae2/blockstates/{name}.json", {
+                "variants": {f"fullness={level}": {"model": f"ae2:block/{name}_{level}"} for level in range(5)}
+            })
         content.write_json(carried / "data/ae2/recipe/charger/a.json", {
             "type": "ae2:charger", "ingredient": {"item": "ae2:certus_quartz_crystal"},
             "result": {"id": "ae2:charged_certus_quartz_crystal"}
@@ -98,9 +102,17 @@ class ContentTests(unittest.TestCase):
         controller = json.loads((carried / "data/ae2/horizon/block/controller.json").read_text())
         self.assertEqual(controller["template"], "minecraft:iron_block")
         self.assertEqual(controller["properties"], {"hardness": 6, "explosion_resistance": 6, "requires_tool": False})
-        for name in ["charger", "crank", "drive", "energy_cell", "dense_energy_cell", "creative_energy_cell"]:
+        for name in ["charger", "crank", "drive"]:
             block = json.loads((carried / f"data/ae2/horizon/block/{name}.json").read_text())
             self.assertEqual(block["template"], "minecraft:dispenser")
+        for name in ["energy_cell", "dense_energy_cell", "creative_energy_cell"]:
+            block = json.loads((carried / f"data/ae2/horizon/block/{name}.json").read_text())
+            self.assertEqual(block["template"], "minecraft:iron_block")
+            self.assertEqual(block["properties"], {"light": 0, "hardness": 2.2, "explosion_resistance": 11,
+                                                 "requires_tool": False, "map_color": 0, "sounds": "minecraft:glass"})
+        for name in ("energy_cell", "dense_energy_cell"):
+            original = json.loads((carried / f"assets/ae2/blockstates/{name}.json").read_text())
+            self.assertEqual(original, {"variants": {f"fullness={level}": {"model": f"ae2:block/{name}_{level}"} for level in range(5)}})
         states = json.loads((carried / "assets/ae2/blockstates/charger.json").read_text())
         self.assertEqual(set(states["variants"]), {f"facing={face}" for face in content.FACINGS})
         drive = json.loads((carried / "assets/ae2/blockstates/drive.json").read_text())

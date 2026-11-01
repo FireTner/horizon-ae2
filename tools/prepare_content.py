@@ -128,13 +128,10 @@ def fit(content, jar, platform):
         })
     for name in ["energy_cell", "dense_energy_cell", "creative_energy_cell"]:
         write_json(blocks / f"{name}.json", {
-            "template": "minecraft:dispenser",
-            "properties": {"light": 0, "hardness": 2.2},
+            "template": "minecraft:iron_block",
+            "properties": {"light": 0, "hardness": 2.2, "explosion_resistance": 11,
+                           "requires_tool": False, "map_color": 0, "sounds": "minecraft:glass"},
         })
-        if name != "creative_energy_cell":
-            # All five original model files stay in carried assets. The later
-            # draw/sync adapter will select fullness; this stage uses level 0.
-            write_json(states / f"{name}.json", {"variants": {"": {"model": f"ae2:block/{name}_0"}}})
 
     for name in ["charger", "drive"]:
         original = json.loads((states / f"{name}.json").read_text())

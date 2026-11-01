@@ -1,0 +1,242 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "case": "energy_cell sub-MIN_AMOUNT load rounds to zero",
+      "energy": 0.0,
+      "fullness": 0,
+      "signal": 0
+    },
+    {
+      "case": "energy_cell ratio 0.0",
+      "energy": 0.0,
+      "fullness": 0,
+      "signal": 0
+    },
+    {
+      "case": "energy_cell ratio 1e-06",
+      "energy": 0.19999999999999998,
+      "fullness": 0,
+      "signal": 1
+    },
+    {
+      "case": "energy_cell ratio 0.01",
+      "energy": 2000.0,
+      "fullness": 0,
+      "signal": 1
+    },
+    {
+      "case": "energy_cell ratio 0.239999",
+      "energy": 47999.799999999996,
+      "fullness": 0,
+      "signal": 4
+    },
+    {
+      "case": "energy_cell ratio 0.24",
+      "energy": 48000.0,
+      "fullness": 1,
+      "signal": 4
+    },
+    {
+      "case": "energy_cell ratio 0.25",
+      "energy": 50000.0,
+      "fullness": 1,
+      "signal": 4
+    },
+    {
+      "case": "energy_cell ratio 0.489999",
+      "energy": 97999.8,
+      "fullness": 1,
+      "signal": 7
+    },
+    {
+      "case": "energy_cell ratio 0.49",
+      "energy": 98000.0,
+      "fullness": 2,
+      "signal": 7
+    },
+    {
+      "case": "energy_cell ratio 0.5",
+      "energy": 100000.0,
+      "fullness": 2,
+      "signal": 8
+    },
+    {
+      "case": "energy_cell ratio 0.739999",
+      "energy": 147999.8,
+      "fullness": 2,
+      "signal": 11
+    },
+    {
+      "case": "energy_cell ratio 0.74",
+      "energy": 148000.0,
+      "fullness": 3,
+      "signal": 11
+    },
+    {
+      "case": "energy_cell ratio 0.75",
+      "energy": 150000.0,
+      "fullness": 3,
+      "signal": 11
+    },
+    {
+      "case": "energy_cell ratio 0.989999",
+      "energy": 197999.8,
+      "fullness": 3,
+      "signal": 14
+    },
+    {
+      "case": "energy_cell ratio 0.99",
+      "energy": 198000.0,
+      "fullness": 4,
+      "signal": 14
+    },
+    {
+      "case": "energy_cell ratio 1.0",
+      "energy": 200000.0,
+      "fullness": 4,
+      "signal": 15
+    },
+    {
+      "case": "dense_energy_cell sub-MIN_AMOUNT load rounds to zero",
+      "energy": 0.0,
+      "fullness": 0,
+      "signal": 0
+    },
+    {
+      "case": "dense_energy_cell ratio 0.0",
+      "energy": 0.0,
+      "fullness": 0,
+      "signal": 0
+    },
+    {
+      "case": "dense_energy_cell ratio 1e-06",
+      "energy": 1.5999999999999999,
+      "fullness": 0,
+      "signal": 1
+    },
+    {
+      "case": "dense_energy_cell ratio 0.01",
+      "energy": 16000.0,
+      "fullness": 0,
+      "signal": 1
+    },
+    {
+      "case": "dense_energy_cell ratio 0.239999",
+      "energy": 383998.39999999997,
+      "fullness": 0,
+      "signal": 4
+    },
+    {
+      "case": "dense_energy_cell ratio 0.24",
+      "energy": 384000.0,
+      "fullness": 1,
+      "signal": 4
+    },
+    {
+      "case": "dense_energy_cell ratio 0.25",
+      "energy": 400000.0,
+      "fullness": 1,
+      "signal": 4
+    },
+    {
+      "case": "dense_energy_cell ratio 0.489999",
+      "energy": 783998.4,
+      "fullness": 1,
+      "signal": 7
+    },
+    {
+      "case": "dense_energy_cell ratio 0.49",
+      "energy": 784000.0,
+      "fullness": 2,
+      "signal": 7
+    },
+    {
+      "case": "dense_energy_cell ratio 0.5",
+      "energy": 800000.0,
+      "fullness": 2,
+      "signal": 8
+    },
+    {
+      "case": "dense_energy_cell ratio 0.739999",
+      "energy": 1183998.4,
+      "fullness": 2,
+      "signal": 11
+    },
+    {
+      "case": "dense_energy_cell ratio 0.74",
+      "energy": 1184000.0,
+      "fullness": 3,
+      "signal": 11
+    },
+    {
+      "case": "dense_energy_cell ratio 0.75",
+      "energy": 1200000.0,
+      "fullness": 3,
+      "signal": 11
+    },
+    {
+      "case": "dense_energy_cell ratio 0.989999",
+      "energy": 1583998.4,
+      "fullness": 3,
+      "signal": 14
+    },
+    {
+      "case": "dense_energy_cell ratio 0.99",
+      "energy": 1584000.0,
+      "fullness": 4,
+      "signal": 14
+    },
+    {
+      "case": "dense_energy_cell ratio 1.0",
+      "energy": 1600000.0,
+      "fullness": 4,
+      "signal": 15
+    },
+    {
+      "case": "before live grid drain across fullness threshold",
+      "energy": 48200.0,
+      "fullness": 1,
+      "signal": 4
+    },
+    {
+      "case": "controller drain updates fullness without replacing comparator",
+      "energy": 47807.0,
+      "fullness": 0,
+      "signal": 4
+    },
+    {
+      "case": "same fullness signal 2",
+      "energy": 20000.0,
+      "fullness": 0,
+      "signal": 2
+    },
+    {
+      "case": "same fullness signal 3",
+      "energy": 40000.0,
+      "fullness": 0,
+      "signal": 3
+    },
+    "creative has one property-free state and no analog output",
+    "vanilla barrel analog output remains one",
+    {
+      "case": "before restart dense half full",
+      "energy": 800000.0,
+      "fullness": 2,
+      "signal": 8
+    },
+    {
+      "case": "after restart dense half full",
+      "energy": 800000.0,
+      "fullness": 2,
+      "signal": 8
+    }
+  ],
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/energy-cell-display-6loo8yw4",
+  "scope": "native finite cell states, real comparator/dust, ticking updates, live Controller drain and restart",
+  "limits": [
+    "full source TickManager/event/readiness lifecycle",
+    "item placement/drop energy components",
+    "Java/NeoForge world oracle and complete rendering/material parity"
+  ]
+}

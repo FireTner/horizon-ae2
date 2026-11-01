@@ -5,8 +5,8 @@
       "pending": 252
     },
     "block": {
-      "partial": 4,
-      "pending": 50
+      "partial": 6,
+      "pending": 48
     },
     "blockentity": {
       "partial": 11,
@@ -1969,8 +1969,10 @@
     {
       "family": "block",
       "path": "src/main/java/appeng/block/networking/CreativeEnergyCellBlock.java",
+      "port": "mixins/ae2/block_states.rs",
+      "scope": "single property-free block entity state, source glassProps and no analog output; full item/drop/lifecycle/material parity pending",
       "sha256": "9d4926bab67d8ed1e15f327751b4fba538ab8981e2796d412732c4f65cb15480",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "block",
@@ -1987,8 +1989,10 @@
     {
       "family": "block",
       "path": "src/main/java/appeng/block/networking/EnergyCellBlock.java",
+      "port": "mixins/ae2/energy.rs",
+      "scope": "five original fullness states, double local-energy comparator, original models and glassProps; native finite-cell notifications; creative-tab charged variant and full item/API lifecycle pending",
       "sha256": "aec44808798d5a3464e9661e2eec0181242c0c4dfdce2cbaa8a9b2cc35c09c4f",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "block",
@@ -2340,7 +2344,7 @@
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/networking/CreativeEnergyCellBlockEntity.java",
       "port": "mixins/ae2/power.rs",
-      "scope": "infinite provider, priority and world full-block node binding; client visuals pending",
+      "scope": "infinite provider, max priority, full-block node binding and original property-free model; full managed-node lifecycle/material parity pending",
       "sha256": "bebd3e060245b3f66913f84ccadf312def4d2e040a68f930a55aaa89504b11be",
       "status": "partial"
     },
@@ -2359,8 +2363,8 @@
     {
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/networking/EnergyCellBlockEntity.java",
-      "port": "mixins/ae2/grid_glue.rs",
-      "scope": "full-block energy storage and dimension network adapter, internalCurrentPower persistence; fullness rendering/comparator/item energy lifecycle pending",
+      "port": "mixins/ae2/energy_cell_glue.rs",
+      "scope": "public finite stores, original internalCurrentPower, four-step display and deferred comparator/fullness notifications in block-ticking chunks; pure visual/comparator Java oracle; original TickManager/event/readiness ordering, dismantle components and full lifecycle pending",
       "sha256": "0c8a815d87bce5b91b2392a670184164f11392c0e7aeadabc1954ae26d4c7f86",
       "status": "partial"
     },

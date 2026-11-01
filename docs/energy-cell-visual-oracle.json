@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "cases": 100000,
+  "top_level_method_comparisons": 200000,
+  "revision": "db17504a86128fdf3dae31f5fb7a112a646e0b93",
+  "input_sha256": "d464f3ddde1ed3cd653332f142ccb03a973ec50209e1eb415cc7818b7d17fcc6",
+  "source_sha256": {
+    "block/networking/EnergyCellBlock.java": "aec44808798d5a3464e9661e2eec0181242c0c4dfdce2cbaa8a9b2cc35c09c4f",
+    "blockentity/networking/EnergyCellBlockEntity.java": "0c8a815d87bce5b91b2392a670184164f11392c0e7aeadabc1954ae26d4c7f86"
+  },
+  "verbatim_fragment_sha256": {
+    "display": "678c27bccfb171ee7943dbd50b1483400ee441033e9d7008aae0f7926a075656",
+    "signal": "3d7a44023a91f1c5c36e01e2ec9b8b151adbdb2dbc298efeabeaf50d8d40d5c3"
+  },
+  "scope": "verbatim EnergyCellBlock comparator and EnergyCellBlockEntity fullness methods; local energy/max stub host",
+  "limits": [
+    "Mth clamp/floor supplied by minimal host",
+    "no grid/tick manager/chunk/event lifecycle",
+    "not a Java/NeoForge world oracle"
+  ]
+}

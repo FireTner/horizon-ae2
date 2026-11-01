@@ -56,6 +56,8 @@ def package():
                  'tools/upstream.py', 'tools/prepare_content.py', 'tools/package.py', 'tools/item_stack_limits.py', 'docs/item-stack-source-audit.json',
                  'tools/smoke_item_stacks.py', 'docs/item-stack-world-smoke.json', 'docs/item-stack-charger-regression.json', 'docs/item-stack-drive-gui-regression.json',
                  'tools/smoke_inventory_signal.py', 'docs/inventory-signal-source-audit.json', 'docs/inventory-signal-world-smoke.json',
+                 'tools/energy_cell_oracle.py', 'examples/energy_cell_oracle.rs', 'docs/energy-cell-visual-oracle.json',
+                 'tools/smoke_energy_cell_display.py', 'docs/energy-cell-world-smoke.json', 'docs/energy-cell-charging-regression.json',
                  'tools/controller_oracle.py', 'examples/controller_oracle.rs', 'docs/controller-visual-oracle.json',
                  'tools/smoke_controller.py', 'docs/controller-world-smoke.json', 'docs/controller-charging-regression.json', 'docs/controller-drive-gui-regression.json',
                  'docs/PARITY.md', 'docs/PLAN.md', 'docs/upstream-inventory.json',

@@ -3,6 +3,61 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
+## Energy Cell fullness / comparator — 1 ноября 2026
+
+- **108 core / 151 native game / 13 native library / 11 Python PASS**.
+  fmt/rustfmt, clippy -D warnings, source audits и native check/build PASS.
+  `target/energy-cell-all-checks-final.log`,
+  `target/energy-cell-native-{game,check,build}-final.json`,
+  `target/energy-cell-native-library-second.json`. Library payload после этого
+  не менялся; финальные game changes повторно прошли native tests/check/build.
+- `block_states.rs` расширяет только четыре owned full-block declarations:
+  Controller 18, finite energy cells по пять, creative один. Native loaders
+  проверяют согласованность 9 JSON/6 NBT, vanilla IDs, preceding/following blocks,
+  foreign door/button/custom shapes, renderer models всех четырёх AE2 blocks и
+  energy-cell-only pack без Controller. Финальные cells используют source cube
+  glassProps: hardness 2.2, resistance 11, no required tool, map color NONE,
+  glass sounds. Dispenser inventory/facing/triggered больше не наследуются.
+- **100000 source cases / 200000 method comparisons PASS**:
+  `docs/energy-cell-visual-oracle.json`. Дословные getAnalogOutputSignal и
+  getStorageLevelFromFillFactor; local energy/max и Mth — minimal Java host.
+  Есть оба capacities, fullness/comparator boundaries, nextafter и IEEE/narrowing
+  cases. Это не world/NeoForge/TickManager oracle. Initial finite cell load
+  дополнительно воспроизводит setStored MIN_AMOUNT < 0.000001; Controller не
+  получает чужой threshold. Source jars/classes/exports остаются в target.
+- **World energy-cell-display-6loo8yw4 — 40 checks PASS**:
+  `docs/energy-cell-world-smoke.json`. Все десять finite states доступны;
+  0/tiny/quarter/full boundaries дают source fullness и настоящий comparator/dust.
+  Existing circuit сохраняется во всех AE2 mutation cases. Controller drain
+  пересекает fullness threshold; 20000 -> 40000 AE меняет signal 2 -> 3 при
+  неизменном fullness 0. Creative — property-free/no analog; vanilla barrel
+  control остаётся 1. Dense 800000 AE/fullness 2/signal 8 переживает restart точно.
+- **Charging item-charging-474fwc4q PASS**: все 16 ранее подключённых powered
+  profiles, source-ordered local/grid/overflow/conservation, front, Crank,
+  components, restart/retrieval. `docs/energy-cell-charging-regression.json`.
+- Original blockstates и одиннадцать block models трёх cells побайтно сверены
+  с pinned jar (14 файлов): `target/energy-cell-model-source-check.json`.
+  Content hmod build/check PASS, SHA-256
+  `fa3a65acf72fbc7e4a88a9c8e04298e9fa39e8fd043ca48d54a73450712da513`.
+  `target/energy-cell-content-{build.log,check.json}`. Runtime fallback запрещён
+  в smoke; original resources не меняются. Исправленный screenshot preview
+  просмотрен: видны исходные модели разных fullness levels и circuit.
+  Полная lighting/material parity не объявляется.
+- Исправленные invocations: initial mixin target требовал exact trait-method ID;
+  native compile выявил отсутствие IntoIterator для &mut BlockEntities (использован
+  get_mut по owned positions). Два world runs остановились на vanilla control:
+  populated barrel читался, но dust оставался 0. Focused fixture подтвердил 1
+  после перестройки всего circuit, как в существующем comparator smoke. AE2
+  notification cases по-прежнему не перестраивают comparator/dust. Первоначальная
+  камера screenshot оказалась вне cleared area; preview исправлен в owned world.
+- **80 partial / 1349 pending / 0 complete**. Exact TickManager/onReady/event
+  scheduling, chunk/drop/spatial lifecycle, item stored_energy placement/drop,
+  EnergyCellBlockItem charging/tooltips/models, charged creative variant и
+  external energy API остаются открытыми. Adapter использует server post_tick
+  и block-ticking area; это не полный source lifecycle. Native unused-API и
+  rust-objcopy/libLLVM diagnostics сохранены; Cargo exit 0 и actual game PASS
+  подтверждены. Goal активен, полного 1:1 ещё нет. No push/install/deployment.
+
 ## ME Controller / native state registration — 1 ноября 2026
 
 - **106 core / 148 native game / 12 native library / 11 Python PASS**;

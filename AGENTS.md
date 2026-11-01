@@ -18,10 +18,16 @@ in horizon-mixin.toml. keys.rs, storage.rs and cells.rs feed the native cell
 tooltip/codec adapter. energy.rs/grid.rs/power.rs feed network.rs and the
 grid_glue.rs world adapter (Charger + three energy-cell kinds + Drive + Controller).
 controller.rs supplies source 8000 public AE/idle 3, node profile and visual rules.
-controller_states.rs wraps only owned Controller content builds and expands the
-single physical cube row to its actual 18 state/type variants across effective
+block_states.rs wraps only owned Controller/energy-cell content builds and expands the
+single physical cube rows to actual Controller 18 state/type and finite-cell five
+fullness variants (creative stays one property-free state) across effective
 JSON/NBT tables. Preserve vanilla ids and foreign shape/model references. This
-is not a general custom-state API. Renderer model schema requires named values.
+is not a general custom-state API. Controller model schema requires named values;
+finite-cell fullness uses integer [0,4]. Cells use source cube glass properties,
+never dispenser behaviour/inventory. energy_cell_glue.rs feeds local stored power
+to analog output and defers comparator/fullness notifications to block-ticking
+chunks, preserving pending NBT. Exact TickManager/readiness and item/drop energy
+component lifecycle remain open. Do not call external callbacks while NETWORKS is locked.
 Controller status/type currently update at server post_tick; immediate shape/
 ready/events, external power funnel, Network Status Menu and full lifecycle
 remain open. Do not mark Controller fully ported on these tests alone.

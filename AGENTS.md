@@ -3,7 +3,7 @@
 User requirement: complete 1:1 parity with the pinned AE2, not an AE2-like replacement.
 All README files and repository documentation must be written exclusively in English.
 The user explicitly authorized creating and publishing the public GitHub repository
-MILLIUMMUSIC/ae2-create with gh. Keep game assets/builds/worlds out of Git.
+MILLIUMMUSIC/horizon-ae2 with gh. Keep game assets/builds/worlds out of Git.
 Work without subagents. Read README.md, docs/PLAN.md, docs/PARITY.md,
 upstream.lock.json and compatibility.json before editing.
 
@@ -138,7 +138,7 @@ Do not report a partial class or a carried resource as complete feature parity.
 
 All generated/intermediate files stay under target/. Update VALIDATION.md with
 what actually ran, including limits. Publication and pushing require explicit user
-authorization; the public ae2-create creation/push is authorized above.
+authorization; the public horizon-ae2 creation/push is authorized above.
 
 During the active full-port goal, check account usage with the Codex app tool
 about every five minutes. The user reset quota and reinstated an automatic stop:

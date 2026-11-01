@@ -3,9 +3,19 @@
 Цель активна: полностью перенести AE2 19.2.18 на Horizon, 1:1, без субагентов.
 Пользователь возобновил goal после контрольной точки Charger automation.
 Цель не уменьшена до текущего набора механик. Все 1429 исходных Java-файлов
-остаются в реестре; сейчас 73 partial, 1356 pending, полностью закрытых нет.
+остаются в реестре; сейчас 76 partial, 1353 pending, полностью закрытых нет.
 
 ## Последний результат
+
+- Comparator Drive/Charger: source slot limit 1, десять/один реальные slots,
+  без transport padding; original inv precedence/strict malformed gate и air
+  emptiness. 101 core / 143 native / 11 Python PASS, native check/build PASS.
+  Minecraft 1.21.1 official bytecode inspection: ContainerAdapter contract,
+  AbstractContainerMenu/Mth arithmetic и ItemStack.isEmpty. World
+  inventory-signal-0l2hpc17 PASS: реальные comparator/dust, все 11 уровней Drive,
+  Charger raw ingredient/powered, direct count-two, malformed gate, notifications
+  от hopper/manual/Drive GUI, vanilla barrel и restart. Other hosts, source
+  recovery/world oracle и redstone propagation >15 ещё открыты.
 
 - Исходные max-stack properties: все 58 unstackable registrations имеют лимит 1,
   остальные 217 carried item definitions — 64. Подготовка контента не наследует
@@ -25,8 +35,8 @@
   в том числе после restart. Все 16 powered items и реальные recipe tags
   участвуют в фильтре; unsupported result components не меняют membership.
   98 core / 135 native / 10 Python PASS. Контрольная точка, игровые проверки
-  и ограничения зафиксированы в VALIDATION.md. Comparator fullness и general
-  capability API остаются открытыми; default stack limits закрыты следующим этапом.
+  и ограничения зафиксированы в VALIDATION.md. General capability API остаётся
+  открытым; default stack limits и Drive/Charger comparator закрыты следующими этапами.
 
 - Текущий этап shared source inventory codec завершён и проверен: 95 core,
   130 native, 10 Python, fmt/clippy/audit и native check/build PASS. World Drive
@@ -135,9 +145,9 @@
 
 ## Следующий связующий слой
 
-0. Исправить исходную comparator fullness Drive/Charger: source slot limit 1,
-   реальные десять/один slots и изоляция от vanilla containers. Component-specific
-   stack overrides и остальные item components/actions также остаются в полном объёме.
+0. Продолжить real world ME nodes/Controller/CableBus и storage hosts; для energy
+   cells остаётся отдельный fullness comparator. Component-specific stack overrides
+   и остальные item components/actions также остаются в полном объёме.
 1. Продолжить source/oracle verification энергосервиса (watchers/addons), закрыть известные
    lifecycle/overlay/events gaps и реальную передачу состояния клиенту.
 2. Закрыть priority UI/bulk actions Drive, external capabilities, sync/рендер и все persistence
@@ -146,7 +156,7 @@
 3. Handheld tool charging/use/painting/shooting, admission reload invalidation;
    creative workbench/tooltip/API и portable handheld UI/energy.
 4. Для energy cells остаются fullness/sync/comparator, item/drop/placement
-   components; для Charger — полный item API/FX, comparator и capability lifecycle; для Crank — ориентация,
+   components; для Charger — полный item API/FX и capability lifecycle; для Crank — ориентация,
    sync/анимация. Остальные задачи полного порта остаются в PLAN/PARITY.
 
 ## Локальные команды и данные

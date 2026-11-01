@@ -66,9 +66,19 @@
   Как InternalInventoryItemHandler, extraction не выпускает internal wrapped stacks.
   Malformed original остаётся blocked до explicit repair. General capability
   API/addon power registry и полный Java/NeoForge world lifecycle ещё открыты.
-  Native comparator fullness пока использует item max stack вместо исходного
-  inventory slot limit; фильтр/лимит переноса этим не ослабляются, comparator parity
-  не заявляется. Исходные default max-stack properties теперь перенесены:
+  Comparator adapter теперь использует source slot limit 1 и реальные 1/10
+  слотов Charger/Drive, исключая 8 transport padding slots. Original inv count
+  имеет приоритет; malformed original даёт нулевой сигнал в рамках существующей
+  strict refusal policy, которую нельзя выдавать за полный source recovery.
+  Float32 sum/division и Mth.lerpDiscrete сверены с байткодом Minecraft 1.21.1:
+  inventory-signal-source-audit.json содержит official artifact URLs/hashes и
+  hashes четырёх просмотренных методов. World inventory-signal-world-smoke.json
+  проверяет реальные comparator/dust, все уровни заполнения Drive, raw recipe
+  item в Charger, hopper/manual/GUI mutations, vanilla isolation и restart.
+  Direct source overstack не clamp-ится: rule/native tests сохраняют значения
+  выше 15; распространение таких сигналов через все redstone components ещё
+  не проверено. Comparator остальных AE2 hosts и full world oracle ещё нужны.
+  Исходные default max-stack properties теперь перенесены:
   58 registrations с лимитом 1 (включая patterns/wrapped/tiered tools), остальные
   217 carried item definitions с лимитом 64. Static pinned source audit находится
   в item-stack-source-audit.json; vanilla durability/stack-size связь сверена с

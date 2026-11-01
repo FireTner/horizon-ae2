@@ -3,7 +3,44 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## Default item stack limits — 1 ноября 2026
+## Drive/Charger comparator — 1 ноября 2026
+
+- **101 core / 143 native game / 11 Python PASS**, fmt/rustfmt/clippy -D warnings,
+  source audits и pinned native check/build PASS. Final evidence:
+  `target/inventory-signal-core-checks-final.log`,
+  `target/inventory-signal-native-{tests,check,build}-final.json`.
+  Library payload не менялся: последние 9 library tests здесь не повторялись.
+  Source inventory после регистрации новых partial contracts: 1429 files,
+  **76 partial / 1353 pending / 0 complete**; финальный audit проверен отдельно.
+- Портирован InternalInventory -> ContainerAdapter analog contract только для
+  двух native hosts: source 10/1 slots, slot limit one, ordered float32 sum,
+  division, Mth.lerpDiscrete. Нет выдуманного clamp для source-loaded overstack.
+  1024 Drive occupancy masks проверяют все размещения и игнорирование padding;
+  source count range и air/zero/legacy fallback/malformed original — отдельные tests.
+- Для проверки формулы получены official Mojang Minecraft 1.21.1 client/mappings
+  с SHA-1 проверкой. JDK21 javap просмотрены AbstractContainerMenu comparator,
+  Container stack minimum, Mth.lerpDiscrete и ItemStack.isEmpty. Source artifacts,
+  method-section hashes и AE2 source hashes записаны в
+  `docs/inventory-signal-source-audit.json`. Jars/classes/mappings остаются в target,
+  в Git/пакет не включаются. Это bytecode inspection, не Java/NeoForge world oracle.
+- **World inventory-signal-0l2hpc17 PASS**: реальные comparator + adjacent dust,
+  Charger empty/raw ingredient/powered/air, все 11 уровней Drive 0..10 occupied,
+  direct source count-two и malformed gate с заполненным native echo.
+  Existing comparator обновляется после hopper insert/extract для обоих hosts,
+  manual Charger insert/extract и Drive GUI shift insert/extract. Vanilla barrel
+  остаётся 0/1/8/15. Full Drive сигнал 15 сохраняется после restart.
+  Matrix: `docs/inventory-signal-world-smoke.json`, transcripts/logs по её `logs`.
+- Первый world run отказал из-за ошибочной ориентации comparator fixture
+  (input смотрел на dust). Исправлена только ориентация тестовой цепи;
+  второй прогон прошёл. После air guard повторно прошли native test/check/build
+  и финальный world с дополнительными GUI/air assertions. Все свои клиенты закрыты.
+- Strict malformed policy, comparator других AE2 hosts, распространение
+  source-loaded signals >15 через все redstone components и полный lifecycle/
+  world oracle остаются открытыми. Native warnings (unused APIs и rust-objcopy
+  libLLVM diagnostic) сохранены; Cargo exit 0 и actual game PASS подтверждены.
+  Goal активен. Player resources/saves и оригинальные engine repos не менялись.
+
+## Default item stack limits — предыдущее подтверждение
 
 - Перенесены default max-stack properties всех 275 carried item definitions:
   **58 limit one**, **217 limit 64**. Подготовка сохраняет template и остальные

@@ -55,6 +55,7 @@ def package():
                  'examples/grid_oracle.rs', 'AGENTS.md', 'LICENSES/AE2-API-MIT',
                  'tools/upstream.py', 'tools/prepare_content.py', 'tools/package.py', 'tools/item_stack_limits.py', 'docs/item-stack-source-audit.json',
                  'tools/smoke_item_stacks.py', 'docs/item-stack-world-smoke.json', 'docs/item-stack-charger-regression.json', 'docs/item-stack-drive-gui-regression.json',
+                 'tools/smoke_inventory_signal.py', 'docs/inventory-signal-source-audit.json', 'docs/inventory-signal-world-smoke.json',
                  'docs/PARITY.md', 'docs/PLAN.md', 'docs/upstream-inventory.json',
                  'docs/baseline-port-pack.json', 'docs/pathing-oracle.json',
                  'docs/energy-oracle.json', 'docs/energy-overlay-oracle.json',

@@ -1,0 +1,177 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "case": "charger empty",
+      "expected": 0,
+      "actual": 0
+    },
+    {
+      "case": "charger stackable raw recipe item fills its limit-one slot",
+      "expected": 15,
+      "actual": 15
+    },
+    {
+      "case": "charger powered item",
+      "expected": 15,
+      "actual": 15
+    },
+    {
+      "case": "charger air stack is empty even with a positive saved count",
+      "expected": 0,
+      "actual": 0
+    },
+    {
+      "case": "drive 0/10 occupied, ignoring eight wire-menu padding slots",
+      "expected": 0,
+      "actual": 0
+    },
+    {
+      "case": "drive 1/10 occupied, ignoring eight wire-menu padding slots",
+      "expected": 2,
+      "actual": 2
+    },
+    {
+      "case": "drive 2/10 occupied, ignoring eight wire-menu padding slots",
+      "expected": 3,
+      "actual": 3
+    },
+    {
+      "case": "drive 3/10 occupied, ignoring eight wire-menu padding slots",
+      "expected": 5,
+      "actual": 5
+    },
+    {
+      "case": "drive 4/10 occupied, ignoring eight wire-menu padding slots",
+      "expected": 6,
+      "actual": 6
+    },
+    {
+      "case": "drive 5/10 occupied, ignoring eight wire-menu padding slots",
+      "expected": 8,
+      "actual": 8
+    },
+    {
+      "case": "drive 6/10 occupied, ignoring eight wire-menu padding slots",
+      "expected": 9,
+      "actual": 9
+    },
+    {
+      "case": "drive 7/10 occupied, ignoring eight wire-menu padding slots",
+      "expected": 10,
+      "actual": 10
+    },
+    {
+      "case": "drive 8/10 occupied, ignoring eight wire-menu padding slots",
+      "expected": 12,
+      "actual": 12
+    },
+    {
+      "case": "drive 9/10 occupied, ignoring eight wire-menu padding slots",
+      "expected": 13,
+      "actual": 13
+    },
+    {
+      "case": "drive 10/10 occupied, ignoring eight wire-menu padding slots",
+      "expected": 15,
+      "actual": 15
+    },
+    {
+      "case": "drive direct source count two is not clamped",
+      "expected": 3,
+      "actual": 3
+    },
+    {
+      "case": "malformed original stays empty for analog output",
+      "expected": 0,
+      "actual": 0
+    },
+    {
+      "case": "charger before hopper insertion",
+      "expected": 0,
+      "actual": 0
+    },
+    {
+      "case": "charger hopper insertion updates existing comparator",
+      "expected": 15,
+      "actual": 15
+    },
+    {
+      "case": "charger hopper extraction updates existing comparator",
+      "expected": 0,
+      "actual": 0
+    },
+    {
+      "case": "drive before hopper insertion",
+      "expected": 0,
+      "actual": 0
+    },
+    {
+      "case": "drive hopper insertion updates existing comparator",
+      "expected": 2,
+      "actual": 2
+    },
+    {
+      "case": "drive hopper extraction updates existing comparator",
+      "expected": 0,
+      "actual": 0
+    },
+    {
+      "case": "manual Charger insertion notifies comparator",
+      "expected": 15,
+      "actual": 15
+    },
+    {
+      "case": "manual Charger extraction notifies comparator",
+      "expected": 0,
+      "actual": 0
+    },
+    {
+      "case": "Drive GUI insertion notifies comparator",
+      "expected": 2,
+      "actual": 2
+    },
+    {
+      "case": "Drive GUI extraction notifies comparator",
+      "expected": 0,
+      "actual": 0
+    },
+    {
+      "case": "vanilla barrel 0 per slot unchanged",
+      "expected": 0,
+      "actual": 0
+    },
+    {
+      "case": "vanilla barrel 1 per slot unchanged",
+      "expected": 1,
+      "actual": 1
+    },
+    {
+      "case": "vanilla barrel 32 per slot unchanged",
+      "expected": 8,
+      "actual": 8
+    },
+    {
+      "case": "vanilla barrel 64 per slot unchanged",
+      "expected": 15,
+      "actual": 15
+    },
+    {
+      "case": "full Drive before restart",
+      "expected": 15,
+      "actual": 15
+    },
+    {
+      "case": "full Drive comparator after restart",
+      "expected": 15,
+      "actual": 15
+    }
+  ],
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/inventory-signal-0l2hpc17",
+  "scope": "actual comparator and adjacent dust, source slot limits/counts, notifications and vanilla isolation",
+  "limits": [
+    "Java/NeoForge world oracle",
+    "other AE2 hosts and energy-cell comparator",
+    "full malformed/missing inventory recovery and all drop/chunk paths"
+  ]
+}

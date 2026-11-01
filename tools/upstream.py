@@ -164,6 +164,13 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "api/inventories/InternalInventory.java": ("mixins/ae2/inventory_signal.rs", "getRedstoneSignal for native Drive/Charger via original slot-one ContainerAdapter contract and Minecraft float32 lerpDiscrete arithmetic; remaining inventory API/hosts pending"),
+    "api/inventories/ContainerAdapter.java": ("mixins/ae2/inventory_signal.rs", "minimum slot limit one used by native Drive/Charger comparator; general container mutation/simulation and heterogeneous inventory adapters pending"),
+    "block/AEBaseEntityBlock.java": ("mixins/ae2/inventory_signal_glue.rs", "Drive/Charger analog output from actual ten/one source slots, excluding wire-menu padding; other block/entity APIs and hosts pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

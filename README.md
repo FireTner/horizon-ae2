@@ -15,6 +15,10 @@
 
 Что уже написано:
 
+- Компараторы Drive/Charger: source slot limit 1, реальные 10/1 slots,
+  исходная float32 арифметика, обновления от hopper/manual/GUI и restart.
+  Обычные контейнеры сохраняют native поведение. Другие AE2 comparator hosts
+  и полный Java/NeoForge world oracle ещё нужны.
 - Исходные размеры стопок предметов: 58 unstackable registrations с лимитом 1,
   остальные 217 carried item definitions — 64. Сверка с pinned factories/builder
   и проверка всех 58 через hopper, full destination, components/restart и inventory.

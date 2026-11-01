@@ -1,12 +1,12 @@
 {
   "families": {
     "api": {
-      "partial": 18,
-      "pending": 254
+      "partial": 20,
+      "pending": 252
     },
     "block": {
-      "partial": 2,
-      "pending": 52
+      "partial": 3,
+      "pending": 51
     },
     "blockentity": {
       "partial": 10,
@@ -819,8 +819,10 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/inventories/ContainerAdapter.java",
+      "port": "mixins/ae2/inventory_signal.rs",
+      "scope": "minimum slot limit one used by native Drive/Charger comparator; general container mutation/simulation and heterogeneous inventory adapters pending",
       "sha256": "71849b7138a93454a3fa2e46abb4dd0a63180ab0a824ec926d7a4520cd899101",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
@@ -837,8 +839,10 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/inventories/InternalInventory.java",
+      "port": "mixins/ae2/inventory_signal.rs",
+      "scope": "getRedstoneSignal for native Drive/Charger via original slot-one ContainerAdapter contract and Minecraft float32 lerpDiscrete arithmetic; remaining inventory API/hosts pending",
       "sha256": "336e863371ea4c49d7d0794ce35855f1f831243b6c952cd94400333f7336af0b",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
@@ -1801,8 +1805,10 @@
     {
       "family": "block",
       "path": "src/main/java/appeng/block/AEBaseEntityBlock.java",
+      "port": "mixins/ae2/inventory_signal_glue.rs",
+      "scope": "Drive/Charger analog output from actual ten/one source slots, excluding wire-menu padding; other block/entity APIs and hosts pending",
       "sha256": "2ca9b85a1afbf6b4e834779e68e5ba90d8cdfdac1936dbe5a55ab1d952ef3285",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "block",

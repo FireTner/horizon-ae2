@@ -27,6 +27,10 @@ It must preserve real custom_data, nested items, original saved keys and click h
 inventory_codec.rs is shared by Drive/Charger for original optional ItemStacks,
 count validation/default omission and source-versus-native echo selection.
 Loaded positive stack counts are not the same as normal input slot limits.
+inventory_signal.rs/glue feed the native Containers.signal hook only for
+Drive/Charger: source 10/1 slots and slot limit one, never menu padding or a
+silent fullness clamp. Air/zero are empty. Preserve the existing malformed gate;
+do not present it as source recovery. Other hosts keep native signal rules.
 charger_inventory.rs reconciles original inv.item0 with native Items by value;
 unchanged echoes cannot restore stale contents/power. Malformed original inv stays
 blocked until an explicit repair; never overwrite it from a changed native echo.

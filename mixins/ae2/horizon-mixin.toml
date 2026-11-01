@@ -13,6 +13,29 @@ name = "ae2_inventory_codec"
 source = "inventory_codec.rs"
 
 [[module]]
+id = "inventory-signal"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_inventory_signal"
+source = "inventory_signal.rs"
+
+[[module]]
+id = "inventory-signal-glue"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_inventory_signal_glue"
+source = "inventory_signal_glue.rs"
+
+[[injection]]
+id = "inventory-signal-override"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::machines::Containers<'_>::signal"
+helper = "inventory_signal_hook.rs"
+bindings = [
+  { name = "containers", ty = "&crate::game::machines::Containers<'_>", value = "&*self" },
+  { name = "view", ty = "&crate::game::machines::View", value = "view" },
+]
+
+[[module]]
 id = "charger-inventory"
 file = "crates/horizon-client/src/game.rs"
 name = "ae2_charger_inventory"

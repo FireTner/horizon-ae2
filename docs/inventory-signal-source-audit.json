@@ -1,0 +1,52 @@
+{
+  "ae2_source_sha256": {
+    "api/inventories/ContainerAdapter.java": "71849b7138a93454a3fa2e46abb4dd0a63180ab0a824ec926d7a4520cd899101",
+    "api/inventories/InternalInventory.java": "336e863371ea4c49d7d0794ce35855f1f831243b6c952cd94400333f7336af0b",
+    "block/AEBaseEntityBlock.java": "2ca9b85a1afbf6b4e834779e68e5ba90d8cdfdac1936dbe5a55ab1d952ef3285",
+    "blockentity/inventory/AppEngCellInventory.java": "788253ee79c1bb40b5378883e6ea4d5efc3ad4d579dfa97ef74f6e15357f41c8",
+    "blockentity/misc/ChargerBlockEntity.java": "f199f50688334f637664cef367fc5e2197bbbcd6afd206768f8d5dbd631888df",
+    "blockentity/storage/DriveBlockEntity.java": "1cd6e904a76eba014f8ba11d23a603815784b1e0c7558cc9c835bdf1ebcc0d27"
+  },
+  "arithmetic": "ordered float32 sum of count/min(container limit,item limit), divide by source slot count; floor(fullness*14)+(fullness>0); no clamp",
+  "inspected_methods": {
+    "AbstractContainerMenu.getRedstoneSignalFromContainer(Container)": {
+      "javap_section_sha256": "176666f9afebee9b10564b45d9582039ca72956c10fc76a56784059cf33cadb8",
+      "obfuscated_header": "public static int b(bqk);"
+    },
+    "Container.getMaxStackSize(ItemStack)": {
+      "javap_section_sha256": "590e70e655e13e09d44253ba005417e7dace896949979de90d2df4287cae0d60",
+      "obfuscated_header": "public default int e_(cuq);"
+    },
+    "ItemStack.isEmpty()": {
+      "javap_section_sha256": "45ed3d7ff7b65f04b26869e0490dae8752728f3e1fd25555dae999616d8e01bb",
+      "obfuscated_header": "public boolean e();"
+    },
+    "Mth.lerpDiscrete(float,int,int)": {
+      "javap_section_sha256": "c57bbe6f6e18c671a580b57ea00a3e56d449ad54c5bf14d0f43a3a7fb5acc4a5",
+      "obfuscated_header": "public static int b(float, int, int);"
+    }
+  },
+  "limits": [
+    "Official Mojang class bytecode inspected via JDK21 javap; not a Java/NeoForge world oracle",
+    "Rust bridge retains existing strict malformed refusal policy; full recovery remains open"
+  ],
+  "minecraft": "1.21.1",
+  "minecraft_artifacts": {
+    "client": {
+      "sha1": "30c73b1c5da787909b2f73340419fdf13b9def88",
+      "size": 26836906,
+      "url": "https://piston-data.mojang.com/v1/objects/30c73b1c5da787909b2f73340419fdf13b9def88/client.jar"
+    },
+    "client_mappings": {
+      "sha1": "2244b6f072256667bcd9a73df124d6c58de77992",
+      "size": 9598610,
+      "url": "https://piston-data.mojang.com/v1/objects/2244b6f072256667bcd9a73df124d6c58de77992/client.txt"
+    }
+  },
+  "schema": 1,
+  "source_slot_limit": 1,
+  "source_slots": {
+    "ae2:charger": 1,
+    "ae2:drive": 10
+  }
+}

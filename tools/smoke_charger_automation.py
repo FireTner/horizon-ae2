@@ -167,6 +167,7 @@ def main():
         result = slots(below)
         assert sum(slot['count'] for slot in result if slot) == 3, result
         assert all(slot['item'] == 'ae2:portable_item_cell_1k' for slot in result if slot), result
+        assert [slot['count'] for slot in result if slot] == [1, 1, 1], result
         saved = nbt(below); assert '777.0d' in saved and '99L' in saved, saved
         assert re.search(r'item0:\s*\{\s*\}', nbt(charger)), nbt(charger)
         checks.append('failed pull restoration; source overstack retains components/current power; immediate empty original persistence')
@@ -192,7 +193,7 @@ def main():
         ctl('quit')
         report = {'passed': True, 'checks': checks, 'logs': str(work),
                   'limits': ['external capability API', 'addon power registry', 'all destruction/chunk paths',
-                             'destination powered-item max-stack metadata', 'comparator fullness',
+                             'comparator fullness',
                              'complete Charger parity and Java world lifecycle']}
         (work / 'result.json').write_text(json.dumps(report, indent=2) + '\n')
         print(json.dumps(report, indent=2))

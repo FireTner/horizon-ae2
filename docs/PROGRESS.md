@@ -1,11 +1,22 @@
 # Текущая точка полного переноса
 
-Цель: полностью перенести AE2 19.2.18 на Horizon, 1:1, без субагентов.
-После завершения этапа Charger automation пользователь запросил паузу для тестирования.
+Цель активна: полностью перенести AE2 19.2.18 на Horizon, 1:1, без субагентов.
+Пользователь возобновил goal после контрольной точки Charger automation.
 Цель не уменьшена до текущего набора механик. Все 1429 исходных Java-файлов
-остаются в реестре; сейчас 71 partial, 1358 pending, полностью закрытых нет.
+остаются в реестре; сейчас 73 partial, 1356 pending, полностью закрытых нет.
 
 ## Последний результат
+
+- Исходные max-stack properties: все 58 unstackable registrations имеют лимит 1,
+  остальные 217 carried item definitions — 64. Подготовка контента не наследует
+  случайный лимит template item. Pinned source audit включает фабрики AEItems,
+  encoded-pattern builder, WrappedGenericStack и vanilla TieredItem inheritance.
+  Native world item-stacks-oad53z4_ PASS: все 58 через реальные hoppers + 3
+  stackable controls, full refusal, component retention/restart и player give split.
+  Charger regression rn68d0mn и Drive GUI xrbuwn6s PASS. 98 core / 11 Python,
+  fmt/clippy/audits/native check и content hmod build/check PASS. Rust payload
+  не менялся; прежние native 135/library 9 tests повторно не запускались.
+  Остальные item properties/actions и component-specific overrides ещё открыты.
 
 - Charger automation (`322cc27`): hopper/dropper на всех шести гранях,
   исходный ChargerInvFilter, вставка по одному, сохранение компонентов и
@@ -14,8 +25,8 @@
   в том числе после restart. Все 16 powered items и реальные recipe tags
   участвуют в фильтре; unsupported result components не меняют membership.
   98 core / 135 native / 10 Python PASS. Контрольная точка, игровые проверки
-  и ограничения зафиксированы в VALIDATION.md. Размер стопок в native item
-  catalog, comparator fullness и general capability API остаются открытыми.
+  и ограничения зафиксированы в VALIDATION.md. Comparator fullness и general
+  capability API остаются открытыми; default stack limits закрыты следующим этапом.
 
 - Текущий этап shared source inventory codec завершён и проверен: 95 core,
   130 native, 10 Python, fmt/clippy/audit и native check/build PASS. World Drive
@@ -124,6 +135,9 @@
 
 ## Следующий связующий слой
 
+0. Исправить исходную comparator fullness Drive/Charger: source slot limit 1,
+   реальные десять/один slots и изоляция от vanilla containers. Component-specific
+   stack overrides и остальные item components/actions также остаются в полном объёме.
 1. Продолжить source/oracle verification энергосервиса (watchers/addons), закрыть известные
    lifecycle/overlay/events gaps и реальную передачу состояния клиенту.
 2. Закрыть priority UI/bulk actions Drive, external capabilities, sync/рендер и все persistence

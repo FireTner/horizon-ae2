@@ -15,6 +15,10 @@
 
 Что уже написано:
 
+- Исходные размеры стопок предметов: 58 unstackable registrations с лимитом 1,
+  остальные 217 carried item definitions — 64. Сверка с pinned factories/builder
+  и проверка всех 58 через hopper, full destination, components/restart и inventory.
+  Остальные свойства и действия предметов продолжают переноситься.
 - Ядро обычных ячеек хранения всех пяти размеров: байты, типы, округление,
   симуляция, извлечение, точные/fuzzy фильтры, inverter/equal distribution/void.
   Добавлены компонентные item/fluid keys, GenericStack, signed KeyCounter и

@@ -68,11 +68,15 @@
   API/addon power registry и полный Java/NeoForge world lifecycle ещё открыты.
   Native comparator fullness пока использует item max stack вместо исходного
   inventory slot limit; фильтр/лимит переноса этим не ослабляются, comparator parity
-  не заявляется. Native item catalog также ещё не переносит все исходные
-  `AEItems` max-stack properties: в world smoke три одинаковые portable cells
-  объединяются в hopper slot, тогда как source `stacksTo(1)` запрещает это.
-  Каждый Charger pull переносит ровно один предмет, суммарный source-loaded
-  count сохраняется; destination stack-size parity этим этапом не закрыта.
+  не заявляется. Исходные default max-stack properties теперь перенесены:
+  58 registrations с лимитом 1 (включая patterns/wrapped/tiered tools), остальные
+  217 carried item definitions с лимитом 64. Static pinned source audit находится
+  в item-stack-source-audit.json; vanilla durability/stack-size связь сверена с
+  [NeoForge 1.21.1 items](https://docs.neoforged.net/docs/1.21.1/items/) и
+  [TieredItem](https://docs.neoforged.net/docs/1.21.1/items/tools/).
+  Все 58 реально распределяются hopper по отдельным слотам без потери count/
+  компонентов; full destination и restart проверены в item-stack-world-smoke.json.
+  Component-specific max-stack overrides и остальные item properties/API ещё нужны.
 - EnergyService/GridEnergyStorage/StoredEnergyAmount/EnergyOverlayGrid сверены
   с неизменённым Java: 1000 single-grid и 1000 overlay traces, 462175 операций.
   Game/event/collection infrastructure stubbed; finite hosts используют исходный

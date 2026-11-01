@@ -1,0 +1,560 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "item": "ae2:certus_quartz_axe",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:certus_quartz_cutting_knife",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:certus_quartz_hoe",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:certus_quartz_pickaxe",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:certus_quartz_shovel",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:certus_quartz_sword",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:certus_quartz_wrench",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:charged_staff",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:color_applicator",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:crafting_pattern",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:creative_storage_cell",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:entropy_manipulator",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:fluid_storage_cell_16k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:fluid_storage_cell_1k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:fluid_storage_cell_256k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:fluid_storage_cell_4k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:fluid_storage_cell_64k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:fluix_axe",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:fluix_hoe",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:fluix_pickaxe",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:fluix_shovel",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:fluix_sword",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:guide",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:item_storage_cell_16k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:item_storage_cell_1k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:item_storage_cell_256k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:item_storage_cell_4k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:item_storage_cell_64k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:matter_cannon",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:memory_card",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:nether_quartz_axe",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:nether_quartz_cutting_knife",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:nether_quartz_hoe",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:nether_quartz_pickaxe",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:nether_quartz_shovel",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:nether_quartz_sword",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:nether_quartz_wrench",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:network_tool",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:portable_fluid_cell_16k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:portable_fluid_cell_1k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:portable_fluid_cell_256k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:portable_fluid_cell_4k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:portable_fluid_cell_64k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:portable_item_cell_16k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:portable_item_cell_1k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:portable_item_cell_256k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:portable_item_cell_4k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:portable_item_cell_64k",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:processing_pattern",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:smithing_table_pattern",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:spatial_storage_cell_128",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:spatial_storage_cell_16",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:spatial_storage_cell_2",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:stonecutting_pattern",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:view_cell",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:wireless_crafting_terminal",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:wireless_terminal",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:wrapped_generic_stack",
+      "limit": 1,
+      "destination_counts": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "item": "ae2:blank_pattern",
+      "limit": 64,
+      "destination_counts": [
+        3
+      ]
+    },
+    {
+      "item": "ae2:certus_quartz_crystal",
+      "limit": 64,
+      "destination_counts": [
+        3
+      ]
+    },
+    {
+      "item": "minecraft:stone",
+      "limit": 64,
+      "destination_counts": [
+        3
+      ]
+    }
+  ],
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/item-stacks-oad53z4_",
+  "additional": [
+    "full hopper refuses sixth unstackable item",
+    "components and exact counts survive restart",
+    "player inventory splits unstackable give; stackable AE2 control still merges"
+  ],
+  "limits": [
+    "component-specific max-stack overrides",
+    "external multiplayer",
+    "other item properties and full item behaviours",
+    "Java/NeoForge world oracle"
+  ]
+}

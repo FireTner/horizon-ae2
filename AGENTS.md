@@ -60,11 +60,16 @@ Use upstream LGPL-3.0-or-later for derived behaviour; preserve notices and licen
 Assets come from the pinned jar into ignored target/content only. Do not commit
 jars, Minecraft resources, models, textures, exported sources or binaries.
 Tooling adapted from horizon-create keeps tools/LICENSE-MIT.
+tools/item_stack_limits.py owns the 58 built-in unstackable registrations and
+audits their pinned factories/builder/inheritance. prepare_content.py sets their
+limit to one and the other carried item definitions to 64, preserving other fields.
+These are registration defaults, not component-specific stack overrides or full item APIs.
 
 Verify cargo fmt --all --check, cargo clippy --all-targets --locked -- -D warnings,
 cargo test --locked, Python 3.12 tools/test_tooling.py and tools/upstream.py audit
 --check. Horizon changes also require tools/horizon.py check against the pinned
-engine. Build and isolated game verification are separate evidence, not implied
+engine. tools/item_stack_limits.py --check must match its committed source audit.
+Build and isolated game verification are separate evidence, not implied
 by unit tests. Log meaningful engine gaps and known deviations in docs/PARITY.md.
 Do not report a partial class or a carried resource as complete feature parity.
 

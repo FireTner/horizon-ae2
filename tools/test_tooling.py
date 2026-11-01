@@ -31,6 +31,8 @@ class ContentTests(unittest.TestCase):
         content.write_json(base / "data/c/tags/item/nuggets/iron.json", {"values": ["minecraft:iron_nugget"]})
         (self.platform / content.LOCK["platform_tags"]["license"]).write_text("platform licence fixture")
         carried = self.root / "carry"
+        for name in content.UNSTACKABLE | {"certus_quartz_crystal", "blank_pattern"}:
+            content.write_json(carried / f"data/ae2/horizon/item/{name}.json", {"template": "minecraft:stick"})
         content.write_json(carried / "assets/ae2/blockstates/charger.json", {
             "variants": {f"facing={face},spin=0": {"model": "ae2:block/charger"} for face in content.FACINGS}
         })
@@ -75,6 +77,20 @@ class ContentTests(unittest.TestCase):
         tag = json.loads((carried / "data/c/tags/item/ingots/iron.json").read_text())
         self.assertEqual(tag["values"], ["minecraft:iron_ingot", {"id": "#forge:ingots/iron", "required": False}, {"id": "other:iron", "required": False}])
         self.assertFalse(tag["replace"])
+
+    def test_item_stack_limits_keep_existing_properties_and_default_stackables(self):
+        carried, jar = self.fixture()
+        path = carried / "data/ae2/horizon/item/portable_item_cell_1k.json"
+        original = {"template": "minecraft:paper", "rarity": "rare", "max_stack_size": 64,
+                    "components": {"minecraft:custom_data": {"kept": True}}}
+        content.write_json(path, original)
+        content.fit(carried, jar, self.platform)
+        data = json.loads(path.read_text())
+        self.assertEqual(data, {**original, "max_stack_size": 1})
+        for name in ("crafting_pattern", "wrapped_generic_stack", "certus_quartz_axe", "spatial_storage_cell_128"):
+            self.assertEqual(json.loads((path.parent / f"{name}.json").read_text())["max_stack_size"], 1)
+        for name in ("blank_pattern", "certus_quartz_crystal"):
+            self.assertEqual(json.loads((path.parent / f"{name}.json").read_text())["max_stack_size"], 64)
 
     def test_native_hosts_have_block_entities_and_valid_six_facing_models(self):
         carried, jar = self.fixture()

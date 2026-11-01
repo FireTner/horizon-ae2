@@ -10,6 +10,7 @@ import subprocess
 import tempfile
 import zipfile
 import upstream
+from item_stack_limits import UNSTACKABLE
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCK = json.loads((ROOT / "upstream.lock.json").read_text())
@@ -100,6 +101,16 @@ def merge_platform_tags(content, source):
 
 def fit(content, jar, platform):
     merge_platform_tags(content, platform)
+    items = content / "data/ae2/horizon/item"
+    missing = sorted(name for name in UNSTACKABLE if not (items / f"{name}.json").is_file())
+    if missing:
+        raise ValueError(f"carried AE2 item registrations missing: {missing}")
+    # Template items are a resource-carry implementation detail. Their stack
+    # sizes must never override AE2's registration properties (default 64).
+    for path in sorted(items.glob("*.json")):
+        data = json.loads(path.read_text())
+        data["max_stack_size"] = 1 if path.stem in UNSTACKABLE else 64
+        write_json(path, data)
     blocks = content / "data/ae2/horizon/block"
     states = content / "assets/ae2/blockstates"
     # A dispenser supplies six-facing placement and a block entity. Its menu

@@ -157,6 +157,13 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "core/definitions/AEItems.java": ("tools/item_stack_limits.py", "basic/portable storage profiles and max-stack metadata for all carried AE2 item registrations; 58 limit-one registrations audited from pinned factories, pattern builder, wrapped stack and tiered-tool inheritance; remaining properties/actions and full registration API pending"),
+    "api/crafting/EncodedPatternItemBuilder.java": ("tools/item_stack_limits.py", "default max-stack one for all four built-in encoded pattern items; decoder, tooltip, custom builders and remaining pattern item behaviour pending"),
+    "items/misc/WrappedGenericStack.java": ("tools/item_stack_limits.py", "max-stack one metadata; Charger exposed-handler extraction refusal; generic-stack display/codecs/behaviours and other hosts pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

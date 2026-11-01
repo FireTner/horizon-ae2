@@ -1,8 +1,8 @@
 {
   "families": {
     "api": {
-      "partial": 17,
-      "pending": 255
+      "partial": 18,
+      "pending": 254
     },
     "block": {
       "partial": 2,
@@ -65,8 +65,8 @@
       "pending": 97
     },
     "items": {
-      "partial": 10,
-      "pending": 47
+      "partial": 11,
+      "pending": 46
     },
     "me": {
       "partial": 21,
@@ -441,8 +441,10 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/crafting/EncodedPatternItemBuilder.java",
+      "port": "tools/item_stack_limits.py",
+      "scope": "default max-stack one for all four built-in encoded pattern items; decoder, tooltip, custom builders and remaining pattern item behaviour pending",
       "sha256": "5128fa4715b076b96a016999f104103974e86e4bd48bcf36271941d42f9cd5b6",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
@@ -3817,8 +3819,8 @@
     {
       "family": "core",
       "path": "src/main/java/appeng/core/definitions/AEItems.java",
-      "port": "mixins/ae2/storage.rs",
-      "scope": "portable cell factory capacity/type constants only; full programmatic item registration/properties and remaining definitions pending",
+      "port": "tools/item_stack_limits.py",
+      "scope": "basic/portable storage profiles and max-stack metadata for all carried AE2 item registrations; 58 limit-one registrations audited from pinned factories, pattern builder, wrapped stack and tiered-tool inheritance; remaining properties/actions and full registration API pending",
       "sha256": "ae048b09d5327b746af086616b9a3420a00e59a3b1eecc81d28bee723a575ca1",
       "status": "partial"
     },
@@ -5805,8 +5807,10 @@
     {
       "family": "items",
       "path": "src/main/java/appeng/items/misc/WrappedGenericStack.java",
+      "port": "tools/item_stack_limits.py",
+      "scope": "max-stack one metadata; Charger exposed-handler extraction refusal; generic-stack display/codecs/behaviours and other hosts pending",
       "sha256": "737be47817e3d323a23e6fd6e72836bb2fc5cc29702ef174cfaf113ae8104bf6",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "items",

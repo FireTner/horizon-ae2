@@ -3,7 +3,44 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## Контрольная точка Charger automation перед паузой — 1 ноября 2026
+## Default item stack limits — 1 ноября 2026
+
+- Перенесены default max-stack properties всех 275 carried item definitions:
+  **58 limit one**, **217 limit 64**. Подготовка сохраняет template и остальные
+  поля; неполный carry без требуемой регистрации отклоняется до замены output.
+  `tools/item_stack_limits.py --check` сверяет таблицу с pinned AEItems factories,
+  EncodedPatternItemBuilder, WrappedGenericStack и наследованием десяти tool
+  классов (15 зарегистрированных tiered tools). Static report/hashes:
+  `docs/item-stack-source-audit.json`. Это не Java runtime properties oracle.
+- **98 standalone**, **11 Python** PASS, fmt/rustfmt, clippy -D warnings,
+  source inventory audit и pinned Horizon check PASS. Логи:
+  `target/item-stack-core-checks.log`, `target/item-stack-native-check.json`.
+  Rust payload не менялся: native test/build и library tests повторно не
+  запускались; использован ранее проверенный fast client (135 game / 9 library).
+  Source inventory: 1429 files, **73 partial / 1356 pending / 0 complete**.
+- Fresh pinned jar content carry/preparation, hmod build/check PASS:
+  `target/item-stack-content.log`, `target/item-stack-content-build.log`,
+  `target/item-stack-content-check.json`. Hmod SHA-256:
+  `31ff7623db77160182e661461b613d5d8321efc233f05f1002052bd963444b41`.
+  Первый вызов checker с directory вместо archive отказал; build из mod folder
+  и проверка фактического `.hmod` затем прошли. Никакие player resources не менялись.
+- **World item-stacks-oad53z4_ PASS**: все 58 unstackable items через настоящие
+  hoppers и 3 stackable controls. Source-loaded count 3 раскладывается как
+  1/1/1, обычные controls остаются count 3. Full hopper не принимает шестой
+  предмет; exact counts, energy 777 и unknown component 99L переживают restart.
+  Player give также создаёт три отдельных portable cells и один stack blank patterns.
+  Полная matrix/log path: `docs/item-stack-world-smoke.json`.
+- **Charger regression charger-automation-rn68d0mn PASS** с новым строгим
+  assertion destination counts `[1,1,1]` после извлечения portable stack:
+  `docs/item-stack-charger-regression.json`.
+  **Drive GUI regression drive-gui-xrbuwn6s PASS**: filters, authoritative shifts,
+  vanilla isolation, count conservation и restart:
+  `docs/item-stack-drive-gui-regression.json`. Все тестовые клиенты завершены.
+- Component-specific max-stack overrides, остальные item properties/behaviours,
+  comparator fullness и полный порт остаются открытыми. Goal возобновлён;
+  данный этап не объявляет ни один Java-класс завершённым. No push/deployment.
+
+## Контрольная точка Charger automation перед паузой — предыдущее подтверждение
 
 - Повторно проверён код `322cc27`: standalone **98 PASS**, native game
   **135 PASS**, Python tooling **10 PASS**. fmt/rustfmt, clippy `-D warnings`,

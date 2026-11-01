@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "checks": [
+    "tag ingredient admitted despite unsupported result; recipe input extraction blocked; limit/remainder",
+    "source loaded unrelated item overstack extracts without clamping",
+    "exposed handler rejects internal wrapped stack extraction",
+    "all six insertion faces hopper/dropper including front; one physical slot",
+    "all sixteen powered item insertion/extraction; empty powered recipe input held until full",
+    "failed pull restoration; source overstack retains components/current power; immediate empty original persistence",
+    "malformed original blocks insertion/extraction across restart until explicit repair",
+    "vanilla barrel and hopper retain ordinary stack insertion"
+  ],
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/charger-automation-rn68d0mn",
+  "limits": [
+    "external capability API",
+    "addon power registry",
+    "all destruction/chunk paths",
+    "comparator fullness",
+    "complete Charger parity and Java world lifecycle"
+  ]
+}

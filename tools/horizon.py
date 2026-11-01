@@ -97,7 +97,10 @@ def mixin_stage(horizon, stages):
     fresh = stages / "modded.next"
     shutil.rmtree(fresh, ignore_errors=True)
     subprocess.run([str(cli), "apply", *base, "--out", str(fresh)], check=True, capture_output=True, text=True)
-    synced = subprocess.run(["rsync", "-a", "--checksum", "--delete", "--itemize-changes", f"{fresh}/", f"{output}/"],
+    # -a also copies fresh extraction timestamps onto unchanged files. Cargo
+    # then recompiles unrelated crates even though their bytes did not change.
+    # Compare bytes and keep permissions/links, but preserve unchanged mtimes.
+    synced = subprocess.run(["rsync", "-rlp", "--checksum", "--delete", "--itemize-changes", f"{fresh}/", f"{output}/"],
                             check=True, capture_output=True, text=True)
     shutil.rmtree(fresh, ignore_errors=True)
     return output, bool(synced.stdout.strip())

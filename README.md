@@ -1,157 +1,153 @@
 # Applied Energistics 2 for Horizon
 
-A native Rust port of [Applied Energistics 2](https://github.com/AppliedEnergistics/Applied-Energistics-2)
-for Minecraft Horizon. The goal is full 1:1 behavior, content, interfaces,
-rendering, persistence, and networking with the pinned AE2 release.
-The full port is in progress.
+[Applied Energistics 2](https://github.com/AppliedEnergistics/Applied-Energistics-2) (AE2 19.2.18 for
+Minecraft 1.21.1) ported to [Horizon](https://github.com/horizon-rust/horizon), Minecraft: Java Edition
+rewritten in Rust. Horizon runs no Java, so AE2's code is ported to Rust and built into the game as a
+**native mod** (a [horizon-mixins](https://github.com/horizon-rust/horizon-mixins) bundle). Its blocks,
+items, recipes, models and textures are prepared from **your own AE2 jar** as a content mod.
 
-The GitHub repository is named `ae2-create`; the mod ID is `ae2`. This project
-ports AE2 to Horizon and does not require Create.
+Status: **ME network and storage foundations, Charger, energy cells, Drive, Controller, and cable
+centers** are ported in part and checked in isolated game worlds. The latest checkpoint adds all five
+cable types in 17 colors, their rendering, selection, power connections and save/restart behavior.
+The target is the **complete 1:1 port** of the pinned AE2 release; the full mod is still in development.
+See [docs/PLAN.md](docs/PLAN.md) for the scope and next steps, [docs/PARITY.md](docs/PARITY.md) for the
+remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and how.
 
-## Pinned versions
+## Progress
 
-| Component | Version / revision |
-| --- | --- |
-| AE2 | 19.2.18, NeoForge, Minecraft 1.21.1 |
-| AE2 source | `db17504a86128fdf3dae31f5fb7a112a646e0b93`, `neoforge/v19.2.18` |
-| Horizon | 26.3, `aa27eca326db26e999d4e59d7899576016764b1e` |
-| horizon-mixins | `3f99a5c60dfa311cc365524c44ae2fd799bfa1de`, schema 6 |
-| NeoForge common tags | 21.1.169, `863802b6dfdb1d5e48c2fda093ed9d01df0f4cd9` |
+| Milestone | Current coverage | Still to port |
+|---|---|---|
+| 1. Toolchain and delivery | Pinned sources, original content preparation, native builds and deterministic packages | Launcher installation/rebuild verification and release workflow |
+| 2. Keys, cells and persistence | Component-aware item/fluid keys; all 23 built-in basic, portable, creative and tool cell profiles; Drive backends | Complete registry recovery, Cell Workbench, config writers and upgrade lifecycle |
+| 3. ME networks and cables | Topology, channels, energy routing, Controller validation, five cable types and 17 colors, native cable centers | Survival cable placement, side parts/facades, full source events, collision and lighting paths |
+| 4. Energy and machines | Charger recipes and powered items, finite/creative energy cells, Controller power | Energy Acceptor, Inscriber, Vibration Chamber, external power capabilities and complete machine behavior |
+| 5. Storage and terminals | Ten-slot Drive, cell mounting, priorities in the storage core, filtered screen and automation | Terminals, ME Chest, storage buses, priority UI and complete storage interactions |
+| 6. Autocrafting | Pending | Patterns, providers, assemblers, crafting CPUs, planning and job lifecycle |
+| 7. Other network services | Pending | P2P, quantum links, wireless, security, spatial I/O and buses |
+| 8. Items, world content and integration | Item energy profiles/bars, finite cell item models and placement/drop energy, original resources and common tags | Complete tools, handheld menus, world generation, effects, guidebook and addon APIs |
+| 9. Full validation | Rule tests, Java differential comparisons, native tests and selected game scenarios | Complete survival progression, source-game comparisons, multiplayer and large-network validation |
 
-See [upstream.lock.json](upstream.lock.json) and
-[compatibility.json](compatibility.json). Java is the behavioral specification;
-ported gameplay runs as native Rust and does not require a JVM.
+These are feature checkpoints, not completed milestones. The source inventory tracks all 1,429 Java
+files, including 103 partially ported classes. That count is not a gameplay completion percentage.
+Blocks, items and recipes carried over as data do not count as working features on their own.
 
-## Implemented layers
+## What is ported
 
-- Component-aware item/fluid keys and storage backends for all 23 built-in
-  basic, portable, creative, Matter Cannon, and Color Applicator cell profiles.
-- ME topology, controller validation, channel routing, energy services,
-  storage mounting, priorities, simulation/commit, and merge/split rules.
-- Native Charger, energy cells, Drive, and Controller. These include original
-  inventories and energy persistence, power/channel gating, a ten-slot Drive
-  screen, automation, and comparator behavior for the supported hosts.
-- Charging for 16 powered-item profiles and both finite energy-cell items;
-  original item energy bars, cell item models, and finite-cell placement/drop
-  energy transfer along the implemented lifecycle paths.
-- Cable types, colors, channel visuals, multipart storage, center NBT parsing,
-  reload identity, source-derived cable quad builders, and native center-only
-  CableBus states, rendering, selection, contextual collision and visual transport.
-- Original assets and recipes prepared from the pinned AE2 jar, plus the pinned
-  NeoForge common tags. Carried data is not evidence of implemented gameplay.
+| AE2 | Here |
+|---|---|
+| `AEItemKey`, `AEFluidKey`, counters and fuzzy matching | `keys.rs`, `cells.rs`: component-aware identity, signed counts, source damage intervals and saved cell contents |
+| Basic, portable, creative, Matter Cannon and Color Applicator cell inventories | `storage.rs`, `backend.rs`, `tool_filters.rs`: capacity, byte/type limits, partitions, simulation, insertion/extraction and restricted tool storage |
+| Grid nodes, connections, pathing and channel finalization | `grid.rs`, `network.rs`: topology, ad-hoc/controller networks, normal/dense channel limits and colored connections |
+| Energy storage and grid energy service | `energy.rs`, `power.rs`: finite/creative stores, provider priorities, local buffers, drain and merge/split rules |
+| Storage providers, mounts and network storage service | `mounts.rs`, `service.rs`, `drive.rs`: mounting, priorities, public/private storage and provider changes |
+| Charger and Wooden Crank | `charger.rs`, `glue.rs`, `charger_inventory.rs`: recipe work, crank rules, local/grid power and original inventory persistence; complete crank placement/animation remains open |
+| Energy cells and Controller | `controller.rs`, `energy_cell_glue.rs`, `block_states.rs`: network power, Controller structures/states, finite-cell fullness and comparator output |
+| Powered items and finite energy-cell items | `item_energy*.rs`, `energy_cell_item.rs`, `energy_cell_model.rs`: charging, energy bars, item models and implemented placement/drop energy paths |
+| ME Drive | `drive_glue.rs`, `gui.rs`, `automation*.rs`: ten actual cell slots, supported backends, power/channel gating, filtered screen and hopper/dropper access |
+| Cable parts and CableBus | `cable.rs`, `part_storage.rs`, `cable_bus.rs`, `node_data.rs`: types/colors, center NBT, saved node data and reload identity |
+| Cable builders and world rendering | `cube_builder.rs`, `cable_render.rs`, `cable_view.rs`: original cable quads/textures, graph-derived connections/channels, outline and contextual shapes |
+| Client state and stack components | `cable_sync.rs`, `component_sync.rs`: native visual transport and typed item components, preserving authoritative saved data |
 
-The source inventory tracks all 1,429 Java files. A partially ported class or a
-visible item does not establish complete feature parity. Read
-[PARITY.md](docs/PARITY.md) for concrete boundaries and
-[PROGRESS.md](docs/PROGRESS.md) for the current checkpoint.
+The Drive supports all 23 built-in cell profiles, but portable and tool cells do not yet have their
+complete handheld behavior. Its screen exposes ten real slots; priority controls and the complete
+AE2 menu remain unfinished. Charger supports 16 powered-item profiles and both finite energy-cell
+items. Cable centers currently enter the world through source-format commands; ordinary cable item
+placement, side parts, facades, partial breaking and drops remain to be implemented.
 
 ## Layout
 
-| Path | Purpose |
-| --- | --- |
-| `mixins/ae2/` | Shared Rust rules, native adapters, and source injection manifest |
-| `src/lib.rs` | Engine-independent rules used by standalone tests |
-| `tools/` | Pinned source/content preparation, staging, packaging, oracles, game checks |
-| `examples/` | Rust drivers used by differential Java comparisons |
-| `docs/` | Scope, parity boundaries, source inventory, and verification reports |
-| `target/` | Ignored sources, jars, content, staged engine, builds, and isolated worlds |
+```text
+mixins/ae2/
+  horizon-mixin.toml     native modules and injections, pinned to Horizon 26.3 (aa27eca)
+  keys.rs, cells.rs     keys, counters, component codecs and cell profiles
+  storage.rs, backend.rs
+                        finite, creative and restricted cell inventories
+  grid.rs, network.rs   topology, channels and native network snapshots
+  energy.rs, power.rs   energy stores and grid energy service
+  mounts.rs, service.rs, drive.rs
+                        storage providers, mounts and Drive rules
+  charger.rs, controller.rs, cable.rs
+                        machine, Controller and cable rules
+  cube_builder.rs, cable_render.rs
+                        source-derived cable geometry and textures
+  *_glue.rs, glue.rs    Horizon world, inventory, energy and lifecycle adapters
+  cable_view.rs, cable_sync.rs
+                        native cable rendering, shapes and client state
+  *.rs                  menu policies, item views and small injection helpers
+src/lib.rs              engine-independent rules as a library for cargo test
+examples/               Rust drivers for Java differential comparisons
+tools/
+  upstream.py           fetch pinned sources/jar/engines and audit source coverage
+  prepare_content.py    prepare the content mod from your AE2 jar
+  horizon.py            export pinned Horizon, apply the bundle, check/test/build
+  package.py            produce the source-only .hnmod
+  smoke_*.py            isolated native game scenarios
+  *_oracle.py           differential checks against pinned Java behavior
+docs/                   full plan, parity boundaries, inventory and evidence
+```
 
-Original Horizon, horizon-mixins, Create, installed game resources, player saves,
-and launcher settings are not edited by the port tooling.
+## Build and run
 
-## Development setup
+Needs Rust 1.99.1, Python 3.12, Git, prepared Horizon 26.3 resources, and the native build dependencies
+for your platform. Java differential comparisons also need JDK 21. The engine revision is `aa27eca`
+and horizon-mixins is `3f99a5c`; full pins are in [compatibility.json](compatibility.json) and
+[upstream.lock.json](upstream.lock.json).
 
-Use the Rust toolchain in [rust-toolchain.toml](rust-toolchain.toml), Python 3.12,
-Git, and a JDK 21 for the Java differential oracles. Native Horizon builds also
-need its documented platform graphics/build dependencies and separately prepared
-26.3 game resources.
+Fetch the pinned checkouts and run the standalone checks:
 
 ```sh
 python3.12 tools/upstream.py fetch
-python3.12 tools/upstream.py fetch-jar
 python3.12 tools/upstream.py fetch-engines
 python3.12 tools/upstream.py fetch-platform
 python3.12 tools/check.py
 ```
 
-Set these variables to your own paths when running native development tools:
+Build the native game with the bundle:
 
 ```sh
-export HORIZON_CHECKOUT=/path/to/pinned/horizon
-export HORIZON_MIXINS=/path/to/pinned/horizon-mixins
-export HORIZON_RESOURCES=/path/to/prepared/26.3
-export HORIZON_PORT_PACK=/path/to/horizon-port-pack
-export HORIZON_MOD_TOOL=/path/to/cargo-horizon-mod
-export HORIZON_CTL=/path/to/horizon-ctl
-export JAVA_HOME=/path/to/jdk21
+HORIZON_MIXINS=target/upstream/horizon-mixins \
+  python3.12 tools/horizon.py build --horizon target/upstream/horizon
 ```
 
-`target/local-env.sh`, when present, is an ignored machine-local convenience file;
-it is not a portable setup script. Never point build output or smoke worlds at
-an installed game or a player save.
-
-Prepare content from the verified jar into a new owned target tree:
+Prepare the content mod from your own `appliedenergistics2-19.2.18.jar` and the resources of the same
+Horizon version. The launcher keeps prepared resources under
+`<launcher data>/versions/<version>/.local/horizon-client/26.3`.
 
 ```sh
+cargo build --release -p horizon-port-pack --manifest-path target/upstream/horizon/Cargo.toml
+export HORIZON_PORT_PACK="$PWD/target/upstream/horizon/target/release/horizon-port-pack"
+export HORIZON_RESOURCES=/path/to/prepared/26.3
+
 python3.12 tools/prepare_content.py \
-  --jar target/jars/appliedenergistics2-19.2.18.jar \
-  --resources "$HORIZON_RESOURCES" \
-  --port-pack "$HORIZON_PORT_PACK"
+  --jar /path/to/appliedenergistics2-19.2.18.jar \
+  --resources "$HORIZON_RESOURCES" --port-pack "$HORIZON_PORT_PACK"
+
+target/horizon-cargo/fast/horizon-client \
+  --resources "$HORIZON_RESOURCES" --dev-mod target/content/ae2
+```
+
+Use a separate game directory for development worlds. Add `--offscreen` for runs driven by
+`horizon-ctl`; screenshots still work. Native checks and tests use the same pinned checkouts:
+
+```sh
 python3.12 tools/horizon.py check
 python3.12 tools/horizon.py test
-python3.12 tools/horizon.py build
+python3.12 tools/horizon.py test --library
 ```
 
-Build the data archive with `$HORIZON_MOD_TOOL build` from `target/content/ae2`.
-Consult each tool's `--help` for its exact interface. Content preparation starts
-from the original jar; repeatedly fitting an already merged content tree is not
-supported.
+For packaging, `python3.12 tools/package.py` writes `target/ae2-0.1.0.hnmod`. Build the separate content
+archive with `cargo-horizon-mod build` from `target/content/ae2`. The native archive contains sources;
+the content archive contains the prepared data/assets. Both use mod ID `ae2`. Launcher installation
+and rebuild remain separate from the built-client checks documented in [VALIDATION.md](VALIDATION.md).
 
-## Verification
+## Licences
 
-```sh
-python3.12 tools/check.py
-python3.12 tools/cable_render_oracle.py --java-home "$JAVA_HOME"
-python3.12 tools/node_data_oracle.py --java-home "$JAVA_HOME"
-python3.12 tools/smoke_power.py \
-  --ctl "$HORIZON_CTL" --resources "$HORIZON_RESOURCES"
-```
+Derived AE2 code is **LGPL-3.0-or-later**, with the original MIT notice for its API. Fabric-derived
+square-coordinate rules retain their Apache-2.0 notice; adapted build tooling retains its MIT notice.
+See [LICENSE](LICENSE), [NOTICE.md](NOTICE.md) and [LICENSES](LICENSES).
 
-[VALIDATION.md](VALIDATION.md) distinguishes standalone rules, Java stub-host
-oracles, native compilation/tests, and actual isolated game scenarios. Java
-oracles do not execute the entire Minecraft/NeoForge mod. Native compilation
-does not establish correct gameplay or rendering.
-
-## Packaging
-
-```sh
-python3.12 tools/package.py
-"$HORIZON_MOD_TOOL" check target/ae2-0.1.0.hnmod --json
-```
-
-The deterministic `.hnmod` contains the native source bundle, pins, licenses,
-and corresponding port source. The `.hmod` contains separately prepared data
-and assets. Both have mod ID `ae2` and must match the pinned engine/tooling.
-Launcher installation/rebuild and external multiplayer are separate checks;
-local built-client smoke tests do not imply they have passed.
-
-## Remaining scope
-
-The complete port still requires native cable/part/facade lifecycle and client
-integration, terminals, ME Chest and other hosts, crafting CPUs/jobs, patterns,
-networks and tunnels, external capabilities, security/ownership, wireless,
-spatial I/O, tools and menus, missing machine recipes, survival progression,
-world generation, visual/audio effects, addon APIs, and complete save/load,
-chunk/dimension, multiplayer, and platform behavior. The detailed plan is in
-[PLAN.md](docs/PLAN.md).
-
-## Licensing
-
-Derived AE2 behavior is LGPL-3.0-or-later; its API carries the original MIT
-notice. Fabric-derived square-coordinate rules retain their Apache-2.0 notice.
-Adapted tooling keeps its MIT notice. See [NOTICE.md](NOTICE.md), [LICENSE](LICENSE),
-and [LICENSES](LICENSES).
-
-AE2 assets are extracted locally from the original jar. They are not included
-in this source repository. This project is not affiliated with Team Applied
-Energistics, Horizon, Mojang, or Microsoft.
+AE2's textures/models are **CC BY-NC-SA 3.0**, translations are CC0, and the guidebook click sound is
+CC BY 4.0, as recorded in NOTICE.md. Assets are prepared locally from the player's own jar and are not
+included in this source repository. Prepared content also carries the pinned NeoForge common tags
+with their licence and provenance. Not affiliated with Team Applied Energistics, Horizon, Mojang or
+Microsoft.

@@ -7,6 +7,12 @@ priority = 100
 horizon_revision = "aa27eca326db26e999d4e59d7899576016764b1e"
 
 [[module]]
+id = "charger-inventory"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_charger_inventory"
+source = "charger_inventory.rs"
+
+[[module]]
 id = "component-sync"
 file = "crates/horizon-client/src/item_sync.rs"
 name = "ae2_component_sync"

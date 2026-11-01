@@ -135,6 +135,9 @@ fn recipe(game: &Game<'_>, stack: &ItemStack) -> Option<ItemStack> {
 }
 
 fn charger_work(game: &mut Game<'_>, pos: Pos, be: &mut ModBlockEntity, power: &mut f64) -> bool {
+    if !super::ae2_charger_inventory::usable(be) {
+        return false;
+    }
     let Some(stack) = be.items.first().and_then(Option::as_ref) else {
         return false;
     };
@@ -189,7 +192,7 @@ pub(super) fn tick(game: &mut Game<'_>, pos: Pos, be: &mut ModBlockEntity) {
             write_crank(be, crank);
         }
         CHARGER => {
-            be.data.resize(1, 0);
+            be.data.resize(2, 0);
             be.data[0] += 1;
             if be.data[0] < rules::CHARGER_INTERVAL as i32 {
                 return;
@@ -208,11 +211,11 @@ pub(super) fn tick(game: &mut Game<'_>, pos: Pos, be: &mut ModBlockEntity) {
                     true,
                 );
             }
-            be.nbt.insert(
-                JavaString::from("HorizonWorking"),
-                Tag::Byte(i8::from(working)),
-            );
+            // Upstream working is transient and synchronized, not saved.
+            be.data[1] = i32::from(working);
+            be.nbt.remove(&JavaString::from("HorizonWorking"));
             set_energy(&mut be.nbt, power);
+            super::ae2_charger_inventory::persist(be);
         }
         _ => {}
     }
@@ -225,6 +228,7 @@ pub(super) fn right_click(game: &mut Game<'_>, pos: Pos, canceled: &mut bool) {
     match game.native_block(pos).as_str() {
         CHARGER => {
             *canceled = true;
+            super::ae2_grid_glue::sync_chargers(game);
             if let Some(hand) = game.held().cloned() {
                 if !super::ae2_item_energy_glue::chargeable(&hand) && recipe(game, &hand).is_none()
                 {
@@ -232,7 +236,7 @@ pub(super) fn right_click(game: &mut Game<'_>, pos: Pos, canceled: &mut bool) {
                 }
                 let inserted = game
                     .native_with_mod_block_entity(pos, |be| {
-                        if be.id != CHARGER {
+                        if be.id != CHARGER || !super::ae2_charger_inventory::usable(be) {
                             return false;
                         }
                         be.items.resize(1, None);
@@ -242,6 +246,7 @@ pub(super) fn right_click(game: &mut Game<'_>, pos: Pos, canceled: &mut bool) {
                         let mut one = hand.clone();
                         one.count = 1;
                         be.items[0] = Some(one);
+                        super::ae2_charger_inventory::persist(be);
                         true
                     })
                     .unwrap_or(false);
@@ -254,10 +259,12 @@ pub(super) fn right_click(game: &mut Game<'_>, pos: Pos, canceled: &mut bool) {
             } else {
                 let taken = game
                     .native_with_mod_block_entity(pos, |be| {
-                        if be.id != CHARGER {
+                        if be.id != CHARGER || !super::ae2_charger_inventory::usable(be) {
                             return None;
                         }
-                        be.items.first_mut().and_then(Option::take)
+                        let taken = be.items.first_mut().and_then(Option::take);
+                        super::ae2_charger_inventory::persist(be);
+                        taken
                     })
                     .flatten();
                 if let Some(stack) = taken {

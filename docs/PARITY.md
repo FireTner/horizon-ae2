@@ -216,3 +216,14 @@
   Nested shulker/bundle packets, typed unknowns, collision with user custom_data,
   malformed wrapper rejection и stable/change-sensitive click hashes проверены
   native library tests. Envelope не добавляется к исходным или сохранённым stacks.
+
+- Charger использует исходный `inv.item0` (AEBaseInvBlockEntity) с native Items
+  transport mirror. Source-format updates приоритетны перед прежним echo, обычные
+  native slot/energy updates сохраняются обратно; slot edits flush сразу.
+  Empty slot — `{}`, default count one опускается, working хранится в transient
+  data. Общий Horizon decoder clamp-ит nonpositive counts; adapter проверяет count
+  раньше. Malformed inv сохраняется и блокирует работу/клики до explicit repair.
+  Это более строгая временная политика, чем Minecraft parseOptional recovery;
+  полные missing-content/legacy codecs и destruction/explosion/drop paths открыты.
+  Формат optional count и empty stack сверялся с
+  [Mojang Item Stack Format](https://www.minecraft.net/en-us/article/minecraft-snapshot-24w09a).

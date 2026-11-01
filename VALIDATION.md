@@ -3,7 +3,34 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## Component sync / energy bars — текущая проверка
+## Charger original inventory — текущая проверка
+
+- Standalone **95**, native **127**, Python **10** PASS; fmt/rustfmt/clippy,
+  inventory audit и native check/build PASS. Logs target/charger-inventory-*.json,
+  target/charger-inventory-core-checks.log. Native library payload не менялся;
+  прежние **9** packet/menu tests остаются подтверждением последнего его изменения.
+- `inv.item0` hydrate/persist, original update precedence, stale native/source
+  echoes, legacy native Items migration, malformed count-zero preservation and
+  blocking until repair; default count=1 omitted and direct count=2 preserved.
+  General Horizon decoder clamps zero to one; adapter checks before decoding.
+- World **charger-inventory-jb66r9mi PASS**:
+  original-format portable energy 1234 + local 777 -> 2011, nested contents retained;
+  explicit original replacement to Staff, local 500 -> final 1500 without reversion;
+  invalid count zero survives ticks/manual extraction, explicit repair clears;
+  native Items migration -> source inv, restart/retrieval retain Color energy 777;
+  original certus input -> charged result in inv.item0, exactly 1600 AE consumed.
+  docs/charger-inventory-world-smoke.json.
+- Full charging regression **item-charging-zoi_dbzl PASS**: all 16 types,
+  conservation/Crank/front/restart/retrieval after original inventory integration.
+  docs/charger-inventory-charging-regression.json.
+- Working uses transient data, legacy HorizonWorking NBT removed. Native Items
+  is a transport mirror of the same slot. Count-one omission/empty-stack shape
+  checked against Mojang's documented format (linked in PARITY).
+- Full Minecraft malformed/missing recovery, all legacy migrations, hopper/
+  capabilities and destruction/explosion/drop paths remain open. Malformed inv
+  policy is stricter than source parseOptional recovery and explicitly temporary.
+
+## Component sync / energy bars — предыдущее подтверждение
 
 - Standalone **95 PASS**, native **123 PASS**, native library **9 PASS**,
   fmt/rustfmt/clippy и Python **10 PASS**. Logs:

@@ -2119,8 +2119,8 @@
     {
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/AEBaseInvBlockEntity.java",
-      "port": "mixins/ae2/drive_glue.rs",
-      "scope": "Drive-only inv.itemN ItemStack load/save with Horizon Items transport mirror; full base-class inventory/drop/capability hooks pending",
+      "port": "mixins/ae2/charger_inventory.rs",
+      "scope": "Drive and Charger original inv/itemN load/save with native Items echo; Charger count-one omission, live/source changes, strict malformed retention, actor flush and restart; full missing-content recovery, legacy migrations, capabilities and all drop paths pending",
       "sha256": "d2a9b5f480e3e1e5b70aef85433d170bdac74cb0edefc74319c2893a97160a1b",
       "status": "partial"
     },
@@ -2224,7 +2224,7 @@
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/misc/ChargerBlockEntity.java",
       "port": "mixins/ae2/glue.rs",
-      "scope": "source-ordered powered item/local buffer/grid/overflow branch plus recipe/refill, private storage and Crank integration; all 16 built-in power profiles; live config, hopper filter, full inventory/visual/sync API pending",
+      "scope": "powered/recipe/refill order, native all-16 power profiles, private buffer/Crank and original inv.item0 persistence; working flag transient; live config, hopper filter, full visual/sync and remaining inventory/capability/drop lifecycle pending",
       "sha256": "f199f50688334f637664cef367fc5e2197bbbcd6afd206768f8d5dbd631888df",
       "status": "partial"
     },

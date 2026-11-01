@@ -24,6 +24,10 @@ item_energy_view.rs implements the source green 13-pixel bar, preserving count/c
 component_sync.rs lives in the native client library, sends AE2 typed component
 maps through a versioned wire-only envelope and unwraps before normal decoding.
 It must preserve real custom_data, nested items, original saved keys and click hashes.
+charger_inventory.rs reconciles original inv.item0 with native Items by value;
+unchanged echoes cannot restore stale contents/power. Malformed original inv stays
+blocked until an explicit repair; never overwrite it from a changed native echo.
+Charger slot edits flush the original format immediately; working stays transient.
 Handheld actions, config reload, item energy tooltip and upgrade callbacks remain open.
 mounts.rs/service.rs/drive.rs are consumed by drive_glue.rs and belong in the
 native manifest. Drive currently has ten real cell slots/providers, supports
@@ -64,6 +68,8 @@ Do not report a partial class or a carried resource as complete feature parity.
 All generated/intermediate files stay under target/. Update VALIDATION.md with
 what actually ran, including limits. No automatic push, publication or deployment.
 
-The user removed the automatic 10% quota stop on 2026-11-01 and explicitly
-requested continuing until the service limit is reached; they will reset quota
-when needed. Do not pause at 10%. Never reset or purchase quota yourself.
+During the active full-port goal, check account usage with the Codex app tool
+about every five minutes. The user reset quota and reinstated an automatic stop:
+pause the goal when any relevant available usage window has 15% or less remaining.
+This replaces the previous removal of the 10% stop. Never reset or purchase quota.
+Unknown/missing windows do not mean zero remaining.

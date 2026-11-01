@@ -16,6 +16,7 @@ use std::sync::Mutex;
 struct Dimension {
     network: Network,
     drives: super::ae2_drive_glue::Drives,
+    chargers: super::ae2_charger_inventory::Inventories,
 }
 static NETWORKS: Mutex<BTreeMap<String, Dimension>> = Mutex::new(BTreeMap::new());
 
@@ -67,6 +68,7 @@ fn snapshots(game: &Game<'_>) -> Vec<Snapshot> {
 pub(super) fn pre_tick(game: &mut Game<'_>, dimension: &str) {
     let mut networks = NETWORKS.lock().unwrap_or_else(|e| e.into_inner());
     let state = networks.entry(dimension.to_owned()).or_default();
+    state.chargers.sync(game);
     state.drives.read(game);
     state.network.sync(snapshots(game));
     state.drives.reconcile(&mut state.network);
@@ -81,6 +83,7 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
         let Some(state) = networks.get_mut(dimension) else {
             return;
         };
+        state.chargers.sync(game);
         state.drives.read(game);
         state.network.sync(snapshots(game));
         state.drives.reconcile(&mut state.network);
@@ -152,4 +155,13 @@ pub(super) fn flush_drives(game: &mut Game<'_>) {
         state.drives.reconcile(&mut state.network);
         state.drives.persist(game);
     }
+}
+
+pub(super) fn sync_chargers(game: &mut Game<'_>) {
+    if game.serving.is_none() && game.options.dedicated.is_none() {
+        return;
+    }
+    let mut networks = NETWORKS.lock().unwrap_or_else(|e| e.into_inner());
+    let state = networks.entry(game.dim.id().to_owned()).or_default();
+    state.chargers.sync(game);
 }

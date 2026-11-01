@@ -6,6 +6,14 @@
 
 ## Последний результат
 
+- Charger original inv.item0 load/save + native echo, direct actor flush,
+  count-one omission, transient working, strict malformed retention/recovery gate.
+  95 core / 127 native / 10 Python + native check/build PASS. World
+  target/smoke/charger-inventory-jb66r9mi and full charging regression
+  target/smoke/item-charging-zoi_dbzl PASS: source format, local energy conservation,
+  stale echo, original replacement, zero-count refusal, legacy migration,
+  restart/retrieval and source recipe output. Full recovery/capabilities/drop paths open.
+
 - Native AE2 component packet bridge сохраняет полную typed component map,
   original custom_data, nested shulker/bundle и click hashes. Original network
   projection отбрасывала mod fields; обнаружено по black energy bars на клиенте.
@@ -117,7 +125,7 @@ pinned checkout: target/upstream/{ae2,horizon,horizon-mixins,neoforge}. Original
 только под target. Все тестовые процессы последнего smoke завершены.
 
 - tools/check.py: fmt, clippy, 95 core tests, 10 tooling tests, inventory check.
-- tools/horizon.py test: 123 native tests (Game + typed NBT); warnings об unused
+- tools/horizon.py test: 127 native tests (Game + typed NBT); warnings об unused
   API остаются до подключения всех потребителей API, не скрыты.
 - tools/horizon.py test --library: 9 tests, в том числе три server-click теста.
 - tools/pathing_oracle.py --cases 2000: JDK 21+, default local Homebrew JDK.
@@ -129,14 +137,15 @@ pinned checkout: target/upstream/{ae2,horizon,horizon-mixins,neoforge}. Original
 
 ## Лимит
 
-1 ноября пользователь отменил автоматическую остановку на остатке 10%.
-Продолжать полный перенос до фактического service limit; сброс выполняет
-пользователь. Не покупать и не сбрасывать quota инструментами.
+Пользователь после сброса quota вновь установил остановку при остатке <=15%.
+Проверять доступные окна get_usage_limits примерно раз в пять минут; при пороге
+вызвать update_goal(paused) и остановить работу. Не покупать/сбрасывать quota.
+Последняя проверка: used 0%, remaining 100%; прежнее отключение порога отменено.
 
 ## Следующие работы
 
 - Item energy tooltip и исходные creative/reequip overrides.
-- Charger original inv/item lifecycle и native automation filters; исходный
+- Charger native automation filters и remaining inv/drop lifecycle; исходный
   ChargerRecipes.allowExtract разрешает любой предмет, не являющийся текущим
   recipe input. Не придумывать запрет извлечения всех partially charged tools.
 - Workbench/upgrade writer: onUpgradesChanged меняет capacity multiplier
@@ -144,3 +153,8 @@ pinned checkout: target/upstream/{ae2,horizon,horizon-mixins,neoforge}. Original
   callback просто при чтении сохранённого item.
 - Live config (батареи/rates/power multipliers), common capability API.
 Цель остаётся полным 1:1 переносом, а не текущим playable subset.
+
+Known next audit: Drive decode_inv currently delegates count decoding to Horizon,
+which clamps count zero to one. Add prevalidation and test original malformed
+retention under native echo changes; blocked Drive must not become live merely
+because its native transport mirror changed. Do not silently erase raw source inv.

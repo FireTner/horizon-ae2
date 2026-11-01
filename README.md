@@ -73,6 +73,10 @@
   map AE2 stacks теперь пересекает native packet sync, включая nested shulker/
   bundle и контейнерные click hashes; source/saved keys сохраняются. Pixel QA,
   actual charged-cell menu roundtrip и Drive GUI regression пройдены.
+- Charger сохраняет исходный `inv.item0`, синхронизирует native Items echo,
+  записывает slot edits сразу и держит working transient. Source updates,
+  malformed retention, native-save migration и restart проверены. Full recovery,
+  hopper/capabilities и все drop paths ещё открыты.
 - Подготовка контента, source-only `.hnmod`, закреплённые исходники и
   проверяемый реестр **всех 1429 Java-файлов** оригинала. В реестре нет
   полностью закрытых классов; 69 отмечены как частично перенесённые.

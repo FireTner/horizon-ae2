@@ -39,13 +39,13 @@ pub(super) fn container(block: &str, out: &mut Option<ModContainer>) {
         });
     }
     if block == CHARGER {
-        // Dynamic per-stack hopper filters do not exist at API 40. Disable
-        // automation until the engine can enforce ChargerInvFilter correctly.
+        // AEBaseInvBlockEntity exposes the same inventory on every side.
+        // Dynamic ChargerInvFilter rules are enforced by the machines hooks.
         *out = Some(ModContainer {
             slots: 1,
-            faces: std::array::from_fn(|_| vec![]),
-            inputs: vec![],
-            outputs: vec![],
+            faces: std::array::from_fn(|_| vec![0]),
+            inputs: vec![0],
+            outputs: vec![0],
             menu: None,
         });
     }

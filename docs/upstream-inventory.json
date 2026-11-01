@@ -1,8 +1,8 @@
 {
   "families": {
     "api": {
-      "partial": 16,
-      "pending": 256
+      "partial": 17,
+      "pending": 255
     },
     "block": {
       "partial": 2,
@@ -109,8 +109,8 @@
       "pending": 25
     },
     "util": {
-      "partial": 3,
-      "pending": 36
+      "partial": 4,
+      "pending": 35
     },
     "worldgen": {
       "partial": 0,
@@ -841,8 +841,10 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/inventories/InternalInventoryItemHandler.java",
+      "port": "mixins/ae2/charger_automation.rs",
+      "scope": "Charger native exposed-handler wrapped-stack extraction guard only; general item handler/capability API pending",
       "sha256": "51ba1d47e9ff15fdd26bc27fa8fe5c2cd32fa5f9c0f1386f571431f35385c91c",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
@@ -2224,15 +2226,15 @@
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/misc/ChargerBlockEntity.java",
       "port": "mixins/ae2/glue.rs",
-      "scope": "powered/recipe/refill order, native all-16 power profiles, private buffer/Crank and original inv.item0 persistence; working flag transient; live config, hopper filter, full visual/sync and remaining inventory/capability/drop lifecycle pending",
+      "scope": "powered/recipe/refill order, all-16 power profiles, original inv.item0, transient working; native all-face hopper/dropper filter with source allowExtract fallback and limit one; live config, visual/sync and remaining capability/drop lifecycle pending",
       "sha256": "f199f50688334f637664cef367fc5e2197bbbcd6afd206768f8d5dbd631888df",
       "status": "partial"
     },
     {
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/misc/ChargerRecipes.java",
-      "port": "mixins/ae2/glue.rs",
-      "scope": "recipe lookup; component-bearing results refused, automation disabled",
+      "port": "mixins/ae2/charger_automation.rs",
+      "scope": "native recipe/tag ingredient membership for automation, independent of result support; work result components and original RecipeManager ordering parity pending",
       "sha256": "d99065b859894aa92951e5d4c4bd6e8dd01668a3555bdf021f7f3860ffab4c78",
       "status": "partial"
     },
@@ -8655,8 +8657,10 @@
     {
       "family": "util",
       "path": "src/main/java/appeng/util/inv/AppEngInternalInventory.java",
+      "port": "mixins/ae2/automation.rs",
+      "scope": "native Drive/Charger one-slot insertion limit, Charger filter-before-extraction and direct-loaded count retention; general inventory API, simulate handler, event/lifecycle and other hosts pending",
       "sha256": "598ffc63a4900654ba1b920e7c0f0b18f32c485a090b3bcb6fe3132930b3b53c",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "util",

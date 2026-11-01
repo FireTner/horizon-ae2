@@ -30,3 +30,6 @@ pub mod ae2_upgrade_rules;
 
 #[path = "../mixins/ae2/item_energy.rs"]
 pub mod ae2_item_energy;
+
+#[path = "../mixins/ae2/charger_automation_rules.rs"]
+pub mod ae2_charger_automation_rules;

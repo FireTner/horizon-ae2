@@ -1,13 +1,22 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
-// AppEngCellInventory/AppEngInternalInventory: Drive has one cell per slot.
-// World-side helpers call this only for the original ten physical slots.
+// AppEngCellInventory/AppEngInternalInventory: normal insertion has limit one.
+// Drive and Charger callers evaluate their filters before this shared mutation.
 use horizon_client::{items::ItemStack, lan::menu::ae2_slot_rules};
 
 pub(super) fn insert(
     target: &mut Option<ItemStack>,
-    mut stack: ItemStack,
+    stack: ItemStack,
 ) -> (Option<ItemStack>, bool) {
-    if target.is_some() || !ae2_slot_rules::drive_slot(&stack.item, stack.count).0 {
+    let valid = ae2_slot_rules::drive_slot(&stack.item, stack.count).0;
+    insert_one(target, stack, valid)
+}
+
+pub(super) fn insert_one(
+    target: &mut Option<ItemStack>,
+    mut stack: ItemStack,
+    valid: bool,
+) -> (Option<ItemStack>, bool) {
+    if target.is_some() || stack.count == 0 || !valid {
         return (Some(stack), false);
     }
     let mut one = stack.clone();

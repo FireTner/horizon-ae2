@@ -149,6 +149,14 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "util/inv/AppEngInternalInventory.java": ("mixins/ae2/automation.rs", "native Drive/Charger one-slot insertion limit, Charger filter-before-extraction and direct-loaded count retention; general inventory API, simulate handler, event/lifecycle and other hosts pending"),
+    "api/inventories/InternalInventoryItemHandler.java": ("mixins/ae2/charger_automation.rs", "Charger native exposed-handler wrapped-stack extraction guard only; general item handler/capability API pending"),
+    "blockentity/misc/ChargerRecipes.java": ("mixins/ae2/charger_automation.rs", "native recipe/tag ingredient membership for automation, independent of result support; work result components and original RecipeManager ordering parity pending"),
+    "blockentity/misc/ChargerBlockEntity.java": ("mixins/ae2/glue.rs", "powered/recipe/refill order, all-16 power profiles, original inv.item0, transient working; native all-face hopper/dropper filter with source allowExtract fallback and limit one; live config, visual/sync and remaining capability/drop lifecycle pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

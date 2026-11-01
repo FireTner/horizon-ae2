@@ -3,7 +3,47 @@
 Дата: 1 ноября 2026. macOS arm64, Rust 1.99.1, Python 3.12.
 AE2 db17504 / Horizon aa27eca / horizon-mixins 3f99a5c.
 
-## Shared source inventory codec — текущий завершённый этап
+## Charger native automation — 1 ноября 2026
+
+- Standalone **98 PASS**, native game **135 PASS**, Python tooling **10 PASS**.
+  `cargo check --locked`, fmt, clippy `-D warnings`, tests, source audit,
+  pinned Horizon check и fast build прошли. Native library tests отдельно не
+  повторялись: library payload не изменён. Все invocations, exit statuses и
+  timestamps находятся в `target/benchmark-report.md`, logs —
+  `target/benchmark-logs/`. Source inventory: 1429 Java files, 71 partial,
+  ни один класс не объявлен полностью перенесённым.
+- `charger-automation-etmv64a5` **PASS**: настоящие hoppers/droppers со всех
+  шести сторон, limit one и remainder; реальный tag ingredient с unsupported
+  result components; recipe input удерживается; все 16 powered items принимаются;
+  empty powered item без рецепта извлекается сразу, powered recipe input ждёт
+  current >= maximum. Internal wrapped stack не извлекается.
+- Source-loaded count 3 извлекается без потери; failed pull возвращает исходный
+  count, energy 777 и custom component. Полное извлечение сразу сохраняет `inv.item0: {}`.
+  Malformed original count zero блокирует insert/pull даже с полным powered
+  native echo; restart удерживает блокировку, explicit source repair снимает её.
+  Ordinary barrel/hopper сохраняют обычную вставку stack 3.
+- Drive regression `drive-automation-k59ctwm5` **PASS**: фильтры/десять слотов,
+  все стороны, offline, full remainder, components, failed pull и restart.
+  Запущена копия исходного smoke под `target/` с единственной адаптацией control
+  socket suffix `.sock` → `.json`, чтобы endpoint тоже оставался в собственном
+  глубоком target path и не превышал Unix SUN_LEN.
+- Всего **4 failed validation invocations**, затем исправлены: native helper
+  return-type spelling; Charger harness Unix socket length; неверное ожидание
+  destination slot layout; unloaded setup chunk. Runtime automation assertions
+  последнего прогона прошли. Первый successful native test/build был повторён
+  после добавления исходного exposed-handler wrapped-stack guard.
+- Отдельно выявлено существующее расхождение item catalog: native hopper может
+  объединить portable cells в count 3, хотя Java AEItems задаёт `stacksTo(1)`.
+  Тест подтверждает точный total count и компоненты, а не destination max-stack
+  parity. Native comparator fullness также ещё использует item stack max вместо
+  исходного inventory slot limit. Оба ограничения записаны в PARITY.
+- General capability API, addon power/ingredients/conditions, full config,
+  destruction/chunk paths и Java/NeoForge world oracle остаются открытыми.
+  Это проверка конкретного automation adapter, не полного Charger parity.
+  Все тестовые клиенты завершены; пользовательские миры, ресурсы и оригинальные
+  engine repositories не изменялись. Push/publication/deployment не выполнялись.
+
+## Shared source inventory codec — предыдущее подтверждение
 
 - Standalone **95 PASS**, native **130 PASS**, Python **10 PASS**, fmt/rustfmt,
   clippy -D warnings, source inventory audit и native check/build PASS.

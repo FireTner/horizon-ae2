@@ -76,14 +76,14 @@
 - Charger сохраняет исходный `inv.item0`, синхронизирует native Items echo,
   записывает slot edits сразу и держит working transient. Source updates,
   malformed retention, native-save migration и restart проверены. Full recovery,
-  hopper/capabilities и все drop paths ещё открыты.
+  native hopper/dropper automation подключена; capabilities и все drop paths ещё открыты.
 - Общий source inventory codec Drive/Charger проверяет count до native clamp,
   сохраняет optional/default форму и защищает blocked original от изменения echo.
   Прямой positive count из NBT сохраняется отдельно от limit-one обычной вставки.
   Проверены block/unblock/restart, точный drain и регрессии обоих устройств/GUI.
 - Подготовка контента, source-only `.hnmod`, закреплённые исходники и
   проверяемый реестр **всех 1429 Java-файлов** оригинала. В реестре нет
-  полностью закрытых классов; 69 отмечены как частично перенесённые.
+  полностью закрытых классов; 71 отмечены как частично перенесённые.
 - Подготовка также переносит 461 исходный общий тег NeoForge из pinned source,
   с лицензией/хэшами и порядком platform → AE2. World item predicates и restart
   проверены. Три прежних ручных списка заменены исходными данными платформы.
@@ -154,6 +154,8 @@ python3.12 tools/smoke_drive.py --ctl /path/to/horizon-ctl \
 python3.12 tools/smoke_drive_gui.py --ctl /path/to/horizon-ctl \
   --resources /path/to/prepared/26.3
 python3.12 tools/smoke_drive_automation.py --ctl /path/to/horizon-ctl \
+  --resources /path/to/prepared/26.3
+python3.12 tools/smoke_charger_automation.py --ctl /path/to/horizon-ctl \
   --resources /path/to/prepared/26.3
 python3.12 tools/smoke_drive.py --portable --ctl /path/to/horizon-ctl \
   --resources /path/to/prepared/26.3

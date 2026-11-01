@@ -18,7 +18,7 @@
 | PortableCellItem | половина bytes, прежний overhead, item type limits 54/45/36/27/18 и fluid 18, 0.5 idle drain, component-preserving backend/Drive mounts и storage tooltip | handheld terminal/menu, private use/disassembly, energy tooltip, item color/LED и full upgrades lifecycle |
 | DriveMenu / DriveScreen | original texture/layout, десять cell slots с лимитом 1, authoritative filters, pickup/shift/drag/hotbar rules, main-before-hotbar shift order и isolation; game restart | priority button/subscreen, ghost icons, AEBaseMenu bulk actions, external multiplayer и addon cell registry |
 | EnergyCellBlockEntity | normal/dense/creative block entities, реальные сетевые хранилища, internalCurrentPower и proxy.e persistence | fullness drawing/sync, comparator, energy components у item/drop/placement, redstone/template side effects |
-| Charger | таблица ae2:charger, local 1600 AE, threshold 1599, interval 10, random > 0.8, один предмет, сохранение энергии/слота; powered branch для 16 items с исходными rates и local/grid/overflow; сеть пополняет private buffer до 800 AE/call | live config multiplier/rates, hopper фильтры, полное inv/drop lifecycle, эффекты и рендер предмета |
+| Charger | таблица ae2:charger, local 1600 AE, threshold 1599, interval 10, random > 0.8, один предмет, сохранение энергии/слота; powered branch для 16 items с исходными rates и local/grid/overflow; сеть пополняет private buffer до 800 AE/call; native hopper/dropper automation по ChargerInvFilter со всех сторон | live config multiplier/rates, external capability API, полное inv/drop lifecycle, эффекты и рендер предмета |
 | Wooden Crank | rotation/hits/charge, 18 ticks/160 AE, busy window, 11 отказов ломают рукоятку, charger-side restriction | placement/survival, fake-player rule, статистика, анимация и sync |
 | Common platform tags | 461 generated c tags NeoForge 21.1.169, exact source hashes/licence, platform-before-AE2 layering/replace и real item predicate/restart checks | runtime membership всех registries/тегов, NeoForge API/events/recipe conditions и полная survival progression |
 
@@ -52,9 +52,27 @@
   порядок отдельных ties и реальный порядок регистрации grid nodes пока не
   воспроизводятся целиком; выводы oracle относятся к заданному входному порядку.
 
-- Динамический `ChargerInvFilter` нельзя выразить статическими `ModContainer`
-  API 40: разные правила вставки/выемки по текущему предмету. Автоматизация
-  Charger временно отключена; ручная вставка и извлечение поддерживаются.
+- Native hopper/dropper Charger использует `ChargerInvFilter` через hooks машин:
+  вставка разрешена для chargeable item либо ingredient любого Charger recipe;
+  извлечение — `(chargeable && current >= maximum) || !recipe_matches`.
+  Поэтому незаряженный powered item без рецепта извлекается сразу, как в Java.
+  Рецепт проверяется по реальным native Items tags/recipe data при обращении,
+  независимо от поддержки result components. Обычная вставка — slot 0/limit 1;
+  source-loaded positive count>1 извлекается по одному без потери остатка.
+  `AEBaseInvBlockEntity.getExposedInventoryForSide` не ограничивает грани:
+  открыты все шесть, включая переднюю; grid front restriction не применяется.
+  Перед изменением синхронизируется source/native echo; успешное изменение
+  немедленно сохраняет inv.item0, failed pull возвращает исходный stack.
+  Как InternalInventoryItemHandler, extraction не выпускает internal wrapped stacks.
+  Malformed original остаётся blocked до explicit repair. General capability
+  API/addon power registry и полный Java/NeoForge world lifecycle ещё открыты.
+  Native comparator fullness пока использует item max stack вместо исходного
+  inventory slot limit; фильтр/лимит переноса этим не ослабляются, comparator parity
+  не заявляется. Native item catalog также ещё не переносит все исходные
+  `AEItems` max-stack properties: в world smoke три одинаковые portable cells
+  объединяются в hopper slot, тогда как source `stacksTo(1)` запрещает это.
+  Каждый Charger pull переносит ровно один предмет, суммарный source-loaded
+  count сохраняется; destination stack-size parity этим этапом не закрыта.
 - EnergyService/GridEnergyStorage/StoredEnergyAmount/EnergyOverlayGrid сверены
   с неизменённым Java: 1000 single-grid и 1000 overlay traces, 462175 операций.
   Game/event/collection infrastructure stubbed; finite hosts используют исходный
@@ -126,9 +144,11 @@
   остаются в assets, выбор по реальному уровню и sync ещё не подключены.
   Рецепты normal/dense energy cells восстановлены из jar, survival chain пока
   не проверена (в том числе Inscriber/processors и внешнее питание).
-- Charger принимает только рецептные предметы без неподдержанных компонентов
-  результата. Зарядка инструментов и GuideME recipe результата с components
-  не подменяются обычным предметом. Конфиг в адаптере пока default multiplier 1.
+- Выполнение Charger recipe пока отказывает результатам с неподдержанными
+  components. Automation admission/extraction использует ingredient membership
+  и не исключает такой рецепт. GuideME result с components не подменяется
+  обычным предметом. Конфиг в адаптере пока default multiplier 1. Полные addon
+  ingredient/NeoForge condition codecs и RecipeManager ordering ещё нужны.
 - `minecraft:dispenser` даёт шесть направлений и block entity, но не `spin`.
   Charger показывает исходную модель с `spin=0`. Placement, outline/collision,
   материал/звуки и нежелательные template behaviours требуют отдельных hooks.

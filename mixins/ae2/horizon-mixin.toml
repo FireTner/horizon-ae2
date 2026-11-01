@@ -522,3 +522,27 @@ bindings = [
   { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
   { name = "pos", ty = "[i32; 3]", value = "pos" },
 ]
+
+[[module]]
+id = "charger-automation-rules"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_charger_automation_rules"
+source = "charger_automation_rules.rs"
+
+[[module]]
+id = "charger-automation"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_charger_automation"
+source = "charger_automation.rs"
+
+[[injection]]
+id = "charger-automation-take"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::machines::Game<'_>::take_one"
+helper = "automation_take.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "view", ty = "&crate::game::machines::View", value = "view" },
+  { name = "slot", ty = "usize", value = "slot" },
+]

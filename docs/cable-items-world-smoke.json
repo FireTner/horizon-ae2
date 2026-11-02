@@ -1,0 +1,131 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "case": "all 85 cable items place original centers in creative without shrinking",
+      "owner": 0
+    },
+    "real held-item cable chain carries ME power to a Charger recipe",
+    {
+      "case": "survival placement/mining glass_cable",
+      "returned": [
+        {
+          "components": "{\"minecraft:custom_data\":{keep_on_unplaced:99},\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 2,
+          "item": "ae2:white_glass_cable",
+          "slot": 0
+        },
+        {
+          "components": "{\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 1,
+          "item": "ae2:white_glass_cable",
+          "slot": 1
+        }
+      ]
+    },
+    {
+      "case": "survival placement/mining covered_cable",
+      "returned": [
+        {
+          "components": "{\"minecraft:custom_data\":{keep_on_unplaced:99},\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 2,
+          "item": "ae2:black_covered_cable",
+          "slot": 0
+        },
+        {
+          "components": "{\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 1,
+          "item": "ae2:black_covered_cable",
+          "slot": 1
+        }
+      ]
+    },
+    {
+      "case": "survival placement/mining smart_cable",
+      "returned": [
+        {
+          "components": "{\"minecraft:custom_data\":{keep_on_unplaced:99},\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 2,
+          "item": "ae2:orange_smart_cable",
+          "slot": 0
+        },
+        {
+          "components": "{\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 1,
+          "item": "ae2:orange_smart_cable",
+          "slot": 1
+        }
+      ]
+    },
+    {
+      "case": "survival placement/mining covered_dense_cable",
+      "returned": [
+        {
+          "components": "{\"minecraft:custom_data\":{keep_on_unplaced:99},\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 2,
+          "item": "ae2:pink_covered_dense_cable",
+          "slot": 0
+        },
+        {
+          "components": "{\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 1,
+          "item": "ae2:pink_covered_dense_cable",
+          "slot": 1
+        }
+      ]
+    },
+    {
+      "case": "survival placement/mining smart_dense_cable",
+      "returned": [
+        {
+          "components": "{\"minecraft:custom_data\":{keep_on_unplaced:99},\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 2,
+          "item": "ae2:blue_smart_dense_cable",
+          "slot": 0
+        },
+        {
+          "components": "{\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 1,
+          "item": "ae2:blue_smart_dense_cable",
+          "slot": 1
+        }
+      ]
+    },
+    "player obstruction rolls back the new host and preserves held count",
+    "unsupported facade host is preserved unchanged when central-item admission fails",
+    "Level command destruction returns the cable part, never a glass or CableBus item",
+    "real bucket drains and refills the CableBus without removing its part",
+    "water placement records source waterlogged state and removal restores water",
+    "creative mining produces no cable drop",
+    "disabled block_drops suppresses the part drop",
+    "source part/custom name and world-wide owner mapping survive restart and another placement"
+  ],
+  "logs": "target/smoke/cable-items-9afv1ob1",
+  "limits": [
+    "Center-only placement/drop; unsupported side parts/facades and compatibility are not implemented",
+    "Offhand Color Applicator, complete settings/security, source readiness events and external CTRL synchronization remain open",
+    "Water host state/restoration checked; complete fluid simulation, lighting and all direct collision callers remain open",
+    "Native game verification; no complete Java/NeoForge world oracle"
+  ],
+  "native_tests": {
+    "standalone": 126,
+    "game": 178,
+    "library": 16,
+    "python": 11
+  },
+  "java_target_cases": 52592,
+  "source_sha256": {
+    "mixins/ae2/cable_items.rs": "1d01bd5026ff7f41337b4ddaabd2774db664399c2d73d36e92320fa5da57250b",
+    "mixins/ae2/part_placement.rs": "992da2c37ca4fd740855f424f9dc3bec7160f580e1e9208be2b5537d8ec5fe3c",
+    "mixins/ae2/player_registry.rs": "d0a5c892351865619a36b39ad2c7ba98dd65d3047381cae68870cb2abebd9e92",
+    "mixins/ae2/block_states.rs": "e724043c08f40c85fc23363aa4bc75e4f9142c7374dcc50ecaba789fb0411e06",
+    "mixins/ae2/grid_glue.rs": "52cee133146ed6625dcab1717fb3e1e8dd0efd6e1b49c11af48ad7c0438b7351",
+    "mixins/ae2/right_click.rs": "29453c7dd4010233df23f0137a24379dcababa2ee1f4d700e119796efa18b91e",
+    "mixins/ae2/horizon-mixin.toml": "46a3620cace8195ba3a530dfa7562619a65399a0ecf2a833266e0b5ae02ad3f6",
+    "tools/smoke_cable_items.py": "0cb8058b277cf05da9c8b83f5179a3a4f83812ed1f1998a7a5730c7fbc837845"
+  },
+  "power_regression": {
+    "passed": true,
+    "output": "PASS: finite ME cell powers Charger; total remaining energy = 400 AE\nPASS: front face does not connect or supply power\nPASS: creative ME cell powers the same recipe without a crank\nPASS: restart conserves finite cell + Charger energy; logs: target/smoke/power-a_2otec0\n"
+  }
+}

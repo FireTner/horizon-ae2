@@ -841,3 +841,70 @@ cancellable = true
 target = "horizon_client::game::remote::Game<'_>::remote_block_entity_data"
 helper = "cable_decode_hook.rs"
 bindings = [{name="game",ty="&mut crate::game::Game<'_>",value="&mut *self"}, {name="pos",ty="[i32;3]",value="pos"}, {name="kind",ty="i32",value="kind"}, {name="tag",ty="&Tag",value="tag"}]
+
+[[module]]
+id = "part-placement"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_part_placement"
+source = "part_placement.rs"
+
+[[module]]
+id = "player-registry"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_player_registry"
+source = "player_registry.rs"
+
+[[module]]
+id = "cable-items"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_cable_items"
+source = "cable_items.rs"
+
+[[injection]]
+id = "cable-use-on"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_use_item_on"
+helper = "cable_use_on.rs"
+bindings = [
+ {name="game",ty="&mut crate::game::Game<'_>",value="&mut *self"},
+ {name="stack",ty="&horizon_client::items::ItemStack",value="stack"},
+ {name="pos",ty="[i32;3]",value="pos"},
+ {name="face",ty="[i32;3]",value="face"},
+ {name="claimed",ty="&mut bool",value="&mut *claimed"},
+]
+
+[[injection]]
+id = "cable-drop-record"
+kind = "HEAD"
+target = "horizon_client::game::spill::Pending::record"
+helper = "cable_drop_record.rs"
+bindings = [
+ {name="pending",ty="&mut crate::game::spill::Pending",value="&mut *self"},
+ {name="pos",ty="[i32;3]",value="pos"},
+ {name="entity",ty="&horizon_client::containers::BlockEntity",value="entity"},
+ {name="block",ty="&str",value="block"},
+]
+
+[[injection]]
+id = "cable-player-loot"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::Game<'_>::block_loot_at"
+helper = "cable_loot.rs"
+bindings = [
+ {name="game",ty="&mut crate::game::Game<'_>",value="&mut *self"},
+ {name="pos",ty="[i32;3]",value="pos"},
+ {name="state",ty="horizon_world::registry::BlockStateId",value="state"},
+]
+
+[[injection]]
+id = "cable-level-drop"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::spill::GameLevel<'_>::drop_resources_now"
+helper = "cable_drop_level.rs"
+bindings = [
+ {name="level",ty="&mut crate::game::GameLevel<'_>",value="&mut *self"},
+ {name="pos",ty="horizon_core::position::BlockPos",value="pos"},
+ {name="state",ty="horizon_world::registry::BlockStateId",value="state"},
+]

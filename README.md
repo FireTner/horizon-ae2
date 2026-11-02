@@ -7,8 +7,8 @@ rewritten in Rust. Horizon runs no Java, so AE2's code is ported to Rust and bui
 items, recipes, models and textures are prepared from **your own AE2 jar** as a content mod.
 
 Status: **ME network and storage foundations, Charger, energy cells, Drive, Controller, and cable
-centers** are ported in part and checked in isolated game worlds. The latest checkpoint adds all five
-cable types in 17 colors, their rendering, selection, power connections and save/restart behavior.
+centers** are ported in part and checked in isolated game worlds. The latest checkpoint adds real item placement for all five
+cable types in 17 colors, survival drops, custom names, waterlogging/buckets, and persistent ownership.
 The target is the **complete 1:1 port** of the pinned AE2 release; the full mod is still in development.
 See [docs/PLAN.md](docs/PLAN.md) for the scope and next steps, [docs/PARITY.md](docs/PARITY.md) for the
 remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and how.
@@ -19,7 +19,7 @@ remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and 
 |---|---|---|
 | 1. Toolchain and delivery | Pinned sources, original content preparation, native builds and deterministic packages | Launcher installation/rebuild verification and release workflow |
 | 2. Keys, cells and persistence | Component-aware item/fluid keys; all 23 built-in basic, portable, creative and tool cell profiles; Drive backends | Complete registry recovery, Cell Workbench, config writers and upgrade lifecycle |
-| 3. ME networks and cables | Topology, channels, energy routing, Controller validation, five cable types and 17 colors, native cable centers | Survival cable placement, side parts/facades, full source events, collision and lighting paths |
+| 3. ME networks and cables | Topology, channels, energy routing, Controller validation, five cable types and 17 colors, native cable centers, item placement/drop and waterlogging | Complete part interactions, side parts/facades, full source events, collision and lighting paths |
 | 4. Energy and machines | Charger recipes and powered items, finite/creative energy cells, Controller power | Energy Acceptor, Inscriber, Vibration Chamber, external power capabilities and complete machine behavior |
 | 5. Storage and terminals | Ten-slot Drive, cell mounting, priorities in the storage core, filtered screen and automation | Terminals, ME Chest, storage buses, priority UI and complete storage interactions |
 | 6. Autocrafting | Pending | Patterns, providers, assemblers, crafting CPUs, planning and job lifecycle |
@@ -28,7 +28,7 @@ remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and 
 | 9. Full validation | Rule tests, Java differential comparisons, native tests and selected game scenarios | Complete survival progression, source-game comparisons, multiplayer and large-network validation |
 
 These are feature checkpoints, not completed milestones. The source inventory tracks all 1,429 Java
-files, including 103 partially ported classes. That count is not a gameplay completion percentage.
+files, including 108 partially ported classes. That count is not a gameplay completion percentage.
 Blocks, items and recipes carried over as data do not count as working features on their own.
 
 ## What is ported
@@ -45,14 +45,16 @@ Blocks, items and recipes carried over as data do not count as working features 
 | Powered items and finite energy-cell items | `item_energy*.rs`, `energy_cell_item.rs`, `energy_cell_model.rs`: charging, energy bars, item models and implemented placement/drop energy paths |
 | ME Drive | `drive_glue.rs`, `gui.rs`, `automation*.rs`: ten actual cell slots, supported backends, power/channel gating, filtered screen and hopper/dropper access |
 | Cable parts and CableBus | `cable.rs`, `part_storage.rs`, `cable_bus.rs`, `node_data.rs`: types/colors, center NBT, saved node data and reload identity |
+| Cable item placement and drops | `part_placement.rs`, `cable_items.rs`, `player_registry.rs`: target/admission rules, entity obstruction, survival/creative consumption, named part drops, buckets and original owner-array persistence |
 | Cable builders and world rendering | `cube_builder.rs`, `cable_render.rs`, `cable_view.rs`: original cable quads/textures, graph-derived connections/channels, outline and contextual shapes |
 | Client state and stack components | `cable_sync.rs`, `component_sync.rs`: native visual transport and typed item components, preserving authoritative saved data |
 
 The Drive supports all 23 built-in cell profiles, but portable and tool cells do not yet have their
 complete handheld behavior. Its screen exposes ten real slots; priority controls and the complete
 AE2 menu remain unfinished. Charger supports 16 powered-item profiles and both finite energy-cell
-items. Cable centers currently enter the world through source-format commands; ordinary cable item
-placement, side parts, facades, partial breaking and drops remain to be implemented.
+items. All 85 cable items place their own center parts, and survival mining returns those parts with
+their custom names. Side parts, facades, partial breaking, Color Applicator placement and complete
+client/security/lifecycle behavior remain to be implemented.
 
 ## Layout
 
@@ -71,6 +73,8 @@ mixins/ae2/
   cube_builder.rs, cable_render.rs
                         source-derived cable geometry and textures
   *_glue.rs, glue.rs    Horizon world, inventory, energy and lifecycle adapters
+  part_placement.rs, cable_items.rs, player_registry.rs
+                        cable placement, drops, waterlogging and player ownership
   cable_view.rs, cable_sync.rs
                         native cable rendering, shapes and client state
   *.rs                  menu policies, item views and small injection helpers

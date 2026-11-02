@@ -3,6 +3,31 @@
 Last updated: 2 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
+## Current cable item placement checkpoint
+
+- Formatting, Clippy with warnings denied, 126 standalone Rust tests, 11 Python
+  tests, English documentation, 58 stack-limit registrations and the 1,429-file
+  source inventory audit pass. Coverage is 108 partial classes; none are claimed
+  complete merely from these tests.
+- Native check/build pass. The native game suite passes 178 tests and the library
+  suite passes 16. The latter verifies wet/dry fluid rows across all 32 CableBus
+  states while retaining vanilla/foreign state and shape mappings.
+- [Part placement Java comparison](docs/part-placement-oracle.json): 52,592 cases
+  of verbatim target/admission methods, including all directions, CTRL/null
+  player, permissions/hosts, and int-boundary coordinates. World mutation,
+  registries, collision, settings and events are declared stubs/separate evidence.
+- [Cable item world scenario](docs/cable-items-world-smoke.json): all 85 held-item
+  placements; opaque facade-host preservation; a real item-placed ME cable chain powering a Charger; five survival
+  placement/name/drop cases; obstruction rollback; Level destruction; real bucket
+  drain/refill; water restoration; creative/no-drop rules; source names/node data
+  and player-ID persistence across restart and another placement.
+- Separate finite/creative power, front-face refusal and finite cell/Charger
+  energy conservation across restart pass with the current adapter changes.
+
+Full side parts/facades, partial breaking, security/settings, CTRL network input,
+exact interaction-result/animation behavior, complete event/readiness lifecycle,
+all direct shape callers/fluid/light and external multiplayer remain open.
+
 ## Current native CableBus stage
 
 - Standalone verification: formatting, Clippy with warnings denied, 122 Rust

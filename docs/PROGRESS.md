@@ -10,8 +10,10 @@ per-file status and `PARITY.md` for unresolved behavior.
 The native center-only CableBus checkpoint integrates all 32 source physical
 states, five cable types and 17 colors, graph-derived visuals, original atlas
 sources, dynamic outline/raycast, contextual movement/piston shapes, and a
-wire-only native client transport. Command-created hosts transfer real ME power
-and retain their source center/node data across restart. Full CableBus and full
+wire-only native client transport. All 85 cable items place real center parts, with survival/creative consumption,
+entity obstruction/rollback, named drops, waterlogging and bucket interactions.
+An item-placed cable chain transfers real ME power. Original center/node data,
+custom names and the world-wide player-ID map survive restart. Full CableBus and full
 mod parity remain unfinished; the limits below are still completion requirements.
 
 ## Verified foundations
@@ -29,15 +31,15 @@ mod parity remain unfinished; the limits below are still completion requirements
 | Keys/storage/services | Component-aware identities, finite/creative/restricted cells, byte/type rules, routing/mounts and caches; full registry recovery, callbacks, consumers and addon APIs remain open |
 | Content/tooling | Pinned original assets, 461 NeoForge tags, 58 unstackable registrations, deterministic source packaging and isolated builds; carried content does not imply implemented mechanics |
 
-Current validation: 122 standalone Rust tests, 172 native game tests, 16 native
+Current validation: 126 standalone Rust tests, 178 native game tests, 16 native
 library tests and 11 Python tests. Native check/build and the isolated CableBus
 world check pass. The finite/creative power and restart regression also passes.
 See `VALIDATION.md` for evidence and the exact boundaries of these runs.
 
 ## Next required work
 
-Complete the remaining direct collision/support/fluid/light paths and real
-CableBus placement, removal, drops, parts/facades, full source visual packets,
+Complete remaining direct collision/support/fluid/light paths, full
+CableBus part interactions, partial removal, facades, full source visual packets,
 and source event/readiness model. Continue
 with missing storage hosts/terminals, capabilities, menu/render gaps, crafting,
 security, wireless/spatial services, tools, world content, addons, and full

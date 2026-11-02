@@ -57,7 +57,9 @@ nesting restrictions, energy conservation, channels, and permissions.
 
 Cable profiles, center NBT, owner-ignoring node-data comparison, and cable-only
 quad construction have source-derived implementations and differential tests.
-Native physical-host integration is the current stage. Keep the original 32
+Native center rendering, item placement/drop, buckets and original player-ID
+arrays are implemented with isolated world checks. Complete multipart host and
+source lifecycle integration remain the current work. Keep the original 32
 `light_level`/`waterlogged` states. Color, type, connections, and channels belong
 to parts and their client state, not invented block properties.
 

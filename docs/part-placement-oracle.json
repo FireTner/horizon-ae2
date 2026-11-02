@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "cases": 52592,
+  "revision": "db17504a86128fdf3dae31f5fb7a112a646e0b93",
+  "source_sha256": "77e5c502d2f9e02c52a0fb3b73ddb856188d24f9648dd99d4b41a384e165e37f",
+  "port_sha256": "992da2c37ca4fd740855f424f9dc3bec7160f580e1e9208be2b5537d8ec5fe3c",
+  "verbatim_fragment_sha256": "f6f52ec9df17206dd0060a00230db91e75c622f2a7208652b3fd5c124eda6a34",
+  "input_sha256": "3ee4e2f9af7047d97a4579dbf69d85707cc110f739aeaa419933cbad9f26d76d",
+  "output_sha256": "1ee3cd2e4f45b54764aa3c9678b03d9cf4c36107edf1d4f3d6ff6b296cd2c21c",
+  "scope": "Original getPartPlacement and canPlacePartOnBlock for central cable parts, all faces, CTRL/null player, existing hosts, replacement/admission and Java int boundary offsets",
+  "limits": [
+    "Level/PartHelper/host registry and permission results are fixtures",
+    "Cable segment replacement is irrelevant to central cable admission and stubbed; side parts/facades are not exercised",
+    "Place mutation, collision, security, owner mapping, settings, sound, consumption and world lifecycle require separate native/game evidence"
+  ]
+}

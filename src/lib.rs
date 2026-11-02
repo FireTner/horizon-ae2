@@ -52,3 +52,8 @@ pub mod ae2_node_data;
 pub mod ae2_cable_render;
 #[path = "../mixins/ae2/cube_builder.rs"]
 pub mod ae2_cube_builder;
+
+#[path = "../mixins/ae2/part_placement.rs"]
+pub mod ae2_part_placement;
+#[path = "../mixins/ae2/player_registry.rs"]
+pub mod ae2_player_registry;

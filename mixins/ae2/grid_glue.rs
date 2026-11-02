@@ -91,6 +91,38 @@ pub(super) fn pre_tick(game: &mut Game<'_>, dimension: &str) {
     state.drives.reconcile(&mut state.network);
     state.network.begin_tick();
 }
+// Placement must test the just-added cable's actual connected shape without
+// advancing TickManager or charging/draining any service a second time.
+pub(super) fn cables_changed(game: &mut Game<'_>) {
+    let mut networks = NETWORKS.lock().unwrap_or_else(|e| e.into_inner());
+    let state = networks.entry(game.dim.id().to_owned()).or_default();
+    let nodes = snapshots(game, state);
+    state.network.sync(nodes);
+    let poses: Vec<_> = game
+        .world
+        .block_entities
+        .iter()
+        .filter_map(|(&(x, y, z), be)| {
+            matches!(be,BlockEntity::Mod(be) if be.id==super::ae2_cable_bus::BLOCK)
+                .then_some([x, y, z])
+        })
+        .collect();
+    for pos in poses {
+        if let Some(visual) = state.network.cable_visual(pos)
+            && let Some(BlockEntity::Mod(be)) =
+                game.world.block_entities.get_mut(&(pos[0], pos[1], pos[2]))
+        {
+            be.data = vec![
+                horizon_client_render::ae2_cable_view::MAGIC,
+                i32::from(visual.connections),
+            ];
+            be.data.extend(visual.channels);
+            if let Some(log) = &mut game.world.block_log {
+                log.push((pos[0], pos[1], pos[2]));
+            }
+        }
+    }
+}
 pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
     // Block placement, removal and /data may run inside the level tick. Notice
     // those changes before persisting; unchanged NBT is not an external refill
@@ -233,7 +265,7 @@ pub(super) fn cell_stored(dimension: &str, pos: [i32; 3], kind: Kind, saved: f64
         .storage_for_snapshot(pos, kind, saved)
 }
 
-pub(super) fn cell_placed(dimension: &str, pos: [i32; 3]) {
+pub(super) fn node_placed(dimension: &str, pos: [i32; 3]) {
     if let Some(state) = NETWORKS
         .lock()
         .unwrap_or_else(|e| e.into_inner())

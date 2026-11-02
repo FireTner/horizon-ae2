@@ -334,9 +334,41 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
         }
         "block-behaviours.json" => {
             layout.rows(&mut doc["states"])?;
+            let water = doc["fluids"]
+                .as_array()
+                .ok_or("missing fluid registry")?
+                .iter()
+                .position(|v| v.as_str() == Some("minecraft:water"))
+                .ok_or("missing water fluid")?;
+            if layout.kind == Definition::CableBus {
+                let blocks = doc["blocks"]
+                    .as_array_mut()
+                    .ok_or("missing behaviour blocks")?;
+                let block = blocks
+                    .iter_mut()
+                    .find(|b| b["name"] == "ae2:cable_bus")
+                    .ok_or("missing CableBus behaviour")?;
+                let interfaces = block["interfaces"]
+                    .as_array_mut()
+                    .ok_or("missing CableBus interfaces")?;
+                for name in [
+                    "SimpleWaterloggedBlock",
+                    "LiquidBlockContainer",
+                    "BucketPickup",
+                ] {
+                    if !interfaces.iter().any(|v| v == name) {
+                        interfaces.push(json!(name));
+                    }
+                }
+            }
             for i in 0..layout.kind.variants() {
                 let row = &mut doc["states"][layout.first + i];
                 let flags = row[1].as_u64().ok_or("no behaviour flags")?;
+                if layout.kind == Definition::CableBus {
+                    row[2] = json!(if i % 2 == 1 { water } else { 0 });
+                    row[3] = json!(if i % 2 == 1 { 8 } else { 0 });
+                    row[4] = json!(false);
+                }
                 row[1] = json!(
                     flags
                         | if !matches!(
@@ -580,6 +612,28 @@ mod tests {
                 .unwrap() >= prior.len() as u64
         );
         assert_eq!(rows.iter().filter(|r| r[0] == "ae2:cable_bus").count(), 32);
+        let behaviours = read_json(&out, "block-behaviours.json").unwrap();
+        let water = behaviours["fluids"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .position(|v| v == "minecraft:water")
+            .unwrap();
+        for (i, (id, _)) in rows
+            .iter()
+            .enumerate()
+            .filter(|(_, r)| r[0] == "ae2:cable_bus")
+            .enumerate()
+        {
+            assert_eq!(
+                behaviours["states"][id][2],
+                json!(if i % 2 == 1 { water } else { 0 })
+            );
+            assert_eq!(
+                behaviours["states"][id][3],
+                json!(if i % 2 == 1 { 8 } else { 0 })
+            );
+        }
         assert_eq!(controller.len(), 18);
         for (i, (_, row)) in controller.iter().enumerate() {
             assert_eq!(row[4]["properties"], properties(i));

@@ -85,7 +85,7 @@ pub(super) fn placed(game: &mut Game<'_>, stack: &ItemStack, pos: [i32; 3]) {
         be.nbt
             .insert("internalCurrentPower".into(), Tag::Double(amount.to_bits()));
         game.world.modified.insert((pos[0] >> 4, pos[2] >> 4));
-        ae2_grid_glue::cell_placed(game.dim.id(), pos);
+        ae2_grid_glue::node_placed(game.dim.id(), pos);
     }
 }
 

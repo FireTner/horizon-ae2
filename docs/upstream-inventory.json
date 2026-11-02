@@ -1,8 +1,8 @@
 {
   "families": {
     "api": {
-      "partial": 24,
-      "pending": 248
+      "partial": 27,
+      "pending": 245
     },
     "block": {
       "partial": 8,
@@ -65,8 +65,8 @@
       "pending": 97
     },
     "items": {
-      "partial": 11,
-      "pending": 46
+      "partial": 12,
+      "pending": 45
     },
     "me": {
       "partial": 22,
@@ -81,8 +81,8 @@
       "pending": 17
     },
     "parts": {
-      "partial": 8,
-      "pending": 74
+      "partial": 9,
+      "pending": 73
     },
     "recipes": {
       "partial": 0,
@@ -521,8 +521,10 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/features/PlayerRegistryInternal.java",
+      "port": "mixins/ae2/player_registry.rs",
+      "scope": "UUID/int mapping, source int/long array saved data, native world-wide owner assignment; service API/configuration/client security integrations pending",
       "sha256": "55f779bc1ffc14d7c096e986b1853e32bdfc9fa5fb966c9fad4879b201326015",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
@@ -1345,8 +1347,10 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/parts/IPart.java",
+      "port": "mixins/ae2/cable_items.rs",
+      "scope": "central cable addPartDrop with dismantle custom name and no gn/buffer carry; full part APIs/additional contents/wrench/side part lifecycle pending",
       "sha256": "d957ce425e1b1777ca1f06427f40b72df08e911bdee2055dd6c22122e34e2ac1",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
@@ -1375,8 +1379,10 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/parts/PartHelper.java",
+      "port": "mixins/ae2/cable_items.rs",
+      "scope": "center host lookup/reuse/replacement and source waterlogged host placement; full addon registry, forced setPart and side/facade helpers pending",
       "sha256": "5acc20d232424c378e69feb22ca541ef64229bbf768dace0e1256665efd65f6e",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
@@ -1957,8 +1963,8 @@
     {
       "family": "block",
       "path": "src/main/java/appeng/block/networking/CableBusBlock.java",
-      "port": "mixins/ae2/block_states.rs",
-      "scope": "source 32 light/waterlogged states and center-only native render/outline/contextual collision; survival placement/drop, all direct queries/fluid/part lifecycle pending",
+      "port": "mixins/ae2/cable_items.rs",
+      "scope": "32 source states and native center rendering/selection/contextual shape; source waterlogged placement and central-part player/Level drops; full direct queries, fluid/support/light, side parts/facades and lifecycle pending",
       "sha256": "f22f593021b2da7d60ccff4efe9adfce815093895d24fcbab4af9b20f72b54e7",
       "status": "partial"
     },
@@ -5867,8 +5873,10 @@
     {
       "family": "items",
       "path": "src/main/java/appeng/items/parts/PartItem.java",
+      "port": "mixins/ae2/cable_items.rs",
+      "scope": "all 85 cable PartItem useOn paths dispatched to native central-part placement; non-cable parts, full item APIs and external client behavior pending",
       "sha256": "0509a3163b5d1063089860c194b51811e3dd0005f0c27453acfedb21b1fa1abb",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "items",
@@ -7219,8 +7227,8 @@
     {
       "family": "parts",
       "path": "src/main/java/appeng/parts/AEBasePart.java",
-      "port": "mixins/ae2/cable_bus.rs",
-      "scope": "part gn node data nesting and raw custom state preservation; full base settings/packet/ownership/visual lifecycle pending",
+      "port": "mixins/ae2/cable_items.rs",
+      "scope": "source gn center persistence, placement owner and customName import/dismantle export; full generic settings, services, packet and readiness lifecycle pending",
       "sha256": "a4fcf64b1586a7b7820eaf83e0dda70b92e1a7fe68c6e8871ead34506df9db19",
       "status": "partial"
     },
@@ -7273,8 +7281,10 @@
     {
       "family": "parts",
       "path": "src/main/java/appeng/parts/PartPlacement.java",
+      "port": "mixins/ae2/part_placement.rs",
+      "scope": "source center placement target/admission, actual native item placement/obstruction/consumption; side-part segment targeting, Color Applicator, security and complete settings/events pending",
       "sha256": "77e5c502d2f9e02c52a0fb3b73ddb856188d24f9648dd99d4b41a384e165e37f",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "parts",

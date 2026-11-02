@@ -215,6 +215,18 @@ PARTIAL.update({
 })
 
 
+
+PARTIAL.update({
+    "parts/PartPlacement.java": ("mixins/ae2/part_placement.rs", "source center placement target/admission, actual native item placement/obstruction/consumption; side-part segment targeting, Color Applicator, security and complete settings/events pending"),
+    "api/parts/PartHelper.java": ("mixins/ae2/cable_items.rs", "center host lookup/reuse/replacement and source waterlogged host placement; full addon registry, forced setPart and side/facade helpers pending"),
+    "items/parts/PartItem.java": ("mixins/ae2/cable_items.rs", "all 85 cable PartItem useOn paths dispatched to native central-part placement; non-cable parts, full item APIs and external client behavior pending"),
+    "api/features/PlayerRegistryInternal.java": ("mixins/ae2/player_registry.rs", "UUID/int mapping, source int/long array saved data, native world-wide owner assignment; service API/configuration/client security integrations pending"),
+    "api/parts/IPart.java": ("mixins/ae2/cable_items.rs", "central cable addPartDrop with dismantle custom name and no gn/buffer carry; full part APIs/additional contents/wrench/side part lifecycle pending"),
+    "parts/AEBasePart.java": ("mixins/ae2/cable_items.rs", "source gn center persistence, placement owner and customName import/dismantle export; full generic settings, services, packet and readiness lifecycle pending"),
+    "block/networking/CableBusBlock.java": ("mixins/ae2/cable_items.rs", "32 source states and native center rendering/selection/contextual shape; source waterlogged placement and central-part player/Level drops; full direct queries, fluid/support/light, side parts/facades and lifecycle pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

@@ -23,7 +23,7 @@ The full mod is not yet complete.
 | Finite cell items | Fixed capacities/rates, source removal threshold, Charger support, float item-model thresholds and placement/first-drop energy | Complete tooltip/settings/capability APIs, charged creative variants and every loot/recovery path |
 | Charger | Source recipe work, local/grid/refill power order, powered items, original inventory, automation and comparator | Live config, capability API, exact geometry/orientation/effects/drop RNG and complete lifecycle |
 | Wooden Crank | Rotation/hits/energy, 18-tick turns, busy window, failure/break rules and Charger-side restriction | Placement/survival/fake-player/statistics, orientation, animation and full synchronization |
-| CableBus | Five types/17 colors, flags, raw shapes, channel payload rules, storage, center NBT and source quad construction | Native center rendering/outline/contextual movement/piston shapes and same-bundle visual transport; full placement, parts/facades, event/selection/drop lifecycle |
+| CableBus | Five types/17 colors, center NBT/geometry/render/sync, real item placement, entity obstruction, survival/creative drops, names, water/buckets and original owner arrays | Complete placement/settings/security/CTRL result semantics, parts/facades, all shapes/fluid/light and source event/selection lifecycle |
 | Platform/content | Pinned original resources, source stack limits, 461 generated NeoForge common tags and recipe preparation | Full platform services, recipe types/conditions/IDs, registries, progression, addons and coexistence checks |
 
 ## Components, keys, and inventories
@@ -152,7 +152,45 @@ center NBT and a versioned, transient visual payload derived from graph channels
 The client unwraps it only at packet receipt; save decoding preserves arbitrary
 source NBT. This same-bundle transport is not AE2's complete source packet or
 external-client negotiation. Full lighting/AO, attachment/facade geometry,
-survival placement, partial breaking and drops remain unfinished.
+complete survival part interactions, partial breaking and multipart drops remain unfinished.
+
+## Cable items, drops, and ownership
+
+All 85 cable PartItems enter the native item-use path. Central parts try the
+clicked position first, then the adjacent position on the opposite face. An
+occupied center is never overwritten. New hosts use the source waterlogged
+state. The full connected cable shape is tested against native building-blocking
+entities; failed placement removes the provisional part/empty host and consumes
+nothing. Explicit placement forgets the previous node identity even for equal
+kind/position/NBT. Topology refresh does not advance the energy tick again.
+
+Survival consumes one item; creative consumes none. Player mining and Level
+resource destruction return the original cable part ID and dismantle custom name,
+without carrying node owner/buffer or arbitrary item components. Creative mining
+and disabled block drops produce none. Native Pending carries the part-drop
+snapshot only until the corresponding drop transaction is cleared; this private
+transport never enters real item components or source saves.
+
+The 16 wet states contain a water source in the behaviour table, and the host
+implements the native SimpleWaterlogged interface. Actual buckets drain/refill
+the host while retaining its cable; removal restores water. This is not evidence
+of complete source fluid propagation, shape support or light behavior.
+
+Owning UUIDs map to source integer IDs using original `playerIds` IntArray and
+`profileIds` LongArray data in overworld `data/ae2_players.dat`. Native assignment
+reads the world-wide map and uses native gzip-NBT writes with backups; all dimensions share
+it. Corrupt mappings are refused without overwrite. Native tests cover signed
+UUID halves, duplicate IDs, repeated readers and persistence. A complete public
+player-registry service and all migration/config/security behavior remain open.
+
+Hosts with raw side/facade payloads refuse central placement until their codecs
+and full shapes are available; failed admission never clears those payloads.
+Side-part/facade admission, segment targeting, Color Applicator offhand placement,
+all generic settings/security callbacks and source readiness/event ordering are
+unfinished. The target/admission rule supports CTRL, but full client-to-server
+modifier synchronization is pending. The native boolean item-use hook consumes
+failed clicks; exact source FAIL/swing/offhand feedback still needs integration.
+These are partial placement paths, not complete PartPlacement/IPart parity.
 
 ## Native networking, recipes, and platform limits
 

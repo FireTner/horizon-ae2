@@ -29,9 +29,11 @@ edits preserve identity; external part-item ID or other gn edits reset it. This
 NBT load path differs from direct painting's in-place recolor. Persist only a
 still-matching observed center, and update the observed gn after our own save.
 Native center-only registration/render and outline/contextual movement hooks are
-implemented; survival placement, per-part nodes/readiness, facades, all direct
-collision callers, partial breaking, drops and full source packet synchronization remain open.
-Future physical states must be source light_level/waterlogged (32), not invented
+implemented. cable_items.rs/part_placement.rs add all 85 central-item placement
+and drop paths, full-shape entity obstruction, names and water/buckets. Per-part
+nodes/readiness, facades, direct collision callers, partial breaking, complete
+settings/security/CTRL/input results and source packets remain open.
+Physical states must stay source light_level/waterlogged (32), not invented
 color/type/connection properties. CableBuilder texture names use enum names:
 TRANSPARENT texture suffix is transparent, whereas the item ID prefix is fluix.
 cube_builder.rs/cable_render.rs now feed cable_view.rs in the native render
@@ -41,6 +43,14 @@ suffixes and smart machine-cap vertex-color retention. Quad.cull records emitter
 metadata only: original cable BakedQuads are returned unculled, not by face.
 RenderState expects already resolved source connection types/core/channel inputs;
 The collector uses actual graph visual counts and source neighbor minima.
+player_registry.rs uses source UUID/int allocation and parallel arrays. Its native
+owner bridge reads/writes world_root/data/ae2_players.dat, shared by dimensions;
+never use a global settings folder, UUID hash or process-only ID counter. Preserve
+existing NBT fields and refuse corrupt mapping overwrites. Cable drops carry only
+dismantle settings, never node power/owner or arbitrary input components. Pending's
+private copied map entry is scoped to the position/transaction and cleared normally;
+it must never be attached to a real stack. grid_glue::node_placed forgets the old
+node before actual cell/cable placement is reconciled, including equal saved data.
 Native center visuals use a wire-only transport in the same bundle. Attachment/facade
 quads, packed normals/AO, full lighting and the complete source packet remain open.
 Preserve FabricMC Apache-2.0 attribution for QuadEmitter.square coordinate rules.
@@ -49,7 +59,7 @@ in horizon-mixin.toml. keys.rs, storage.rs and cells.rs feed the native cell
 tooltip/codec adapter. energy.rs/grid.rs/power.rs feed network.rs and the
 grid_glue.rs world adapter (Charger + three energy-cell kinds + Drive + Controller).
 controller.rs supplies source 8000 public AE/idle 3, node profile and visual rules.
-block_states.rs wraps only owned Controller/energy-cell content builds and expands the
+block_states.rs wraps only owned Controller/energy-cell/CableBus content builds and expands the
 single physical cube rows to actual Controller 18 state/type and finite-cell five
 fullness variants (creative stays one property-free state) across effective
 JSON/NBT tables. Preserve vanilla ids and foreign shape/model references. This
@@ -140,8 +150,6 @@ All generated/intermediate files stay under target/. Update VALIDATION.md with
 what actually ran, including limits. Publication and pushing require explicit user
 authorization; the public horizon-ae2 creation/push is authorized above.
 
-During the active full-port goal, check account usage with the Codex app tool
-about every five minutes. The user reset quota and reinstated an automatic stop:
-pause the goal when any relevant available usage window has 15% or less remaining.
-This replaces the previous removal of the 10% stop. Never reset or purchase quota.
-Unknown/missing windows do not mean zero remaining.
+The user removed the quota-based automatic pause rule. Continue the full-port
+goal without pausing at a remaining-usage percentage. Never reset or purchase
+quota on the user's behalf.

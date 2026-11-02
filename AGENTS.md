@@ -32,7 +32,7 @@ Native center-only registration/render and outline/contextual movement hooks are
 implemented. cable_items.rs/part_placement.rs add all 85 central-item placement
 and drop paths, full-shape entity obstruction, names and water/buckets. Per-part
 nodes/readiness, facades, direct collision callers, partial breaking, complete
-settings/security/input results and source packets remain open.
+settings/security, multipart input results and source packets remain open.
 ctrl.rs/cable_input.rs carry default-false per-player CTRL state through the native
 authenticated mod channel. Process it in guest_native_net before subsequent use
 packets, charging the shared PER_TICK allowance exactly once. Never defer this
@@ -42,9 +42,29 @@ state on world lifecycle/death; connection identity uses a retained Arc marker.
 cable_pick.rs selects only hit-tested supported centers and returns a bare part
 item; optional creative BE data encodes the actual Mod BE and uses the native
 component collector. saved_block_entity's vanilla canonicalizer rejects mod IDs.
-Complete
-client prediction, FAIL/swing/offhand feedback and all player replacement and
-external multiplayer paths remain open.
+part_use.rs owns the source ordered result flow; cable_actions.rs scopes the
+boolean hand bridge by Game identity and RAII. A failed cable click stops with
+no swing/offhand action; client SUCCESS swings, server CONSUME does not.
+Keep block reactions and other native claims ahead of part use. Server success
+consumes only for an actual noncreative player and awards the use statistic/
+criterion. cable_prediction.rs runs in the remote module: never use native_set_block,
+the server network, or the persistent owner map for a client preview. Newly
+constructed client cable connections are empty until streamed. Retain server
+blocks and BE snapshots under native action sequences; received BE data takes
+precedence over the original preview snapshot. Reset on connection/dimension/
+respawn/leave. The guest packet wrapper sends queued CableBus updates while it
+owns the hub, before normal acknowledgements; do not read game.lan inside a
+guest's use (the hub is temporarily outside Game). Wire occupancy fields preserve
+raw unsupported side/facade admission. Full multipart prediction, settings,
+security, all replacement/unload/fake-player and external multiplayer paths
+remain open. Native test filtering includes nested ae2_ modules, not only direct
+children of game.
+The next generic stack gap is adventure use: pinned NeoForge's ItemStack patch
+and CommonHooks.onPlaceItemIntoWorld return PASS before PartPlacement for a
+disallowed can_place_on. The current target guard yields part FAIL instead.
+Do not claim full input parity from survival/creative tests. Offhand permission
+lookup must use its actual stack, and original 1.21.1 predicate/component handling
+must not be replaced by an unconstrained native compound match.
 Physical states must stay source light_level/waterlogged (32), not invented
 color/type/connection properties. CableBuilder texture names use enum names:
 TRANSPARENT texture suffix is transparent, whereas the item ID prefix is fluix.

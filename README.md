@@ -9,7 +9,8 @@ items, recipes, models and textures are prepared from **your own AE2 jar** as a 
 Status: **ME network and storage foundations, Charger, energy cells, Drive, Controller, and cable
 centers** are ported in part and checked in isolated game worlds. Cable items support placement,
 survival drops, names, waterlogging/buckets and persistent ownership. The current input layer adds
-the configurable opposite-side key, synchronized server state and center-part Pick Block.
+the configurable opposite-side key, synchronized server state and center-part Pick Block. Center
+placement also has client prediction, source interaction results and server correction.
 The target is the **complete 1:1 port** of the pinned AE2 release; the full mod is still in development.
 See [docs/PLAN.md](docs/PLAN.md) for the scope and next steps, [docs/PARITY.md](docs/PARITY.md) for the
 remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and how.
@@ -48,6 +49,7 @@ Blocks, items and recipes carried over as data do not count as working features 
 | Cable parts and CableBus | `cable.rs`, `part_storage.rs`, `cable_bus.rs`, `node_data.rs`: types/colors, center NBT, saved node data and reload identity |
 | Cable item placement and drops | `part_placement.rs`, `cable_items.rs`, `player_registry.rs`: target/admission rules, entity obstruction, survival/creative consumption, named part drops, buckets and original owner-array persistence |
 | Cable input and Pick Block | `ctrl.rs`, `cable_input.rs`, `cable_pick.rs`: configurable physical key, authenticated per-player opposite-side state and hit-selected bare center item |
+| Cable placement results | `part_use.rs`, `cable_actions.rs`, `cable_prediction.rs`: ordered source results, client preview, server consumption and sequence-based correction |
 | Cable builders and world rendering | `cube_builder.rs`, `cable_render.rs`, `cable_view.rs`: original cable quads/textures, graph-derived connections/channels, outline and contextual shapes |
 | Client state and stack components | `cable_sync.rs`, `component_sync.rs`: native visual transport and typed item components, preserving authoritative saved data |
 
@@ -57,7 +59,7 @@ AE2 menu remain unfinished. Charger supports 16 powered-item profiles and both f
 items. All 85 cable items place their own center parts, and survival mining returns those parts with
 their custom names. The opposite-side key defaults to Left Control and is configurable in native
 mod settings. Pick Block selects the actual center item; creative Ctrl can include block-entity data.
-Side parts, facades, partial breaking, Color Applicator placement and complete
+Adventure stack prechecks, side parts, facades, partial breaking, Color Applicator placement and complete
 client/security/lifecycle behavior remain to be implemented.
 
 ## Layout

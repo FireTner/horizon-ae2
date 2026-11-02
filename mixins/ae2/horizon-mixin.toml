@@ -993,3 +993,110 @@ bindings=[
  {name="pos",ty="[i32;3]",value="pos"},
  {name="include_data",ty="bool",value="include_data"},
 ]
+
+[[module]]
+id="part-use"
+file="crates/horizon-client/src/game.rs"
+name="ae2_part_use"
+source="part_use.rs"
+
+[[module]]
+id="cable-actions"
+file="crates/horizon-client/src/game.rs"
+name="ae2_cable_actions"
+source="cable_actions.rs"
+
+[[module]]
+id="cable-prediction"
+file="crates/horizon-client/src/game/remote.rs"
+name="ae2_cable_prediction"
+source="cable_prediction.rs"
+
+[[injection]]
+id="cable-hand-result"
+kind="HEAD"
+cancellable=true
+target="horizon_client::game::Game<'_>::use_hand"
+helper="cable_hand.rs"
+bindings=[
+ {name="game",ty="&mut crate::game::Game<'_>",value="&mut *self"},
+ {name="hit",ty="Option<&crate::game::Hit>",value="block_hit"},
+]
+
+[[injection]]
+id="cable-swing-result"
+kind="HEAD"
+cancellable=true
+target="horizon_client::game::hand::Game<'_>::swing_arm"
+helper="cable_swing.rs"
+bindings=[{name="game",ty="&crate::game::Game<'_>",value="&*self"}]
+
+[[injection]]
+id="cable-guest-update"
+kind="HEAD"
+cancellable=true
+target="horizon_client::game::lan_actions::Game<'_>::lan_guest_packet"
+helper="cable_guest_packet.rs"
+bindings=[
+ {name="game",ty="&mut crate::game::Game<'_>",value="&mut *self"},
+ {name="host",ty="&mut crate::game::lan::LanHost",value="&mut *host"},
+ {name="conn",ty="u32",value="conn"},
+ {name="packet",ty="&S",value="&packet"},
+]
+
+[[injection]]
+id="cable-remote-result"
+kind="HEAD"
+cancellable=true
+target="horizon_client::game::remote::Game<'_>::remote_use_item_on"
+helper="cable_remote_hand.rs"
+bindings=[
+ {name="game",ty="&mut crate::game::Game<'_>",value="&mut *self"},
+ {name="hand",ty="Hand",value="hand"},
+]
+
+[[injection]]
+id="cable-predict-part"
+kind="HEAD"
+cancellable=true
+target="horizon_client::game::remote::Game<'_>::predict_item_on_block"
+helper="cable_predict_hook.rs"
+bindings=[
+ {name="game",ty="&mut crate::game::Game<'_>",value="&mut *self"},
+ {name="stack",ty="&ItemStack",value="stack"},
+ {name="hit",ty="&crate::game::Hit",value="hit"},
+]
+
+[[injection]]
+id="cable-prediction-ack"
+kind="HEAD"
+cancellable=true
+target="horizon_client::game::remote::Game<'_>::end_predictions"
+helper="cable_prediction_ack.rs"
+bindings=[
+ {name="game",ty="&mut crate::game::Game<'_>",value="&mut *self"},
+ {name="sequence",ty="i32",value="sequence"},
+]
+
+[[injection]]
+id="cable-prediction-level"
+kind="HEAD"
+target="horizon_client::game::remote::Game<'_>::enter_remote_dimension"
+helper="cable_prediction_reset.rs"
+
+[[injection]]
+id="cable-prediction-leave"
+kind="HEAD"
+target="horizon_client::game::remote::Game<'_>::leave_server"
+helper="cable_prediction_reset.rs"
+
+[[injection]]
+id="cable-prediction-break"
+kind="HEAD"
+target="horizon_client::game::remote::Game<'_>::predict_break"
+helper="cable_prediction_break.rs"
+bindings=[
+ {name="game",ty="&crate::game::Game<'_>",value="&*self"},
+ {name="pos",ty="[i32;3]",value="pos"},
+ {name="sequence",ty="i32",value="sequence"},
+]

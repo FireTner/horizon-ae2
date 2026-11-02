@@ -23,7 +23,7 @@ The full mod is not yet complete.
 | Finite cell items | Fixed capacities/rates, source removal threshold, Charger support, float item-model thresholds and placement/first-drop energy | Complete tooltip/settings/capability APIs, charged creative variants and every loot/recovery path |
 | Charger | Source recipe work, local/grid/refill power order, powered items, original inventory, automation and comparator | Live config, capability API, exact geometry/orientation/effects/drop RNG and complete lifecycle |
 | Wooden Crank | Rotation/hits/energy, 18-tick turns, busy window, failure/break rules and Charger-side restriction | Placement/survival/fake-player/statistics, orientation, animation and full synchronization |
-| CableBus | Five types/17 colors, center NBT/geometry/render/sync, item placement/drop, names, water/buckets, owner arrays, synchronized opposite-side key and center Pick Block | Complete prediction/interaction results/settings/security, parts/facades, all shapes/fluid/light and source event/selection lifecycle |
+| CableBus | Five types/17 colors, center NBT/geometry/render/sync, item placement/drop, names, water/buckets, owner arrays, synchronized opposite-side key, center Pick Block and center placement prediction/results | Full multipart prediction/settings/security, parts/facades, all shapes/fluid/light and source event/selection lifecycle |
 | Platform/content | Pinned original resources, source stack limits, 461 generated NeoForge common tags and recipe preparation | Full platform services, recipe types/conditions/IDs, registries, progression, addons and coexistence checks |
 
 ## Components, keys, and inventories
@@ -202,8 +202,38 @@ are refused rather than guessed. Survival selection uses the existing native
 inventory path. Full facade/side selection and vanilla/source-game data-component
 comparisons remain open.
 
-The native boolean item-use hook consumes failed clicks; exact source
-FAIL/swing/offhand feedback and complete client prediction still need integration.
+`part_use.rs` preserves the source PASS/FAIL/sided-success control flow. A failed
+center placement ends the click without swinging or trying the other hand.
+Client success swings once and does not shrink the item; server success consumes
+one survival item, awards its use statistic and triggers the block-use criterion.
+Scoped adapters retain the block's own reaction and native mod priority; results
+do not remain on a player or affect a later vanilla action.
+
+The client constructs a supported center and checks its local obstruction shape,
+without writing the server graph, owner registry or saved node state. A new
+client cable starts with no streamed connections, as the source constructor does.
+Native block sequences retain known server states, including reverse CTRL
+targets. A companion BE ledger retains the original/last received host and
+settles it with the sequence, so an acknowledgement cannot retain a refused
+preview or restore stale empty-host data over a verified part. Later native
+actions on the same position extend that host's pending sequence; server host
+data is remembered even while a predicted break hides it. Connection,
+dimension/respawn and leave paths reset preview state. Explicit CableBus updates
+bridge the host while Horizon temporarily lends its hub to a guest packet.
+
+The generic adventure ItemStack gate is still incomplete. Pinned NeoForge's
+`ItemStack.onItemUse` and `CommonHooks.onPlaceItemIntoWorld` return PASS before
+calling the part when `can_place_on` does not permit it. The current part target
+guard instead returns FAIL through the part coordinator, affecting offhand
+fallback in adventure mode. Client offhand predicate lookup also needs the
+actual acting stack rather than the default hand context. Original 1.21.1
+predicate/component normalization, NBT/state conditions and full permissions
+remain required; the survival/creative world checks do not prove these paths.
+
+The native visual envelope also carries raw side/facade occupancy fields for
+correct refusal. This is not an implementation of those parts or AE2's full
+source packet. Exact source neighbour/event/packet timing, full settings/security,
+multipart prediction and all unload/replacement/fake-player paths remain open.
 These are partial placement paths, not complete PartPlacement/IPart parity.
 
 ## Native networking, recipes, and platform limits

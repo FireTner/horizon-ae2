@@ -18,6 +18,9 @@ mod parity remain unfinished; the limits below are still completion requirements
 The input layer synchronizes a configurable physical opposite-side key before
 dependent use packets. Center Pick Block returns the actual bare cable item,
 with optional creative block-entity data collected from the supported Mod host.
+Center placement predicts a real local part, checks entities, preserves source
+interaction results and uses native sequences to settle authoritative blocks
+and host data. A client success swings once; a failure stops before the off hand.
 
 ## Verified foundations
 
@@ -26,7 +29,8 @@ with optional creative block-entity data collected from the supported Mod host.
 | Cable geometry | 24,405 Java cases, 467,940 quads, 9,358,800 float fields; GPU/world collector, attachments/facades and full lighting remain separate |
 | Cable node data | 20,064 Java equality cases; real typed NBT roundtrip and native graph-buffer identity tests; explicit source load/readiness events remain open |
 | Cable profiles | 85 type/color profiles, source flags and channel visuals; 278,956 Java cases; dense trunk and normal bottleneck tested in the binding |
-| Cable input | 11,028 Java boolean-packet cases; native per-world/sender state and hit-selected center clone; full client prediction, interaction results and external multiplayer remain open |
+| Cable input | 11,028 Java boolean-packet cases; native per-world/sender state and hit-selected center clone; full multipart behavior and external multiplayer remain open |
+| Part use | 10,320 Java placement-result/order/consumption cases; supported center client preview and server correction; full multipart/settings/security and source event lifecycle remain open |
 | Finite cell items | Fixed power profiles, original item-model thresholds, Charger support, placement/first matching drop energy transfer; full base APIs and all loot paths remain open |
 | Energy cells | Original fullness states/models, local comparator formula, deferred ticking-chunk notifications, grid power and persistence; complete event/TickManager lifecycle remains open |
 | Controller | Public 8,000 AE store, 3 AE/tick idle, source flags/validation/channel rules, 18 states/models, conflict/restart world checks; menus/capabilities/full lifecycle remain open |
@@ -35,16 +39,24 @@ with optional creative block-entity data collected from the supported Mod host.
 | Keys/storage/services | Component-aware identities, finite/creative/restricted cells, byte/type rules, routing/mounts and caches; full registry recovery, callbacks, consumers and addon APIs remain open |
 | Content/tooling | Pinned original assets, 461 NeoForge tags, 58 unstackable registrations, deterministic source packaging and isolated builds; carried content does not imply implemented mechanics |
 
-Current validation: 128 standalone Rust tests, 182 native game tests, 16 native
+Current validation: 128 standalone Rust tests, 186 native game tests, 16 native
 library tests and 11 Python tests. Native check/build and the isolated CableBus
 world checks pass, including all 85 center Pick Block items, Ctrl data, packet
 ordering, configured keys and restart. The earlier finite/creative power and
 restart regression also passes.
+The center-result world check passes client/server prediction, obstruction,
+offhand failure, acknowledgement and interleaved break cases; placement and
+input regressions pass again with the current adapter.
 See `VALIDATION.md` for evidence and the exact boundaries of these runs.
 
 ## Next required work
 
-Complete client placement prediction and exact FAIL/swing/offhand handling,
+Separate the source adventure ItemStack PASS gate from PartPlacement FAIL,
+bind offhand permission checks to the actual stack, and complete original
+predicate/component handling. Survival/creative prediction tests do not cover
+this generic stack layer.
+
+Complete multipart client prediction, settings/security and all lifecycle paths,
 remaining direct collision/support/fluid/light paths, full
 CableBus part interactions, partial removal, facades, full source visual packets,
 and source event/readiness model. Continue

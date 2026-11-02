@@ -144,7 +144,7 @@ def main():
             if args.action == "build":
                 command.extend(["--profile", "fast"])
             if args.action == "test":
-                command.extend(["ae2_" if args.library else "game::ae2_", "--", "--nocapture"])
+                command.extend(["ae2_", "--", "--nocapture"])
             with lock(target.parent / (target.name + ".mod-template.lock")):
                 run_start = time.monotonic()
                 result = subprocess.run(command, cwd=output, capture_output=True, text=True)

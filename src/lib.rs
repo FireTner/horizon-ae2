@@ -60,3 +60,5 @@ pub mod ae2_player_registry;
 
 #[path = "../mixins/ae2/ctrl.rs"]
 pub mod ae2_ctrl;
+#[path = "../mixins/ae2/part_use.rs"]
+pub mod ae2_part_use;

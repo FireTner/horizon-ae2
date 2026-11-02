@@ -217,9 +217,9 @@ PARTIAL.update({
 
 
 PARTIAL.update({
-    "parts/PartPlacement.java": ("mixins/ae2/part_placement.rs", "source center placement target/admission, actual native item placement/obstruction/consumption; side-part segment targeting, Color Applicator, security and complete settings/events pending"),
+    "parts/PartPlacement.java": ("mixins/ae2/part_use.rs", "source ordered PASS/FAIL/sided-success flow, center target/admission, client/server placement/obstruction and server-only consumption; native sequence correction; side-part segment targeting, Color Applicator, security and complete settings/events pending"),
     "api/parts/PartHelper.java": ("mixins/ae2/cable_items.rs", "center host lookup/reuse/replacement and source waterlogged host placement; full addon registry, forced setPart and side/facade helpers pending"),
-    "items/parts/PartItem.java": ("mixins/ae2/cable_items.rs", "all 85 cable PartItem useOn paths dispatched to native central-part placement; non-cable parts, full item APIs and external client behavior pending"),
+    "items/parts/PartItem.java": ("mixins/ae2/cable_items.rs", "all 85 cable useOn paths, source results and scoped client/server hand integration; non-cable parts, factories/full item APIs and external-client validation pending"),
     "api/features/PlayerRegistryInternal.java": ("mixins/ae2/player_registry.rs", "UUID/int mapping, source int/long array saved data, native world-wide owner assignment; service API/configuration/client security integrations pending"),
     "api/parts/IPart.java": ("mixins/ae2/cable_items.rs", "central cable addPartDrop with dismantle custom name and no gn/buffer carry; full part APIs/additional contents/wrench/side part lifecycle pending"),
     "parts/AEBasePart.java": ("mixins/ae2/cable_items.rs", "source gn center persistence, placement owner and customName import/dismantle export; full generic settings, services, packet and readiness lifecycle pending"),

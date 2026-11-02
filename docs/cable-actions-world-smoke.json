@@ -1,0 +1,264 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "case": "client preview and one server consumption for glass_cable",
+      "preview": {
+        "block": "ae2:cable_bus",
+        "loaded": true,
+        "pos": [
+          6,
+          74,
+          7
+        ],
+        "state": "ae2:cable_bus[light_level=0,waterlogged=false]"
+      }
+    },
+    {
+      "case": "client preview and one server consumption for covered_cable",
+      "preview": {
+        "block": "ae2:cable_bus",
+        "loaded": true,
+        "pos": [
+          6,
+          74,
+          7
+        ],
+        "state": "ae2:cable_bus[light_level=0,waterlogged=false]"
+      }
+    },
+    {
+      "case": "client preview and one server consumption for smart_cable",
+      "preview": {
+        "block": "ae2:cable_bus",
+        "loaded": true,
+        "pos": [
+          6,
+          74,
+          7
+        ],
+        "state": "ae2:cable_bus[light_level=0,waterlogged=false]"
+      }
+    },
+    {
+      "case": "client preview and one server consumption for covered_dense_cable",
+      "preview": {
+        "block": "ae2:cable_bus",
+        "loaded": true,
+        "pos": [
+          6,
+          74,
+          7
+        ],
+        "state": "ae2:cable_bus[light_level=0,waterlogged=false]"
+      }
+    },
+    {
+      "case": "client preview and one server consumption for smart_dense_cable",
+      "preview": {
+        "block": "ae2:cable_bus",
+        "loaded": true,
+        "pos": [
+          6,
+          74,
+          7
+        ],
+        "state": "ae2:cable_bus[light_level=0,waterlogged=false]"
+      }
+    },
+    "FAIL does not swing or raise the off-hand shield before or after the server processes it",
+    "opaque facade-host admission is refused on both sides without clearing the source payload",
+    "client and server entity obstruction roll back the host without swing or item consumption",
+    "authoritative BE data survives acknowledgement when a predicted part reuses an empty host",
+    "server refusal corrects normal preview without spending the item or adding a server swing",
+    "server refusal corrects CTRL reverse preview without spending the item or adding a server swing",
+    "coalesced predicted placement and native break do not revive a stale cable host after acknowledgement",
+    "chest reaction retains priority over part placement",
+    "scope cleanup leaves subsequent vanilla item actions unchanged"
+  ],
+  "logs": "target/smoke/cable-actions-47s1lbv_",
+  "limits": [
+    "Integrated authenticated client/server; external LAN and dedicated clients remain separate",
+    "Covers supported center parts; full side parts, facades, source security/settings, source visual packets and all lifecycle paths remain open",
+    "Corrupt owner map is an intentional native strict-refusal fault, not a Java recovery oracle",
+    "No complete Java/NeoForge world comparison; exact source lighting, neighbour events and packet timing remain separate"
+  ],
+  "regressions": {
+    "items": {
+      "passed": true,
+      "checks": [
+        {
+          "case": "all 85 cable items place original centers in creative without shrinking",
+          "owner": 0
+        },
+        "real held-item cable chain carries ME power to a Charger recipe",
+        {
+          "case": "survival placement/mining glass_cable",
+          "returned": [
+            {
+              "components": "{\"minecraft:custom_data\":{keep_on_unplaced:99},\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+              "count": 2,
+              "item": "ae2:white_glass_cable",
+              "slot": 0
+            },
+            {
+              "components": "{\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+              "count": 1,
+              "item": "ae2:white_glass_cable",
+              "slot": 1
+            }
+          ]
+        },
+        {
+          "case": "survival placement/mining covered_cable",
+          "returned": [
+            {
+              "components": "{\"minecraft:custom_data\":{keep_on_unplaced:99},\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+              "count": 2,
+              "item": "ae2:black_covered_cable",
+              "slot": 0
+            },
+            {
+              "components": "{\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+              "count": 1,
+              "item": "ae2:black_covered_cable",
+              "slot": 1
+            }
+          ]
+        },
+        {
+          "case": "survival placement/mining smart_cable",
+          "returned": [
+            {
+              "components": "{\"minecraft:custom_data\":{keep_on_unplaced:99},\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+              "count": 2,
+              "item": "ae2:orange_smart_cable",
+              "slot": 0
+            },
+            {
+              "components": "{\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+              "count": 1,
+              "item": "ae2:orange_smart_cable",
+              "slot": 1
+            }
+          ]
+        },
+        {
+          "case": "survival placement/mining covered_dense_cable",
+          "returned": [
+            {
+              "components": "{\"minecraft:custom_data\":{keep_on_unplaced:99},\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+              "count": 2,
+              "item": "ae2:pink_covered_dense_cable",
+              "slot": 0
+            },
+            {
+              "components": "{\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+              "count": 1,
+              "item": "ae2:pink_covered_dense_cable",
+              "slot": 1
+            }
+          ]
+        },
+        {
+          "case": "survival placement/mining smart_dense_cable",
+          "returned": [
+            {
+              "components": "{\"minecraft:custom_data\":{keep_on_unplaced:99},\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+              "count": 2,
+              "item": "ae2:blue_smart_dense_cable",
+              "slot": 0
+            },
+            {
+              "components": "{\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+              "count": 1,
+              "item": "ae2:blue_smart_dense_cable",
+              "slot": 1
+            }
+          ]
+        },
+        "player obstruction rolls back the new host and preserves held count",
+        "unsupported facade host is preserved unchanged when central-item admission fails",
+        "Level command destruction returns the cable part, never a glass or CableBus item",
+        "real bucket drains and refills the CableBus without removing its part",
+        "water placement records source waterlogged state and removal restores water",
+        "creative mining produces no cable drop",
+        "disabled block_drops suppresses the part drop",
+        "source part/custom name and world-wide owner mapping survive restart and another placement"
+      ],
+      "logs": "target/smoke/cable-items-_trsssii",
+      "limits": [
+        "Center-only placement/drop; unsupported side parts/facades and compatibility are not implemented",
+        "Offhand Color Applicator, complete settings/security, source readiness events and external CTRL synchronization remain open",
+        "Water host state/restoration checked; complete fluid simulation, lighting and all direct collision callers remain open",
+        "Native game verification; no complete Java/NeoForge world oracle"
+      ]
+    },
+    "input": {
+      "passed": true,
+      "checks": [
+        "real CTRL press/release reverses central placement for the acting player",
+        "six coalesced CTRL/use packet batches observe the new attachment before placement",
+        "normal creative Pick Block returns each of all 85 bare part IDs without name/node/host data",
+        "creative Ctrl-Pick retains original host NBT without transient visual envelope fields",
+        "survival Pick Block selects an existing cable stack without creating another",
+        "survival Pick Block cannot manufacture a missing part",
+        "restart clears old CTRL state and honors the configured opposite-placement key instead of hard-coded controls",
+        "rebinding vanilla sprint does not change the physical AE2 opposite-placement modifier"
+      ],
+      "logs": "target/smoke/cable-input-jj7asrxz",
+      "limits": [
+        "Integrated authenticated client/server, not a separate LAN/dedicated-client run",
+        "Sprint remap uses the ctl repeat path because ctl down also inserts the canonical action into physical_keys",
+        "Center-only clone selection; unsupported raw side/facade hosts remain refused",
+        "Complete client part prediction, FAIL/swing/offhand semantics, facades, side parts and source lifecycle remain open"
+      ]
+    }
+  },
+  "native_tests": {
+    "standalone": 128,
+    "game": 186,
+    "library": 16,
+    "python": 11
+  },
+  "java_use_cases": 10320,
+  "source_sha256": {
+    "mixins/ae2/cable.rs": "3290cf4eb759e68914000b8cca0d742980a9b51135badbacf63c83607ee2b5c7",
+    "mixins/ae2/cable_actions.rs": "d4ef1d543ac20fb6c4944c1320e28d9efc0969a7e03c4aebb4fa481147237270",
+    "mixins/ae2/cable_atlas_hook.rs": "dfce2620a4fe63b91c29665c9533af50264d276d59dd2c881e2c4aa1186820df",
+    "mixins/ae2/cable_bus.rs": "13909562f16a851770065bfc93d9b82977e648f96c83ec4fdf98f2cab53804fc",
+    "mixins/ae2/cable_collision_hook.rs": "170e8af7f3379d43424d3e2f6bad5e2459cca757461e5af94968eaaef45e2d73",
+    "mixins/ae2/cable_decode_hook.rs": "a4578d56efdd506cd72e084dcbe2c23b0be2eb009eca1d9e5adddafd8175e711",
+    "mixins/ae2/cable_drop_level.rs": "c73a4727442bf9b5e34a5dbc3a3c27fb76b49e63da159952b2b0ce688b5bedc6",
+    "mixins/ae2/cable_drop_record.rs": "73b3e0eb9ad5d333e1e38929fe03446d1c3b1e0806ef066f1b412f8a55f026db",
+    "mixins/ae2/cable_entity_tag_hook.rs": "406b9c22f0331cefbc3cfb2990f7d70920c3f2b1b65fbca0d7aa06dacb88b814",
+    "mixins/ae2/cable_entity_type_hook.rs": "148b4975ec8434d4d2b08b6b08a0fba5256b253d1cda6ad9be4e04a4fed70fdc",
+    "mixins/ae2/cable_for_block_hook.rs": "e6ee83d17d7e90c4efad3f18195bc6cb36c1b9c38615e3678a1205936fa773f2",
+    "mixins/ae2/cable_geometry_hook.rs": "8c2f724e358d847335540083efd0eea4fe3b28667fb855d13e725f36fdcc6128",
+    "mixins/ae2/cable_guest_packet.rs": "aff5d33c7c72f1dd588f74366b09f722e567c234d599adb24c4b1300af2ec69e",
+    "mixins/ae2/cable_hand.rs": "8bc3ec1a6a21699970f549daaa8fe03d3ea4fa2e7265f83911833f7caf36a623",
+    "mixins/ae2/cable_input.rs": "cb3b3d11107729bbbfac98d34dcae5fc8b67152b0af3bb229e9c6848bd58bb4c",
+    "mixins/ae2/cable_items.rs": "446da3990048ad89ee8f1f3bc14e13a6f25d1e39128c8c44b8b4bb317d6b1946",
+    "mixins/ae2/cable_loot.rs": "b87749fdba0651be1c41fd5cf08dc736a365b4f2322e49376fd55f405503a94a",
+    "mixins/ae2/cable_outline_hook.rs": "11aba478766ac6a52da56b87e12a88bb2457818097928b12d3064df9cfe39b3f",
+    "mixins/ae2/cable_pick.rs": "330f41f2109bbcbf1ffc203bf485a449d387d6721e51580dc99eab3d288bfab3",
+    "mixins/ae2/cable_piston_shape_hook.rs": "013645768bd6b437d08505146f499560fe1df34326d933398868b71b400421c7",
+    "mixins/ae2/cable_predict_hook.rs": "8890191938d3ddc6ec9c2272b9515d61f898ef2046cfe069b4e3c575eb24f7a4",
+    "mixins/ae2/cable_prediction.rs": "35f6bdb66c6f2508b15235493e72bfe36baeab06d51cc5a8bcae4659ff211e26",
+    "mixins/ae2/cable_prediction_ack.rs": "d6300fc671b9e655fb79b7cdab060653aec1c880c6c747764dc093aa5e1141f8",
+    "mixins/ae2/cable_prediction_break.rs": "f5a54d5d8499d70e326e0d72ef40c02d075338e2c302a55f3fb0d8038aa766f7",
+    "mixins/ae2/cable_prediction_reset.rs": "9e98d58940c499aac07c49201cef46678b36a0013c4f60246bc92122af65a880",
+    "mixins/ae2/cable_remote_hand.rs": "888cf83d2282b58014aef6141c372b19983cc0d6e6c6267cc2a13b25a7ac3d86",
+    "mixins/ae2/cable_render.rs": "9c04c4c871a731520ddf12866694fae5951dac13bcf464d51799f6a5e7e5c5ae",
+    "mixins/ae2/cable_swing.rs": "b4b4a32e292f65a8c9597e5574493ef0303b37e48a073b3ed7f80eb38725510a",
+    "mixins/ae2/cable_sync.rs": "ec88788fda69e0a6594fb1ddea34f298de556505cc036dfb8a6c107a4123e141",
+    "mixins/ae2/cable_use_on.rs": "4e731f4495c2600e0fa5772281084f42734df6ca7ed782092e7bcab54ff2b4aa",
+    "mixins/ae2/cable_view.rs": "a4bda59e5cd39a994ce3e254aba37df9d12d0de85ca861e2f18ab93b4a8bd948",
+    "mixins/ae2/horizon-mixin.toml": "1ab2cd9614b0f8647215bfc512d592db62ac736074d5c8eeca4e3942979a8d37",
+    "mixins/ae2/part_use.rs": "be26c6f09ebf5bfe4e43fe96da84bd33acac21c0f5046fb538f5485e9e67bec6",
+    "tools/horizon.py": "bf73f343722cb7287b994e9ee0834e13fe6ae536fe1daef2a066d2c64e32c90e",
+    "tools/smoke_cable_actions.py": "6dab96acee5f8715d1f3e7425731c4b29aab5b87db3ff1e5cb6d289225e75a40",
+    "tools/smoke_cable_input.py": "b0a8d274d4a281244251300650217e79375b730cacefdcc6040ab21c9f1d1468",
+    "tools/smoke_cable_items.py": "0cb8058b277cf05da9c8b83f5179a3a4f83812ed1f1998a7a5730c7fbc837845"
+  }
+}

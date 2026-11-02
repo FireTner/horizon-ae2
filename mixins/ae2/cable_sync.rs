@@ -5,8 +5,27 @@ use horizon_world::nbt::Tag;
 const FIELD: &str = "ae2:cable_visual_v1";
 pub fn encode(be: &ModBlockEntity) -> Tag {
     let mut tag = horizon_world::nbt::Compound::new();
-    if let Some(part) = be.nbt.get(&"cable".into()) {
-        tag.insert("cable".into(), part.clone());
+    // The client must see occupied/unsupported host slots to make the same
+    // admission decision. These raw fields are not implemented side/facade parts.
+    for name in [
+        "cable",
+        "hasRedstone",
+        "down",
+        "up",
+        "north",
+        "south",
+        "west",
+        "east",
+        "facadeDown",
+        "facadeUp",
+        "facadeNorth",
+        "facadeSouth",
+        "facadeWest",
+        "facadeEast",
+    ] {
+        if let Some(value) = be.nbt.get(&name.into()) {
+            tag.insert(name.into(), value.clone());
+        }
     }
     tag.insert(FIELD.into(), Tag::IntArray(be.data.clone()));
     Tag::Compound(tag)
@@ -61,6 +80,10 @@ mod tests {
             ]),
         );
         be.nbt.insert("private".into(), Tag::Int(9));
+        be.nbt.insert(
+            "facadeNorth".into(),
+            Tag::compound([("opaque", Tag::Int(7))]),
+        );
         let original = be.nbt.clone();
         let Tag::Compound(mut wire) = encode(&be) else {
             panic!()
@@ -80,6 +103,10 @@ mod tests {
         };
         assert!(saved.nbt.contains_key(&FIELD.into()));
         assert_eq!(decoded.data, be.data);
+        assert_eq!(
+            decoded.nbt.get(&"facadeNorth".into()),
+            be.nbt.get(&"facadeNorth".into())
+        );
         assert_eq!(
             decoded.nbt.get(&"cable".into()),
             be.nbt.get(&"cable".into())

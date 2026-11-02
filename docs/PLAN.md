@@ -61,8 +61,9 @@ Native center rendering, item placement/drop, buckets and original player-ID
 arrays are implemented with isolated world checks. Complete multipart host and
 source lifecycle integration remain the current work. The center input layer
 includes a configurable physical opposite-side key, ordered server synchronization
-and hit-selected Pick Block. Full client prediction and interaction results are
-still required. Keep the original 32
+and hit-selected Pick Block. Center placement has source interaction results,
+client preview and sequence-based server correction; full multipart prediction
+and complete settings/security remain required. Keep the original 32
 `light_level`/`waterlogged` states. Color, type, connections, and channels belong
 to parts and their client state, not invented block properties.
 

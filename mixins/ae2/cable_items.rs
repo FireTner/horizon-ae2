@@ -96,34 +96,92 @@ fn fluid_water(game: &Game<'_>, pos: [i32; 3]) -> bool {
         .and_then(|state| FluidState::from_block(state).ok())
         .is_some_and(|fluid| fluid.kind() == FluidKind::Water)
 }
+pub(super) fn target(
+    game: &Game<'_>,
+    pos: [i32; 3],
+    face: [i32; 3],
+    ctrl: bool,
+) -> Option<part_placement::Placement> {
+    if game.spectator() || (!game.may_build() && !game.can_place_on_in_adventure(pos)) {
+        return None;
+    }
+    let face = Direction::ALL.into_iter().find(|d| d.offset() == face)?;
+    part_placement::center_target(pos, face, ctrl, |p| slot(game, p))
+}
 pub(super) fn use_on(
     game: &mut Game<'_>,
     stack: &ItemStack,
     pos: [i32; 3],
     face: [i32; 3],
     claimed: &mut bool,
-) {
+) -> Option<super::ae2_part_use::UseResult> {
     if *claimed || Cable::from_item(&stack.item).is_none() || stack.count == 0 {
-        return;
+        return None;
     }
-    // A failed PartItem.useOn is FAIL too: never let a template item place a
-    // different block or fall through to an unrelated use action.
     *claimed = true;
-    if game.spectator() || (!game.may_build() && !game.can_place_on_in_adventure(pos)) {
-        return;
+    struct Server<'a, 'g> {
+        game: &'a mut Game<'g>,
+        stack: &'a ItemStack,
+        pos: [i32; 3],
+        face: [i32; 3],
     }
-    let Some(face) = Direction::ALL.into_iter().find(|d| d.offset() == face) else {
-        return;
-    };
-    let ctrl = super::ae2_cable_input::holding(game);
-    let Some(target) = part_placement::center_target(pos, face, ctrl, |p| slot(game, p)) else {
-        return;
-    };
-    let pos = target.pos;
+    impl super::ae2_part_use::Context for Server<'_, '_> {
+        type Placement = part_placement::Placement;
+        fn is_part(&self) -> bool {
+            true
+        }
+        fn client_side(&self) -> bool {
+            false
+        }
+        fn placement(&mut self) -> Option<Self::Placement> {
+            target(
+                self.game,
+                self.pos,
+                self.face,
+                super::ae2_cable_input::holding(self.game),
+            )
+        }
+        fn place(&mut self, target: Self::Placement) -> bool {
+            place(self.game, self.stack, target.pos)
+        }
+        fn immediate_update(&mut self) {
+            immediate_update(self.game, self.pos);
+        }
+        fn consume(&mut self) {
+            if self.game.native_acting_player().is_some() {
+                self.game.consume_held();
+            }
+        }
+    }
+    let result = super::ae2_part_use::use_item(&mut Server {
+        game,
+        stack,
+        pos,
+        face,
+    });
+    if result == super::ae2_part_use::UseResult::Consume {
+        game.stats.add("used", &stack.item, 1);
+        game.trigger_block("minecraft:item_used_on_block", pos, stack);
+    }
+    Some(result)
+}
+fn immediate_update(game: &Game<'_>, pos: [i32; 3]) {
+    if let Some(BlockEntity::Mod(be)) = game.world.block_entities.get(&(pos[0], pos[1], pos[2]))
+        && be.id == bus::BLOCK
+    {
+        super::ae2_cable_actions::queue_update(
+            game,
+            pos,
+            horizon_client::ae2_cable_sync::encode(be),
+        );
+    }
+}
+
+fn place(game: &mut Game<'_>, stack: &ItemStack, pos: [i32; 3]) -> bool {
     let was_host = game.native_block(pos) == bus::BLOCK;
     let wet = fluid_water(game, pos);
     let Some(mut state) = game.pack.assets.registry.default_state(bus::BLOCK) else {
-        return;
+        return false;
     };
     if wet {
         state = game
@@ -133,7 +191,7 @@ pub(super) fn use_on(
     if !was_host {
         let dimension = game.dim.id().to_owned();
         if !game.native_set_block(&dimension, pos, state, 3) {
-            return;
+            return false;
         }
     }
     let owner = match owner(game) {
@@ -141,7 +199,7 @@ pub(super) fn use_on(
         Err(error) => {
             log::warn!("AE2 cable placement: {error}");
             cleanup_empty(game, pos, wet);
-            return;
+            return false;
         }
     };
     let mut part = Compound::new();
@@ -162,7 +220,7 @@ pub(super) fn use_on(
         .unwrap_or(false);
     if !added {
         cleanup_empty(game, pos, wet);
-        return;
+        return false;
     }
     super::ae2_grid_glue::node_placed(game.dim.id(), pos);
     super::ae2_grid_glue::cables_changed(game);
@@ -194,7 +252,7 @@ pub(super) fn use_on(
         });
         cleanup_empty(game, pos, wet);
         super::ae2_grid_glue::cables_changed(game);
-        return;
+        return false;
     }
     if let Some(log) = &mut game.world.block_log {
         log.push((pos[0], pos[1], pos[2]));
@@ -209,7 +267,8 @@ pub(super) fn use_on(
             0.8,
         );
     });
-    game.consume_held();
+    immediate_update(game, pos);
+    true
 }
 fn cleanup_empty(game: &mut Game<'_>, pos: [i32; 3], wet: bool) {
     // CableBusBlockEntity.cleanup -> fluid legacy block, not the replaced grass.

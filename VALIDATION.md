@@ -3,7 +3,39 @@
 Last updated: 2 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Current cable input checkpoint
+## Current center placement results checkpoint
+
+- Formatting, Clippy and 128 standalone Rust tests pass. Native check/build pass;
+  the game suite passes 186 tests and the library suite passes 16. Game filtering
+  includes nested `ae2_` modules, including the remote prediction ledger.
+- [Part-use Java comparison](docs/part-use-oracle.json): 10,320 cases of the
+  verbatim `PartPlacement.place` method. Results, target/place/failure-update
+  order, client/server consumption, nullable/creative players and empty-hand
+  replacement match. Target lookup and actual mutation are boolean host stubs;
+  real registry/world/platform transport behavior is separate.
+- [Placement world scenario](docs/cable-actions-world-smoke.json): previews of
+  all five cable types while server packets are held, unchanged client item
+  counts, exactly one swing and one subsequent survival consumption, a source
+  use-statistic scoreboard, no offhand shield action on FAIL, player/mob
+  obstruction, opaque facade refusal, empty-host BE acknowledgement, normal/
+  reverse server rejection correction, coalesced placement/break, chest priority
+  and vanilla action cleanup. These world checks use survival/creative, not
+  adventure mode. The ledger also has a native regression for a
+  refused later action receiving host data while the block is locally hidden.
+- Both regressions pass with this adapter: all 85 item placements, names/drops,
+  water/buckets, ownership/restart and an item-placed cable power chain; then all
+  85 Pick Block IDs, Ctrl data, ordered modifier packets and rebound keys.
+  Their complete results are nested in the placement world report.
+
+The rejection fixture corrupts only its private native owner map and restores
+it afterwards. This exercises the adapter's strict refusal and reconciliation;
+it is not a claim about Java corrupt-save recovery. The same integrated bundle
+is used on both sides. Full multipart prediction, source security/settings,
+adventure ItemStack PASS/acting-stack predicate handling,
+unload/replacement/fake-player paths, exact neighbour/event/packet timing and
+independent external multiplayer remain unfinished.
+
+## Cable input checkpoint
 
 - Standalone checks pass with 128 Rust tests and 11 Python tests. The source
   inventory has 1,429 Java files, 111 partially ported classes and no complete
@@ -212,6 +244,8 @@ Recorded means an audit/metadata/report whose scope must be read directly.
 | [node-data-oracle.json](docs/node-data-oracle.json) | PASS | cases: 20,064 |
 | [ctrl-oracle.json](docs/ctrl-oracle.json) | PASS | cases: 11,028; packet methods with declared host substitutes |
 | [cable-input-world-smoke.json](docs/cable-input-world-smoke.json) | PASS | Integrated input, 85 center clones, Ctrl data, restart and bindings |
+| [part-use-oracle.json](docs/part-use-oracle.json) | PASS | cases: 10,320; source placement control flow with declared host substitutes |
+| [cable-actions-world-smoke.json](docs/cable-actions-world-smoke.json) | PASS | Center preview/results, offhand refusal and server correction |
 | [pathing-oracle.json](docs/pathing-oracle.json) | PASS | cases: 2,000 |
 | [platform-tags-report.json](docs/platform-tags-report.json) | Recorded | See report scope and limits |
 | [platform-tags-world-smoke.json](docs/platform-tags-world-smoke.json) | PASS | checks: 7 |

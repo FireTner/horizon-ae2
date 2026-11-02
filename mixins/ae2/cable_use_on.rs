@@ -5,5 +5,7 @@ fn ae2_cable_use_on(
     face: [i32; 3],
     claimed: &mut bool,
 ) {
-    crate::game::ae2_cable_items::use_on(game, stack, pos, face, claimed);
+    if let Some(result) = crate::game::ae2_cable_items::use_on(game, stack, pos, face, claimed) {
+        crate::game::ae2_cable_actions::record(game, result);
+    }
 }

@@ -64,6 +64,7 @@ def package():
                  'tools/cable_render_oracle.py', 'examples/cable_render_oracle.rs', 'docs/cable-render-oracle.json', 'docs/cable-world-smoke.json',
                  'tools/part_placement_oracle.py', 'examples/part_placement_oracle.rs', 'docs/part-placement-oracle.json', 'tools/smoke_cable_items.py', 'docs/cable-items-world-smoke.json',
                  'tools/ctrl_oracle.py', 'examples/ctrl_oracle.rs', 'docs/ctrl-oracle.json', 'tools/smoke_cable_input.py', 'docs/cable-input-world-smoke.json',
+                 'tools/part_use_oracle.py', 'examples/part_use_oracle.rs', 'docs/part-use-oracle.json', 'tools/smoke_cable_actions.py', 'docs/cable-actions-world-smoke.json',
                  'tools/cable_oracle.py', 'examples/cable_oracle.rs', 'docs/cable-oracle.json', 'docs/cable-controller-regression.json',
                  'tools/controller_oracle.py', 'examples/controller_oracle.rs', 'docs/controller-visual-oracle.json',
                  'tools/smoke_controller.py', 'docs/controller-world-smoke.json', 'docs/controller-charging-regression.json', 'docs/controller-drive-gui-regression.json',

@@ -12,13 +12,14 @@ fn ae2_cable_decode(
     if !is_cable {
         return core::ops::ControlFlow::Continue(());
     }
-    if game.native_block(pos) == "ae2:cable_bus"
-        && let Some(be) = horizon_client::ae2_cable_sync::decode(tag)
-    {
-        game.world.block_entities.insert(
-            (pos[0], pos[1], pos[2]),
-            horizon_client::containers::BlockEntity::Mod(Box::new(be)),
-        );
+    if let Some(be) = horizon_client::ae2_cable_sync::decode(tag) {
+        let entity = horizon_client::containers::BlockEntity::Mod(Box::new(be));
+        ae2_cable_prediction::verified(game, pos, &entity);
+        if game.native_block(pos) == "ae2:cable_bus" {
+            game.world
+                .block_entities
+                .insert((pos[0], pos[1], pos[2]), entity);
+        }
     }
     core::ops::ControlFlow::Break(())
 }

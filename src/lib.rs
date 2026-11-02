@@ -57,3 +57,6 @@ pub mod ae2_cube_builder;
 pub mod ae2_part_placement;
 #[path = "../mixins/ae2/player_registry.rs"]
 pub mod ae2_player_registry;
+
+#[path = "../mixins/ae2/ctrl.rs"]
+pub mod ae2_ctrl;

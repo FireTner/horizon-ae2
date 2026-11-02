@@ -7,8 +7,9 @@ rewritten in Rust. Horizon runs no Java, so AE2's code is ported to Rust and bui
 items, recipes, models and textures are prepared from **your own AE2 jar** as a content mod.
 
 Status: **ME network and storage foundations, Charger, energy cells, Drive, Controller, and cable
-centers** are ported in part and checked in isolated game worlds. The latest checkpoint adds real item placement for all five
-cable types in 17 colors, survival drops, custom names, waterlogging/buckets, and persistent ownership.
+centers** are ported in part and checked in isolated game worlds. Cable items support placement,
+survival drops, names, waterlogging/buckets and persistent ownership. The current input layer adds
+the configurable opposite-side key, synchronized server state and center-part Pick Block.
 The target is the **complete 1:1 port** of the pinned AE2 release; the full mod is still in development.
 See [docs/PLAN.md](docs/PLAN.md) for the scope and next steps, [docs/PARITY.md](docs/PARITY.md) for the
 remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and how.
@@ -28,7 +29,7 @@ remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and 
 | 9. Full validation | Rule tests, Java differential comparisons, native tests and selected game scenarios | Complete survival progression, source-game comparisons, multiplayer and large-network validation |
 
 These are feature checkpoints, not completed milestones. The source inventory tracks all 1,429 Java
-files, including 108 partially ported classes. That count is not a gameplay completion percentage.
+files, including 111 partially ported classes. That count is not a gameplay completion percentage.
 Blocks, items and recipes carried over as data do not count as working features on their own.
 
 ## What is ported
@@ -46,6 +47,7 @@ Blocks, items and recipes carried over as data do not count as working features 
 | ME Drive | `drive_glue.rs`, `gui.rs`, `automation*.rs`: ten actual cell slots, supported backends, power/channel gating, filtered screen and hopper/dropper access |
 | Cable parts and CableBus | `cable.rs`, `part_storage.rs`, `cable_bus.rs`, `node_data.rs`: types/colors, center NBT, saved node data and reload identity |
 | Cable item placement and drops | `part_placement.rs`, `cable_items.rs`, `player_registry.rs`: target/admission rules, entity obstruction, survival/creative consumption, named part drops, buckets and original owner-array persistence |
+| Cable input and Pick Block | `ctrl.rs`, `cable_input.rs`, `cable_pick.rs`: configurable physical key, authenticated per-player opposite-side state and hit-selected bare center item |
 | Cable builders and world rendering | `cube_builder.rs`, `cable_render.rs`, `cable_view.rs`: original cable quads/textures, graph-derived connections/channels, outline and contextual shapes |
 | Client state and stack components | `cable_sync.rs`, `component_sync.rs`: native visual transport and typed item components, preserving authoritative saved data |
 
@@ -53,7 +55,9 @@ The Drive supports all 23 built-in cell profiles, but portable and tool cells do
 complete handheld behavior. Its screen exposes ten real slots; priority controls and the complete
 AE2 menu remain unfinished. Charger supports 16 powered-item profiles and both finite energy-cell
 items. All 85 cable items place their own center parts, and survival mining returns those parts with
-their custom names. Side parts, facades, partial breaking, Color Applicator placement and complete
+their custom names. The opposite-side key defaults to Left Control and is configurable in native
+mod settings. Pick Block selects the actual center item; creative Ctrl can include block-entity data.
+Side parts, facades, partial breaking, Color Applicator placement and complete
 client/security/lifecycle behavior remain to be implemented.
 
 ## Layout

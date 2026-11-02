@@ -115,8 +115,7 @@ pub(super) fn use_on(
     let Some(face) = Direction::ALL.into_iter().find(|d| d.offset() == face) else {
         return;
     };
-    let ctrl = game.keys.contains(&winit::keyboard::KeyCode::ControlLeft)
-        || game.keys.contains(&winit::keyboard::KeyCode::ControlRight);
+    let ctrl = super::ae2_cable_input::holding(game);
     let Some(target) = part_placement::center_target(pos, face, ctrl, |p| slot(game, p)) else {
         return;
     };

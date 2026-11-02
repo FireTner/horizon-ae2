@@ -32,7 +32,19 @@ Native center-only registration/render and outline/contextual movement hooks are
 implemented. cable_items.rs/part_placement.rs add all 85 central-item placement
 and drop paths, full-shape entity obstruction, names and water/buckets. Per-part
 nodes/readiness, facades, direct collision callers, partial breaking, complete
-settings/security/CTRL/input results and source packets remain open.
+settings/security/input results and source packets remain open.
+ctrl.rs/cable_input.rs carry default-false per-player CTRL state through the native
+authenticated mod channel. Process it in guest_native_net before subsequent use
+packets, charging the shared PER_TICK allowance exactly once. Never defer this
+input behind the packet batch. Read physical_keys, not canonical action keys:
+rebinding sprint must not change the opposite-side binding. Reset world/player
+state on world lifecycle/death; connection identity uses a retained Arc marker.
+cable_pick.rs selects only hit-tested supported centers and returns a bare part
+item; optional creative BE data encodes the actual Mod BE and uses the native
+component collector. saved_block_entity's vanilla canonicalizer rejects mod IDs.
+Complete
+client prediction, FAIL/swing/offhand feedback and all player replacement and
+external multiplayer paths remain open.
 Physical states must stay source light_level/waterlogged (32), not invented
 color/type/connection properties. CableBuilder texture names use enum names:
 TRANSPARENT texture suffix is transparent, whereas the item ID prefix is fluix.

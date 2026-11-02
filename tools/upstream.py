@@ -223,7 +223,10 @@ PARTIAL.update({
     "api/features/PlayerRegistryInternal.java": ("mixins/ae2/player_registry.rs", "UUID/int mapping, source int/long array saved data, native world-wide owner assignment; service API/configuration/client security integrations pending"),
     "api/parts/IPart.java": ("mixins/ae2/cable_items.rs", "central cable addPartDrop with dismantle custom name and no gn/buffer carry; full part APIs/additional contents/wrench/side part lifecycle pending"),
     "parts/AEBasePart.java": ("mixins/ae2/cable_items.rs", "source gn center persistence, placement owner and customName import/dismantle export; full generic settings, services, packet and readiness lifecycle pending"),
-    "block/networking/CableBusBlock.java": ("mixins/ae2/cable_items.rs", "32 source states and native center rendering/selection/contextual shape; source waterlogged placement and central-part player/Level drops; full direct queries, fluid/support/light, side parts/facades and lifecycle pending"),
+    "block/networking/CableBusBlock.java": ("mixins/ae2/cable_items.rs", "32 source states and native center rendering/selection/contextual shape; waterlogged placement, central-part drops and bare-item hit-selected clone; full direct queries, fluid/support/light, side parts/facades and lifecycle pending"),
+    "core/AppEngClient.java": ("mixins/ae2/cable_input.rs", "physical configurable opposite-side key and changed-value CTRL transport; full client bootstrap, events, renderer and integrations pending"),
+    "core/network/serverbound/UpdateHoldingCtrlPacket.java": ("mixins/ae2/ctrl.rs", "source boolean codec and authenticated per-player attachment update before following use packets; native envelope replaces source platform framing"),
+    "core/definitions/AEAttachmentTypes.java": ("mixins/ae2/cable_input.rs", "nonpersistent default-false HOLDING_CTRL state with world/death reset; all other attachments and full player replacement/disconnect lifecycle pending"),
 })
 
 

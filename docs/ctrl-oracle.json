@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "cases": 11028,
+  "revision": "db17504a86128fdf3dae31f5fb7a112a646e0b93",
+  "source_sha256": "f9817dd9833f3087a3f8fc61b6651dee786471459b91137f7834a61cca5d072b",
+  "verbatim_fragment_sha256": "2b0d87dbdc7944bc8c22b719c6fb25793e8496afd4d8208ece52770779369d9d",
+  "port_sha256": "881b001432e5a1e2b30363dc5dac233cb80d4cc3ac834cb4273e29d1a293e302",
+  "input_sha256": "57c4c1b172e7ad48c44686f139b5288d9ea1e7a4a0e32e05b70ccb197b73ac54",
+  "output_sha256": "9e31da7deeda4acf299c9921529d55a0a7dca47291592674f820f22834f909b7",
+  "scope": "Verbatim UpdateHoldingCtrlPacket decode/write/handleOnServer; all byte values, empty/trailing input and isolated player attachments",
+  "limits": [
+    "RegistryFriendlyByteBuf uses DataInputStream boolean semantics; ServerPlayer is a boolean attachment stub",
+    "Source methods consume the first boolean byte; complete NeoForge outer-payload trailing-byte validation is not exercised",
+    "Native framing, authenticated sender identity, tick ordering, configured key events, lifecycle and multiplayer require separate evidence"
+  ]
+}

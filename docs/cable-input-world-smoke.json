@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "checks": [
+    "real CTRL press/release reverses central placement for the acting player",
+    "six coalesced CTRL/use packet batches observe the new attachment before placement",
+    "normal creative Pick Block returns each of all 85 bare part IDs without name/node/host data",
+    "creative Ctrl-Pick retains original host NBT without transient visual envelope fields",
+    "survival Pick Block selects an existing cable stack without creating another",
+    "survival Pick Block cannot manufacture a missing part",
+    "restart clears old CTRL state and honors the configured opposite-placement key instead of hard-coded controls",
+    "rebinding vanilla sprint does not change the physical AE2 opposite-placement modifier"
+  ],
+  "logs": "target/smoke/cable-input-uq04sfhp",
+  "limits": [
+    "Integrated authenticated client/server, not a separate LAN/dedicated-client run",
+    "Sprint remap uses the ctl repeat path because ctl down also inserts the canonical action into physical_keys",
+    "Center-only clone selection; unsupported raw side/facade hosts remain refused",
+    "Complete client part prediction, FAIL/swing/offhand semantics, facades, side parts and source lifecycle remain open"
+  ],
+  "native_tests": {
+    "standalone": 128,
+    "game": 182,
+    "library": 16,
+    "python": 11
+  },
+  "java_ctrl_cases": 11028,
+  "source_sha256": {
+    "mixins/ae2/cable_input.rs": "cb3b3d11107729bbbfac98d34dcae5fc8b67152b0af3bb229e9c6848bd58bb4c",
+    "mixins/ae2/cable_items.rs": "e4f6d9ee30288009a4e7d84c9f4e8e67cb61f7dac84b41b2585b9424c17de6c2",
+    "mixins/ae2/cable_pick.rs": "330f41f2109bbcbf1ffc203bf485a449d387d6721e51580dc99eab3d288bfab3",
+    "mixins/ae2/ctrl.rs": "881b001432e5a1e2b30363dc5dac233cb80d4cc3ac834cb4273e29d1a293e302",
+    "mixins/ae2/ctrl_frame.rs": "f7161b73dbd6a4ce109b9bb99979fec3c93dad3f97688393d57a2cd90171da49",
+    "mixins/ae2/ctrl_key.rs": "8bd843491c0f89daed97bcf420c8dfe7d89fbda0df06e90c82fe865b58caa07c",
+    "mixins/ae2/ctrl_mods.rs": "cd7821f025c39cb10ffc7aa94fb4a43143e8472c974023d740b6b9e0af66f3af",
+    "mixins/ae2/ctrl_player_died.rs": "57551498acfb93cebf084e3a7e6ad86b90b6447f036b8a785bb4677b69f67ccc",
+    "mixins/ae2/ctrl_receive.rs": "20a4413c63168f768dd1304d8a8b2c6ad54712c56dbfed029165270798f07336",
+    "mixins/ae2/ctrl_world.rs": "702b0945e9d074f3f93202ad19d05d7b30f506a80d2fdc3d21d507b5f9dc55d3",
+    "mixins/ae2/horizon-mixin.toml": "d1fa0a5e40d269cc673dcdcf599863943822cda372e7602f6cf3937b85f312bf",
+    "tools/smoke_cable_input.py": "b0a8d274d4a281244251300650217e79375b730cacefdcc6040ab21c9f1d1468"
+  }
+}

@@ -23,7 +23,7 @@ The full mod is not yet complete.
 | Finite cell items | Fixed capacities/rates, source removal threshold, Charger support, float item-model thresholds and placement/first-drop energy | Complete tooltip/settings/capability APIs, charged creative variants and every loot/recovery path |
 | Charger | Source recipe work, local/grid/refill power order, powered items, original inventory, automation and comparator | Live config, capability API, exact geometry/orientation/effects/drop RNG and complete lifecycle |
 | Wooden Crank | Rotation/hits/energy, 18-tick turns, busy window, failure/break rules and Charger-side restriction | Placement/survival/fake-player/statistics, orientation, animation and full synchronization |
-| CableBus | Five types/17 colors, center NBT/geometry/render/sync, real item placement, entity obstruction, survival/creative drops, names, water/buckets and original owner arrays | Complete placement/settings/security/CTRL result semantics, parts/facades, all shapes/fluid/light and source event/selection lifecycle |
+| CableBus | Five types/17 colors, center NBT/geometry/render/sync, item placement/drop, names, water/buckets, owner arrays, synchronized opposite-side key and center Pick Block | Complete prediction/interaction results/settings/security, parts/facades, all shapes/fluid/light and source event/selection lifecycle |
 | Platform/content | Pinned original resources, source stack limits, 461 generated NeoForge common tags and recipe preparation | Full platform services, recipe types/conditions/IDs, registries, progression, addons and coexistence checks |
 
 ## Components, keys, and inventories
@@ -187,9 +187,23 @@ Hosts with raw side/facade payloads refuse central placement until their codecs
 and full shapes are available; failed admission never clears those payloads.
 Side-part/facade admission, segment targeting, Color Applicator offhand placement,
 all generic settings/security callbacks and source readiness/event ordering are
-unfinished. The target/admission rule supports CTRL, but full client-to-server
-modifier synchronization is pending. The native boolean item-use hook consumes
-failed clicks; exact source FAIL/swing/offhand feedback still needs integration.
+unfinished. The configurable physical opposite-side key defaults to Left Control.
+It sends changed boolean state through an authenticated native channel, scoped
+by world and player. The server handles it before following use packets in the
+same batch and retains the shared native per-tick allowance. World/death reset
+and connection initialization are implemented; complete replacement/disconnect,
+dimension and external multiplayer lifecycle still require validation.
+
+Pick Block hit-tests supported center geometry and returns the bare part item,
+without its dismantle name or node state. Optional creative Ctrl block-entity
+data encodes the actual Mod block entity before the native item-component
+collector; the vanilla canonicalizer cannot serialize a mod type. Unsupported side/facade hosts
+are refused rather than guessed. Survival selection uses the existing native
+inventory path. Full facade/side selection and vanilla/source-game data-component
+comparisons remain open.
+
+The native boolean item-use hook consumes failed clicks; exact source
+FAIL/swing/offhand feedback and complete client prediction still need integration.
 These are partial placement paths, not complete PartPlacement/IPart parity.
 
 ## Native networking, recipes, and platform limits

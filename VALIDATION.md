@@ -3,7 +3,37 @@
 Last updated: 2 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Current cable item placement checkpoint
+## Current cable input checkpoint
+
+- Standalone checks pass with 128 Rust tests and 11 Python tests. The source
+  inventory has 1,429 Java files, 111 partially ported classes and no complete
+  classes. English documentation, formatting, Clippy and stack-limit audit pass.
+- Native check and fast build pass. The game suite passes 182 tests, including
+  independent world/sender state and mod block-entity clone data preservation.
+  The native library suite passes 16 tests.
+- [Input world scenario](docs/cable-input-world-smoke.json): real CTRL press/
+  release, six coalesced modifier/use packet batches, all 85 bare creative
+  center-item clones, creative Ctrl NBT without visual transport fields,
+  survival existing/missing stacks, restart, configurable binding and sprint
+  remapping independent of the AE2 modifier.
+
+These game checks use the integrated authenticated client/server and private
+world/settings directories. The sprint-remap case uses the control tool's repeat
+path because its down helper also inserts the canonical action into physical
+keys. Independent external clients, complete player replacement/disconnect and
+dimension lifecycle, side/facade selection, source-world comparison, full client
+prediction and exact FAIL/swing/offhand results remain open.
+
+## Cable input source comparison
+
+[CTRL packet Java comparison](docs/ctrl-oracle.json) passes 11,028 cases using
+verbatim packet decode/write/server-handler methods. It covers all 256 byte
+values, empty/trailing input and independently updated player attachments.
+DataInputStream and a boolean player attachment substitute the Minecraft hosts.
+This does not verify NeoForge outer-payload validation, native authentication,
+packet ordering, key events or multiplayer lifecycle.
+
+## Cable item placement checkpoint
 
 - Formatting, Clippy with warnings denied, 126 standalone Rust tests, 11 Python
   tests, English documentation, 58 stack-limit registrations and the 1,429-file
@@ -24,7 +54,7 @@ Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 - Separate finite/creative power, front-face refusal and finite cell/Charger
   energy conservation across restart pass with the current adapter changes.
 
-Full side parts/facades, partial breaking, security/settings, CTRL network input,
+Full side parts/facades, partial breaking, security/settings,
 exact interaction-result/animation behavior, complete event/readiness lifecycle,
 all direct shape callers/fluid/light and external multiplayer remain open.
 
@@ -180,6 +210,8 @@ Recorded means an audit/metadata/report whose scope must be read directly.
 | [item-stack-world-smoke.json](docs/item-stack-world-smoke.json) | PASS | See report scope and limits |
 | [mounts-oracle.json](docs/mounts-oracle.json) | PASS | cases: 2,000; operations: 410,882 |
 | [node-data-oracle.json](docs/node-data-oracle.json) | PASS | cases: 20,064 |
+| [ctrl-oracle.json](docs/ctrl-oracle.json) | PASS | cases: 11,028; packet methods with declared host substitutes |
+| [cable-input-world-smoke.json](docs/cable-input-world-smoke.json) | PASS | Integrated input, 85 center clones, Ctrl data, restart and bindings |
 | [pathing-oracle.json](docs/pathing-oracle.json) | PASS | cases: 2,000 |
 | [platform-tags-report.json](docs/platform-tags-report.json) | Recorded | See report scope and limits |
 | [platform-tags-world-smoke.json](docs/platform-tags-world-smoke.json) | PASS | checks: 7 |

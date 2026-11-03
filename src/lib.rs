@@ -58,7 +58,12 @@ pub mod ae2_part_placement;
 #[path = "../mixins/ae2/player_registry.rs"]
 pub mod ae2_player_registry;
 
+#[path = "../mixins/ae2/adventure.rs"]
+pub mod ae2_adventure;
 #[path = "../mixins/ae2/ctrl.rs"]
 pub mod ae2_ctrl;
 #[path = "../mixins/ae2/part_use.rs"]
 pub mod ae2_part_use;
+
+#[path = "../mixins/ae2/adventure_snbt.rs"]
+pub mod ae2_adventure_snbt;

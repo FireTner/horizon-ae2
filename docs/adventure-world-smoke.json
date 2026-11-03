@@ -1,0 +1,228 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "case": "missing component is PASS and permits the offhand shield",
+      "allowed": false,
+      "offhand": false
+    },
+    {
+      "case": "full predicate permits stone",
+      "allowed": true,
+      "offhand": false
+    },
+    {
+      "case": "full predicate denies dirt selector on stone",
+      "allowed": false,
+      "offhand": false
+    },
+    {
+      "case": "simple selector permits stone",
+      "allowed": true,
+      "offhand": false
+    },
+    {
+      "case": "source empty-full fallback to simple unconditional",
+      "allowed": true,
+      "offhand": false
+    },
+    {
+      "case": "direct empty block list matches nothing",
+      "allowed": false,
+      "offhand": false
+    },
+    {
+      "case": "tag selector permits log",
+      "allowed": true,
+      "offhand": false
+    },
+    {
+      "case": "tag selector denies stone",
+      "allowed": false,
+      "offhand": false
+    },
+    {
+      "case": "typed enum range uses Java ordinal",
+      "allowed": true,
+      "offhand": false
+    },
+    {
+      "case": "enum out of horizontal property domain fails",
+      "allowed": false,
+      "offhand": false
+    },
+    {
+      "case": "enum range lower bound rejects north",
+      "allowed": false,
+      "offhand": false
+    },
+    {
+      "case": "integer Unicode lower bound",
+      "allowed": true,
+      "offhand": false
+    },
+    {
+      "case": "integer out of property domain is rejected",
+      "allowed": false,
+      "offhand": false
+    },
+    {
+      "case": "offhand permitted stack independent of main hand",
+      "allowed": true,
+      "offhand": true
+    },
+    {
+      "case": "offhand missing permission is PASS",
+      "allowed": false,
+      "offhand": true
+    },
+    {
+      "case": "offhand denied full selector",
+      "allowed": false,
+      "offhand": true
+    },
+    {
+      "case": "compound AE2 block entity NBT creates the client instance",
+      "allowed": true,
+      "offhand": false
+    },
+    {
+      "case": "compound AE2 block entity mismatch",
+      "allowed": false,
+      "offhand": false
+    },
+    {
+      "case": "AE2 SNBT string block entity NBT",
+      "allowed": true,
+      "offhand": false
+    },
+    {
+      "case": "compound vanilla block entity NBT",
+      "allowed": true,
+      "offhand": false
+    },
+    {
+      "case": "compound vanilla block entity mismatch",
+      "allowed": false,
+      "offhand": false
+    },
+    {
+      "case": "original SNBT string block entity NBT",
+      "allowed": true,
+      "offhand": false
+    },
+    {
+      "case": "original SNBT rejects trailing data",
+      "allowed": false,
+      "offhand": false
+    },
+    {
+      "case": "chest block reaction precedes disallowed part stack",
+      "allowed": false
+    }
+  ],
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/adventure-m3gekogg",
+  "scope": "Native fresh adventure gate and actual hand, client prediction and server authority",
+  "limits": [
+    "Fresh predicate matching only; mutable component cache, copy identity and reload lifecycle remain open",
+    "Only existing native BE codecs and registered client constructors are used; complete original BE fields, packet/default and component semantics remain open",
+    "Property facts cover original vanilla blocks and seven supported AE2 hosts; new/addon domains and missing native spin states remain open",
+    "Integrated native client/server; independent external multiplayer and full permissions/security are not covered"
+  ],
+  "source_sha256": {
+    "mixins/ae2/adventure.rs": "27fc0d398d23372721041a8dd06f432df662b3ba2c43357ca7b92448056ac2ba",
+    "mixins/ae2/adventure_snbt.rs": "6f882893be17885896cff4bd3da095c40a99a3318e789b78425f60b7f0c775e3",
+    "mixins/ae2/adventure_native.rs": "ada25b63d076fc4b9d96cc5e325f931dbd7cd28bc6923271f26dd2c7feb821e6",
+    "mixins/ae2/cable_items.rs": "3683f1253048afc8648b0085b04c6a7f97428d6c0ecb9343c967ee649ff1c621",
+    "mixins/ae2/cable_prediction.rs": "fc6c252aa7dabadace6a872429b46e7f798853e221a44dc3cd1f0abe3cf22c2e",
+    "mixins/ae2/horizon-mixin.toml": "5b25dd4e5b11ea8f9253838ebb28da7a05586e77bd50cca3b947313a61e48409"
+  },
+  "binary_sha256": "8878e51d18e54af0ba6af541bfddc31113f6750016a7b119a64ee3575575b161",
+  "property_facts_sha256": "bfb51bd7777fd3bd089011bc5a11454aa3c02adb493b9db1a1552720550cd2be",
+  "survival_creative_regression": {
+    "passed": true,
+    "checks": [
+      {
+        "case": "client preview and one server consumption for glass_cable",
+        "preview": {
+          "block": "ae2:cable_bus",
+          "loaded": true,
+          "pos": [
+            6,
+            74,
+            7
+          ],
+          "state": "ae2:cable_bus[light_level=0,waterlogged=false]"
+        }
+      },
+      {
+        "case": "client preview and one server consumption for covered_cable",
+        "preview": {
+          "block": "ae2:cable_bus",
+          "loaded": true,
+          "pos": [
+            6,
+            74,
+            7
+          ],
+          "state": "ae2:cable_bus[light_level=0,waterlogged=false]"
+        }
+      },
+      {
+        "case": "client preview and one server consumption for smart_cable",
+        "preview": {
+          "block": "ae2:cable_bus",
+          "loaded": true,
+          "pos": [
+            6,
+            74,
+            7
+          ],
+          "state": "ae2:cable_bus[light_level=0,waterlogged=false]"
+        }
+      },
+      {
+        "case": "client preview and one server consumption for covered_dense_cable",
+        "preview": {
+          "block": "ae2:cable_bus",
+          "loaded": true,
+          "pos": [
+            6,
+            74,
+            7
+          ],
+          "state": "ae2:cable_bus[light_level=0,waterlogged=false]"
+        }
+      },
+      {
+        "case": "client preview and one server consumption for smart_dense_cable",
+        "preview": {
+          "block": "ae2:cable_bus",
+          "loaded": true,
+          "pos": [
+            6,
+            74,
+            7
+          ],
+          "state": "ae2:cable_bus[light_level=0,waterlogged=false]"
+        }
+      },
+      "FAIL does not swing or raise the off-hand shield before or after the server processes it",
+      "opaque facade-host admission is refused on both sides without clearing the source payload",
+      "client and server entity obstruction roll back the host without swing or item consumption",
+      "authoritative BE data survives acknowledgement when a predicted part reuses an empty host",
+      "server refusal corrects normal preview without spending the item or adding a server swing",
+      "server refusal corrects CTRL reverse preview without spending the item or adding a server swing",
+      "coalesced predicted placement and native break do not revive a stale cable host after acknowledgement",
+      "chest reaction retains priority over part placement",
+      "scope cleanup leaves subsequent vanilla item actions unchanged"
+    ],
+    "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/cable-actions-bomxq5v5",
+    "limits": [
+      "Integrated authenticated client/server; external LAN and dedicated clients remain separate",
+      "Covers supported center parts; full side parts, facades, source security/settings, source visual packets and all lifecycle paths remain open",
+      "Corrupt owner map is an intentional native strict-refusal fault, not a Java recovery oracle",
+      "No complete Java/NeoForge world comparison; exact source lighting, neighbour events and packet timing remain separate"
+    ]
+  }
+}

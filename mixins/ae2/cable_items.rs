@@ -102,7 +102,7 @@ pub(super) fn target(
     face: [i32; 3],
     ctrl: bool,
 ) -> Option<part_placement::Placement> {
-    if game.spectator() || (!game.may_build() && !game.can_place_on_in_adventure(pos)) {
+    if game.spectator() {
         return None;
     }
     let face = Direction::ALL.into_iter().find(|d| d.offset() == face)?;
@@ -116,6 +116,9 @@ pub(super) fn use_on(
     claimed: &mut bool,
 ) -> Option<super::ae2_part_use::UseResult> {
     if *claimed || Cable::from_item(&stack.item).is_none() || stack.count == 0 {
+        return None;
+    }
+    if !super::ae2_adventure_native::may_use(game, stack, pos) {
         return None;
     }
     *claimed = true;

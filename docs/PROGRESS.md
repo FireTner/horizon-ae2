@@ -20,7 +20,9 @@ dependent use packets. Center Pick Block returns the actual bare cable item,
 with optional creative block-entity data collected from the supported Mod host.
 Center placement predicts a real local part, checks entities, preserves source
 interaction results and uses native sequences to settle authoritative blocks
-and host data. A client success swings once; a failure stops before the off hand.
+and host data. A client success swings once; a failure stops before the off hand. The generic
+adventure stack gate instead returns PASS on denied use, checks the actual hand
+and evaluates original saved block/state/NBT predicates.
 
 ## Verified foundations
 
@@ -30,6 +32,7 @@ and host data. A client success swings once; a failure stops before the off hand
 | Cable node data | 20,064 Java equality cases; real typed NBT roundtrip and native graph-buffer identity tests; explicit source load/readiness events remain open |
 | Cable profiles | 85 type/color profiles, source flags and channel visuals; 278,956 Java cases; dense trunk and normal bottleneck tested in the binding |
 | Cable input | 11,028 Java boolean-packet cases; native per-world/sender state and hit-selected center clone; full multipart behavior and external multiplayer remain open |
+| Adventure predicates | 73,399 original-Java comparisons: saved predicates, SNBT, NBT comparison and integer parsing; actual-hand native gate; mutable component cache and full BE codecs remain open |
 | Part use | 10,320 Java placement-result/order/consumption cases; supported center client preview and server correction; full multipart/settings/security and source event lifecycle remain open |
 | Finite cell items | Fixed power profiles, original item-model thresholds, Charger support, placement/first matching drop energy transfer; full base APIs and all loot paths remain open |
 | Energy cells | Original fullness states/models, local comparator formula, deferred ticking-chunk notifications, grid power and persistence; complete event/TickManager lifecycle remains open |
@@ -39,22 +42,30 @@ and host data. A client success swings once; a failure stops before the off hand
 | Keys/storage/services | Component-aware identities, finite/creative/restricted cells, byte/type rules, routing/mounts and caches; full registry recovery, callbacks, consumers and addon APIs remain open |
 | Content/tooling | Pinned original assets, 461 NeoForge tags, 58 unstackable registrations, deterministic source packaging and isolated builds; carried content does not imply implemented mechanics |
 
-Current validation: 128 standalone Rust tests, 186 native game tests, 16 native
-library tests and 11 Python tests. Native check/build and the isolated CableBus
+Current validation: 128 standalone Rust tests, 188 native game tests, 16 native
+library tests and 12 Python tests. Native check/build and the isolated CableBus
 world checks pass, including all 85 center Pick Block items, Ctrl data, packet
 ordering, configured keys and restart. The earlier finite/creative power and
 restart regression also passes.
 The center-result world check passes client/server prediction, obstruction,
 offhand failure, acknowledgement and interleaved break cases; placement and
 input regressions pass again with the current adapter.
+The adventure world check passes 24 actual-hand/client/server scenarios,
+including generic PASS/offhand fallback, enum/integer domains, original compound/
+SNBT masks and real Energy Cell/chest entities. It exercises the registered
+client BE constructor on demand; complete source BE defaults/codecs and mutable
+component-object cache remain required. The same final binary also passes the
+14-case survival/creative center-action regression.
 See `VALIDATION.md` for evidence and the exact boundaries of these runs.
 
 ## Next required work
 
-Separate the source adventure ItemStack PASS gate from PartPlacement FAIL,
-bind offhand permission checks to the actual stack, and complete original
-predicate/component handling. Survival/creative prediction tests do not cover
-this generic stack layer.
+Complete source AdventureModePredicate's mutable component-object cache and
+ItemStack.copy sharing, full original BE save/component codecs/defaults and
+native client/server identity/reload behavior. Fresh matching currently uses
+actual registered BE instances; a missing client instance is created on demand
+only when an NBT predicate reaches it. Add typed domains for new/addon blocks
+through a real property API and finish native Charger/Drive spin states.
 
 Complete multipart client prediction, settings/security and all lifecycle paths,
 remaining direct collision/support/fluid/light paths, full

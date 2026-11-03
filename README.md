@@ -11,6 +11,7 @@ centers** are ported in part and checked in isolated game worlds. Cable items su
 survival drops, names, waterlogging/buckets and persistent ownership. The current input layer adds
 the configurable opposite-side key, synchronized server state and center-part Pick Block. Center
 placement also has client prediction, source interaction results and server correction.
+Adventure item use evaluates the actual hand and original block/state/NBT predicates.
 The target is the **complete 1:1 port** of the pinned AE2 release; the full mod is still in development.
 See [docs/PLAN.md](docs/PLAN.md) for the scope and next steps, [docs/PARITY.md](docs/PARITY.md) for the
 remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and how.
@@ -50,6 +51,7 @@ Blocks, items and recipes carried over as data do not count as working features 
 | Cable item placement and drops | `part_placement.rs`, `cable_items.rs`, `player_registry.rs`: target/admission rules, entity obstruction, survival/creative consumption, named part drops, buckets and original owner-array persistence |
 | Cable input and Pick Block | `ctrl.rs`, `cable_input.rs`, `cable_pick.rs`: configurable physical key, authenticated per-player opposite-side state and hit-selected bare center item |
 | Cable placement results | `part_use.rs`, `cable_actions.rs`, `cable_prediction.rs`: ordered source results, client preview, server consumption and sequence-based correction |
+| Adventure stack use | `adventure.rs`, `adventure_snbt.rs`, `adventure_native.rs`: actual-hand PASS gate, original saved predicates, typed property ranges and NBT comparison; component cache and complete BE codecs remain open |
 | Cable builders and world rendering | `cube_builder.rs`, `cable_render.rs`, `cable_view.rs`: original cable quads/textures, graph-derived connections/channels, outline and contextual shapes |
 | Client state and stack components | `cable_sync.rs`, `component_sync.rs`: native visual transport and typed item components, preserving authoritative saved data |
 
@@ -59,7 +61,7 @@ AE2 menu remain unfinished. Charger supports 16 powered-item profiles and both f
 items. All 85 cable items place their own center parts, and survival mining returns those parts with
 their custom names. The opposite-side key defaults to Left Control and is configurable in native
 mod settings. Pick Block selects the actual center item; creative Ctrl can include block-entity data.
-Adventure stack prechecks, side parts, facades, partial breaking, Color Applicator placement and complete
+Adventure component cache/lifecycle, side parts, facades, partial breaking, Color Applicator placement and complete
 client/security/lifecycle behavior remain to be implemented.
 
 ## Layout
@@ -99,7 +101,8 @@ docs/                   full plan, parity boundaries, inventory and evidence
 ## Build and run
 
 Needs Rust 1.99.1, Python 3.12, Git, prepared Horizon 26.3 resources, and the native build dependencies
-for your platform. Java differential comparisons also need JDK 21. The engine revision is `aa27eca`
+for your platform. Content preparation and Java differential comparisons need JDK 21;
+Java is never required at game runtime. The engine revision is `aa27eca`
 and horizon-mixins is `3f99a5c`; full pins are in [compatibility.json](compatibility.json) and
 [upstream.lock.json](upstream.lock.json).
 
@@ -127,6 +130,7 @@ Horizon version. The launcher keeps prepared resources under
 cargo build --release -p horizon-port-pack --manifest-path target/upstream/horizon/Cargo.toml
 export HORIZON_PORT_PACK="$PWD/target/upstream/horizon/target/release/horizon-port-pack"
 export HORIZON_RESOURCES=/path/to/prepared/26.3
+export JAVA_HOME=/path/to/jdk21
 
 python3.12 tools/prepare_content.py \
   --jar /path/to/appliedenergistics2-19.2.18.jar \
@@ -135,6 +139,10 @@ python3.12 tools/prepare_content.py \
 target/horizon-cargo/fast/horizon-client \
   --resources "$HORIZON_RESOURCES" --dev-mod target/content/ae2
 ```
+
+Content preparation downloads hash-verified original Minecraft 1.21.1 reference dependencies
+into ignored `target/` and derives property domains for AE2-owned metadata. Installed Horizon
+resources remain read-only; the mod loader builds a separate effective resource cache.
 
 Use a separate game directory for development worlds. Add `--offscreen` for runs driven by
 `horizon-ctl`; screenshots still work. Native checks and tests use the same pinned checkouts:

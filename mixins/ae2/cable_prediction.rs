@@ -143,6 +143,9 @@ pub(super) fn use_on(
     {
         return None;
     }
+    if !crate::game::ae2_adventure_native::may_use(game, stack, hit.pos) {
+        return None;
+    }
     let seq = game.remote.as_ref()?.sequence;
     struct Client<'a, 'g> {
         game: &'a mut Game<'g>,

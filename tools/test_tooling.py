@@ -155,6 +155,20 @@ class ContentTests(unittest.TestCase):
             content.prepare(jar, carried, None, None, out, self.platform)
         self.assertEqual((out / "sentinel").read_text(), "keep")
 
+    def test_property_facts_are_written_only_to_generated_mod_and_failure_keeps_previous(self):
+        carried, jar = self.fixture()
+        out = self.root / "out"
+        lock = {**content.LOCK, "jar": {"sha512": hashlib.sha512(jar.read_bytes()).hexdigest()}}
+        facts = {"schema": 1, "blocks": {"minecraft:stone": {}}}
+        with patch.object(content, "LOCK", lock), patch.object(content.upstream, "verify_platform"), patch.object(content.source_properties, "build", return_value=facts):
+            content.prepare(jar, carried, None, None, out, self.platform)
+        self.assertEqual(json.loads((out / "data/ae2/source-property-domains.json").read_text()), facts)
+        self.assertFalse((carried / "data/ae2/source-property-domains.json").exists())
+        (out / "sentinel").write_text("keep")
+        with patch.object(content, "LOCK", lock), patch.object(content.upstream, "verify_platform"), patch.object(content.source_properties, "build", side_effect=ValueError("bad reference")), self.assertRaisesRegex(ValueError, "bad reference"):
+            content.prepare(jar, carried, None, None, out, self.platform)
+        self.assertEqual((out / "sentinel").read_text(), "keep")
+
     def test_platform_tags_layer_before_mod_tags_and_preserve_replace_and_provenance(self):
         carried, _ = self.fixture()
         report = content.merge_platform_tags(carried, self.platform)

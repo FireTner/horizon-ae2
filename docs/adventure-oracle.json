@@ -1,0 +1,43 @@
+{
+  "passed": true,
+  "cases": 73399,
+  "predicate_cases": 3970,
+  "nbt_cases": 625,
+  "snbt_cases": 3255,
+  "integer_cases": 65549,
+  "property_schemas": 1060,
+  "minecraft": "1.21.1",
+  "metadata_sha1": "018296bcb207bea6fd25b05f08eee3942dcec406",
+  "client_sha256": "499f6897d1837516680f3114072d8106e11c9adcd933fe5cf051b551089b0c99",
+  "classes_sha256": {
+    "csc": "728a4412bc8344cf33b77cd79f399fe51d3f6d321bfb5c6cfbd5a25bd5fca083",
+    "aw": "636b9e9cb7d180d72b99d429c47470c42472dd00757cd96769df7ecc016c273e",
+    "eb": "90629aa60524d1d10f15274a79e0af11871980f01688f2dd6e57b5f5f64f92b5",
+    "eb$b": "37b445de17b035cd0b6ab3391594169b5dc5604aa4deaa17d0f66c916018f8e6",
+    "eb$c": "1e08e257e7bfd683ad7563ee338e96eae9d4adcb6e3f66e91daa73ceb6dfb78b",
+    "eb$d": "a8f80b85c94517438fad89b32e729c27aa34f5ed65067679a56b70b77389013b",
+    "eb$e": "d39ce619fb35e2f23f85cb1c2ec7753bdc0673073e6232e8bbc58af191b4875d",
+    "dk": "744affbbab7ed9902391f3e33a30eedb7c082e4b2e85bde22bb6559a50e2998c",
+    "uq": "c9d94c74581e2ff51040eaccff634c9522acb89dfb0c6ff6c1f41a24a2774877",
+    "dtt": "d8aba236bd71928d40cc69ffa077a540381396c82875ca93ae7e44efb9312bb2",
+    "dua": "0f8d5d33e3f8a2f264610ea2e1be2a411a5b521bfa67014f79faa1f83a67fff0",
+    "duc": "89d5b13474514ae68f559feb17dd6df574dab8a4b2778cdd0392add5204f08ca",
+    "uz": "748e3f4bd4898ae6e0b15b70a7f308c617c3cfd5b6fb48707d01c0902efa9b1f",
+    "dtg": "1c066a01aa26eda9f2c39877fa0b1e5be9d952e21dd04cd752ba4ed311e706c1",
+    "dcw": "6f23c2e3b7598af35b9524023c079dd4dcc1eb45dd3650c54573aad887872d26",
+    "dvi": "55db5c8f201f7ef02be9142b35a52f72e51a2ac73d028ba9796a45066df6e478"
+  },
+  "reference_helper_sha256": "94bac12d717d589c1399882a6b3609dd338c844f471af61df5501bd4f4a36c2d",
+  "port_sha256": "27fc0d398d23372721041a8dd06f432df662b3ba2c43357ca7b92448056ac2ba",
+  "snbt_sha256": "6f882893be17885896cff4bd3da095c40a99a3318e789b78425f60b7f0c775e3",
+  "input_sha256": "69235f1e1e09960770d4212234013af1d96270672d38604394be6cefb5c296da",
+  "java_output_sha256": "9b73be31b4ad668c9bb5aba246e8bb2b8d3a64507c20734e966b92cf82ef2baa",
+  "lookup_reference": "Level.getBlockEntity delegates to LevelChunk with EntityCreationType.IMMEDIATE; source bytecode inspected, not exercised by the proxy-level oracle",
+  "scope": "Original unmodified AdventureModePredicate CODEC, BlockPredicate, StatePropertiesPredicate, NbtPredicate, NbtUtils and Java Integer parsing; real original block states and chest block entities",
+  "limits": [
+    "LevelReader is a read-only proxy; synthetic tag bindings are declared by each case",
+    "Predicate instances are fresh per case; mutable component-object cache/lifecycle requires separate evidence",
+    "Rust receives original typed input/state/entity views; native component, registry and world bindings require separate game checks",
+    "No Minecraft client/server entry point or complete Java/NeoForge world is run"
+  ]
+}

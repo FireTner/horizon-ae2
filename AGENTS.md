@@ -59,12 +59,18 @@ raw unsupported side/facade admission. Full multipart prediction, settings,
 security, all replacement/unload/fake-player and external multiplayer paths
 remain open. Native test filtering includes nested ae2_ modules, not only direct
 children of game.
-The next generic stack gap is adventure use: pinned NeoForge's ItemStack patch
-and CommonHooks.onPlaceItemIntoWorld return PASS before PartPlacement for a
-disallowed can_place_on. The current target guard yields part FAIL instead.
-Do not claim full input parity from survival/creative tests. Offhand permission
-lookup must use its actual stack, and original 1.21.1 predicate/component handling
-must not be replaced by an unconstrained native compound match.
+adventure.rs/adventure_snbt.rs implement the original 1.21.1 saved predicate codec,
+typed property ranges, numeric parsing and NBT subset comparison. The native
+adapter checks the actual passed stack before claiming the item, so a denied
+can_place_on is generic PASS rather than part FAIL. Client NBT lookup creates a
+missing registered BE on demand through new_block_entity; it must not synthesize
+an NBT mask or borrow the server's private save. Existing instances are retained.
+Property domains come from AE2-owned data/ae2/source-property-domains.json, never
+modified base tables. Missing domains/properties refuse that state condition.
+The current matcher evaluates fresh predicates. Source mutable component-object
+cache, ItemStack.copy sharing, full BE save/component codecs, new/addon property
+domains and complete security/fake-player lifecycle remain open. Do not equate
+fresh oracle/world results with those remaining contracts.
 Physical states must stay source light_level/waterlogged (32), not invented
 color/type/connection properties. CableBuilder texture names use enum names:
 TRANSPARENT texture suffix is transparent, whereas the item ID prefix is fluix.

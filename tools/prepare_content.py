@@ -10,6 +10,7 @@ import subprocess
 import tempfile
 import zipfile
 import upstream
+import source_properties
 from item_stack_limits import UNSTACKABLE
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -206,7 +207,7 @@ def carry(jar, resources, port_pack, work):
     return work / "port/mods/ae2/carry"
 
 
-def prepare(jar, carried, resources, port_pack, out, platform=None):
+def prepare(jar, carried, resources, port_pack, out, platform=None, java_home=None):
     if hashlib.sha512(jar.read_bytes()).hexdigest() != LOCK["jar"]["sha512"]:
         raise ValueError("jar differs from pinned AE2 19.2.18; do not mix source and content versions")
     if out.exists() and not (out / MARKER).is_file():
@@ -220,6 +221,7 @@ def prepare(jar, carried, resources, port_pack, out, platform=None):
         stage = work / "ae2"
         shutil.copytree(source, stage)
         fit(stage, jar, platform)
+        write_json(stage / "data/ae2/source-property-domains.json", source_properties.build(java_home))
         backup = work / "previous"
         if out.exists():
             out.rename(backup)
@@ -240,11 +242,12 @@ def main():
     parser.add_argument("--port-pack", type=Path, default=Path(os.environ.get("HORIZON_PORT_PACK", "horizon-port-pack")))
     parser.add_argument("--out", type=Path, default=ROOT / "target/content/ae2")
     parser.add_argument("--platform", type=Path, default=ROOT / "target/upstream/neoforge", help="pinned NeoForge checkout for generated common tags")
+    parser.add_argument("--java-home", type=Path, default=Path(os.environ["JAVA_HOME"]) if "JAVA_HOME" in os.environ else None, help="JDK 21 for original source property metadata")
     args = parser.parse_args()
     if not args.carried and not args.resources:
         parser.error("give --resources or --carried")
     print(prepare(args.jar.resolve(), args.carried.resolve() if args.carried else None,
-                  args.resources, args.port_pack, args.out.resolve(), args.platform.resolve()))
+                  args.resources, args.port_pack, args.out.resolve(), args.platform.resolve(), args.java_home))
 
 
 if __name__ == "__main__":

@@ -1,7 +1,50 @@
 # Verification evidence
 
-Last updated: 2 November 2026. Development host: macOS arm64, Rust 1.99.1,
+Last updated: 3 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
+
+## Current adventure stack-use checkpoint
+
+- Formatting, Clippy, 128 standalone Rust tests and 12 Python tooling tests pass.
+  Native check/build and 188 game tests pass; the library suite passes 16 tests.
+- [Original Java comparison](docs/adventure-oracle.json): 73,399 cases, comprising
+  3,970 saved-predicate cases, 625 NBT comparisons, 3,255 SNBT parses and 65,549
+  integer parses. The verified original 1.21.1 classes execute their real codecs
+  and matchers over original states and chest entities. LevelReader is a read-only
+  proxy and per-case tags are synthetic bindings; this is not a full Java game.
+  Each component object is fresh. Original Level/LevelChunk bytecode separately
+  establishes on-demand `IMMEDIATE` lookup; those methods are not exercised by
+  the proxy-level comparison. Class/helper/input/output hashes are in the report.
+- [Adventure world scenario](docs/adventure-world-smoke.json): 24 checks use
+  actual mouse input and actual stacks in an isolated integrated native game.
+  Holding server packets distinguishes client preview from server mutation and
+  verifies unchanged preview counts, one successful swing and later server
+  consumption. Missing/denied permissions return PASS and permit the offhand
+  shield. A permitted/denied offhand cable consults its own component without
+  spending the main-hand stick. Block reactions still precede disallowed items.
+- World conditions cover FULL/SIMPLE/fallback forms, empty holder sets, real block
+  tags, Java enum ordinal ranges and invalid enum-domain bounds, Unicode integer
+  bounds and invalid property-domain values, direct compound and SNBT masks on
+  Energy Cell/chest BEs, and rejected trailing SNBT. Client NBT lookup uses the
+  registered BE constructor if a loaded block has no client instance; it retains
+  existing instances and does not fabricate NBT or copy the server's save.
+- The same final client passes the 14-case survival/creative center-action
+  regression: five cable types, one preview/swing/consumption, obstruction/FAIL,
+  offhand suppression, acknowledgement, correction and block priority. Its report
+  is nested in the adventure world report.
+- Property facts are generated from 1,060 original vanilla block definitions and
+  seven supported AE2 hosts, under the mod's own `data/ae2/` namespace. Reference
+  artifacts are hash-verified build/check dependencies in ignored `target/`;
+  no installed Horizon resources are edited and no Java runs in the native game.
+
+These checks establish fresh predicate evaluation and the native stack gate.
+Source mutable AdventureModePredicate component-object cache, ItemStack.copy
+sharing, full original BE save/default/component codecs and lifecycle, new/addon
+property domains, exact permissions/security and independent multiplayer remain
+completion requirements. Missing native properties cannot be inferred from the
+source facts; Charger/Drive spin states remain unported. SNBT nesting above the
+mod's defensive limit of 512 is not covered. Failed or interrupted runs are not
+evidence for this checkpoint; only final-source reports are retained here.
 
 ## Current center placement results checkpoint
 
@@ -31,7 +74,7 @@ The rejection fixture corrupts only its private native owner map and restores
 it afterwards. This exercises the adapter's strict refusal and reconciliation;
 it is not a claim about Java corrupt-save recovery. The same integrated bundle
 is used on both sides. Full multipart prediction, source security/settings,
-adventure ItemStack PASS/acting-stack predicate handling,
+adventure component-object cache and complete BE codecs/lifecycle,
 unload/replacement/fake-player paths, exact neighbour/event/packet timing and
 independent external multiplayer remain unfinished.
 
@@ -182,6 +225,8 @@ python3.12 tools/horizon.py test
 python3.12 tools/horizon.py test --library
 python3.12 tools/horizon.py build
 python3.12 tools/cable_render_oracle.py --java-home /path/to/jdk21
+python3.12 tools/adventure_oracle.py --java-home /path/to/jdk21
+python3.12 tools/smoke_adventure.py --resources /path/to/prepared/26.3 --ctl /path/to/horizon-ctl
 ```
 
 Smoke tools require prepared game resources, horizon-ctl and a built client;
@@ -198,6 +243,8 @@ Recorded means an audit/metadata/report whose scope must be read directly.
 
 | Report | Status | Selected measurements |
 | --- | --- | --- |
+| [adventure-oracle.json](docs/adventure-oracle.json) | PASS | 73,399 original-class comparisons; fresh components |
+| [adventure-world-smoke.json](docs/adventure-world-smoke.json) | PASS | 24 actual-hand/client/server/NBT checks; scope and limits in report |
 | [baseline-port-pack.json](docs/baseline-port-pack.json) | Recorded | See report scope and limits |
 | [cable-bus-nbt-power-regression.json](docs/cable-bus-nbt-power-regression.json) | PASS | See report scope and limits |
 | [cable-controller-regression.json](docs/cable-controller-regression.json) | PASS | checks: 14 |

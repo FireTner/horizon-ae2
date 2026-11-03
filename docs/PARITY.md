@@ -221,14 +221,35 @@ data is remembered even while a predicted break hides it. Connection,
 dimension/respawn and leave paths reset preview state. Explicit CableBus updates
 bridge the host while Horizon temporarily lends its hub to a guest packet.
 
-The generic adventure ItemStack gate is still incomplete. Pinned NeoForge's
-`ItemStack.onItemUse` and `CommonHooks.onPlaceItemIntoWorld` return PASS before
-calling the part when `can_place_on` does not permit it. The current part target
-guard instead returns FAIL through the part coordinator, affecting offhand
-fallback in adventure mode. Client offhand predicate lookup also needs the
-actual acting stack rather than the default hand context. Original 1.21.1
-predicate/component normalization, NBT/state conditions and full permissions
-remain required; the survival/creative world checks do not prove these paths.
+The generic adventure ItemStack gate runs before the part coordinator, following
+pinned NeoForge's `ItemStack.onItemUse` and `CommonHooks.onPlaceItemIntoWorld`.
+A missing/disallowed `can_place_on` returns PASS, leaving the other hand eligible.
+Both server use and client prediction consult the actual passed stack. Block
+reactions still precede the item gate; a permitted part can still return FAIL
+from its placement checks.
+
+The saved predicate decoder follows original 1.21.1 FULL/SIMPLE alternative
+codecs, including fallback after an invalid full form. Block/tag selectors,
+exact/ranged typed properties, direct compound/SNBT masks and NBT subset/list
+matching use source rules. Enum bounds compare Java ordinals, not spelling;
+integer properties use Java's accepted BMP decimal digits and property domain.
+SNBT is parsed by the mod's original-format parser, independently of Horizon's
+newer syntax. Its defensive nesting limit is 512; deeper source parser behavior
+is not claimed. Source facts cover 1,060 original vanilla blocks and seven
+currently supported AE2 hosts in an AE2-owned data file. An absent/new/addon
+domain or missing native property refuses that state condition; it is not a
+complete dynamic property API. Charger/Drive's missing native spin states remain
+part of their existing orientation gap.
+
+The matcher evaluates fresh predicates on real native state/entity data. Client
+NBT lookup constructs an absent registered BE on demand for a loaded block and
+keeps existing instances; it does not copy a server save into the client. Full
+original BE save/component codecs and source default-field reconstruction are
+still required for every host. Native 26.3 data is not automatically a complete
+1.21.1 save. Source AdventureModePredicate's mutable component-object cache,
+ItemStack.copy sharing, reload/identity behavior and all permissions/security/
+fake-player paths remain open. Fresh codec comparisons and isolated game checks
+do not establish those contracts.
 
 The native visual envelope also carries raw side/facade occupancy fields for
 correct refusal. This is not an implementation of those parts or AE2's full

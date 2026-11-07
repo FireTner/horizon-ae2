@@ -5,7 +5,7 @@
 use super::{
     Game,
     ae2_cells as codec,
-    ae2_keys::{Key, KeyType},
+    ae2_keys::Key,
     ae2_me_chest::{Chest, BLOCK, CELL_SLOT, INPUT, LOCAL_CAPACITY, SLOTS, WITHDRAW},
 };
 use horizon_client::containers::{BlockEntity, ModBlockEntity};
@@ -387,54 +387,10 @@ pub(super) fn server_click(
             .put(pos, horizon_client::containers::BlockEntity::Mod(be));
         return;
     }
-    let resolve = |kind, id: &str| codec::resolve_key(game.items(), kind, id);
-    withdraw(&mut be, &resolve);
+    sync(game, [pos.0, pos.1, pos.2], &mut be, true);
     game.world
         .block_entities
         .put(pos, horizon_client::containers::BlockEntity::Mod(be));
     game.world.modified.insert((pos.0 >> 4, pos.2 >> 4));
 }
 
-fn withdraw(be: &mut ModBlockEntity, resolve: &impl Fn(KeyType, &str) -> Option<super::ae2_keys::KeyProperties>) {
-    if be.items.len() != SLOTS {
-        be.items.resize(SLOTS, None);
-    }
-    if be
-        .items
-        .get(WITHDRAW)
-        .and_then(|slot| slot.as_ref())
-        .is_some()
-    {
-        return;
-    }
-    let Some(cell_item) = be.items.get(CELL_SLOT).cloned().flatten() else {
-        return;
-    };
-    let Ok(cell) = codec::load_backend(&cell_item, resolve) else {
-        return;
-    };
-    let mut chest = Chest::new();
-    chest.set_power(power(&be.nbt));
-    chest.set_idle(idle(&be.data));
-    chest.set_cell(Some(cell));
-    chest.update_handler();
-    let Some(key) = chest.first_item() else {
-        return;
-    };
-    let max = u64::from(key.properties().max_stack.max(1));
-    let amount = chest.stored(&key).min(max);
-    if amount == 0 || codec::key_to_item(&key, amount as u32).is_err() {
-        return;
-    }
-    let got = chest.powered_extract(&key, amount, true);
-    if got == 0 {
-        return;
-    }
-    let Ok(stack) = codec::key_to_item(&key, got as u32) else {
-        return;
-    };
-    be.items[WITHDRAW] = Some(stack);
-    write_cell(be, Some(cell_item), chest.cell());
-    write_power(&mut be.nbt, chest.power());
-    write_idle(&mut be.data, chest.idle());
-}

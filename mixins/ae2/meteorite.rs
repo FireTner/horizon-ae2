@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 // MeteoritePlacer (AE2 19.2.18): sky-stone ellipsoid, mysterious cube,
 // crater bowl, fallout blocks, and crater-lake water.
-// ae2meteorite still places only place_sky_stone. Press drops stay on the cube.
+// ae2meteorite writes all of those. Press drops stay on the cube.
 // Copyright (c) AlgorithmX2 / AE2 contributors; 2026 Horizon port contributors.
 
-#[path = "meteorite_fallout.rs"]
-pub mod meteorite_fallout;
+use super::ae2_meteorite_fallout as meteorite_fallout;
 
-pub use meteorite_fallout::{ColumnKind, CraterType, FalloutMode, Site};
+pub use meteorite_fallout::{
+    ColumnKind, CopyBiome, CraterType, FalloutMode, Site, column_kind, copy_block, crater_squared,
+    enclosing_block, fall_block, fall_budget, fall_height, filler, inset_block, inset_reaches,
+};
 
 pub const SKY_STONE: &str = "ae2:sky_stone_block";
 pub const MYSTERIOUS_CUBE: &str = "ae2:mysterious_cube";
@@ -135,6 +137,43 @@ pub fn place_sky_stone(x: i32, y: i32, z: i32, radius: f64, rng: &mut impl Rng) 
         });
     }
     out
+}
+
+/// One draw for [`place_sky_stone_rolls`]. The slot field matching the ask is written.
+#[derive(Clone, Copy, Debug)]
+pub enum SkyRoll {
+    Int(i32),
+    Float,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct RollSlot {
+    pub int: i32,
+    pub float: f32,
+}
+
+/// `place_sky_stone` fed by one closure, so the command can share `RandomSource`.
+pub fn place_sky_stone_rolls(
+    x: i32,
+    y: i32,
+    z: i32,
+    radius: f64,
+    roll: impl FnMut(SkyRoll, &mut RollSlot),
+) -> Vec<Placed> {
+    struct Rolls<F>(F);
+    impl<F: FnMut(SkyRoll, &mut RollSlot)> Rng for Rolls<F> {
+        fn next_int(&mut self, bound: i32) -> i32 {
+            let mut slot = RollSlot { int: 0, float: 0.0 };
+            (self.0)(SkyRoll::Int(bound), &mut slot);
+            slot.int
+        }
+        fn next_float(&mut self) -> f32 {
+            let mut slot = RollSlot { int: 0, float: 0.0 };
+            (self.0)(SkyRoll::Float, &mut slot);
+            slot.float
+        }
+    }
+    place_sky_stone(x, y, z, radius, &mut Rolls(roll))
 }
 
 /// `placeCrater`. Sand and snow fallout raise the bowl by `adjustCrater`.

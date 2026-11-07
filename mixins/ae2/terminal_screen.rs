@@ -7,8 +7,8 @@
 //
 // shortcut: minecraft:generic_9x1 is the OpenScreen the client draws as
 // `container`. Replace it with MEStorageMenu when that menu can be shown.
-// shortcut: nothing calls `open` until src/lib.rs and mixins/ae2/horizon-mixin.toml
-// register this file and the right-click path sends `Menu` through native_open_menu.
+// shortcut: native_open_menu needs the hub, which is not on Game during the
+// guest right-click. request() holds the menu until the level tick sends it.
 
 /// Side-part id of the ME terminal.
 pub const TERMINAL: &str = "ae2:terminal";
@@ -19,6 +19,28 @@ pub const MENU_ROWS: u8 = 1;
 pub const TITLE_KEY: &str = "gui.ae2.Terminal";
 
 const FACES: [&str; 6] = ["down", "up", "north", "south", "west", "east"];
+const OFFSETS: [[i32; 3]; 6] = [
+    [0, -1, 0],
+    [0, 1, 0],
+    [0, 0, -1],
+    [0, 0, 1],
+    [-1, 0, 0],
+    [1, 0, 0],
+];
+
+/// The clicked block face, in the same order cable NBT stores side parts.
+pub fn face_name(face: [i32; 3]) -> Option<&'static str> {
+    OFFSETS
+        .iter()
+        .zip(FACES)
+        .find(|(offset, _)| **offset == face)
+        .map(|(_, name)| name)
+}
+
+/// Holding `ae2:terminal` against an empty cable face stores that one side part.
+pub fn places(hand: Option<&str>, face: &str, occupied: bool) -> bool {
+    hand == Some(TERMINAL) && FACES.contains(&face) && !occupied
+}
 
 /// One stored side part. `grid_node` is the part's `gn` tag.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -85,6 +107,46 @@ pub fn show(screen: Screen, menu: Option<Menu>) -> Screen {
     } else {
         screen
     }
+}
+
+/// Menu waiting for `native_open_menu` once the server hub is back on Game.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Pending {
+    pub uuid: u128,
+    pub rows: u8,
+    pub title_key: &'static str,
+}
+
+static PENDING: std::sync::Mutex<Option<Pending>> = std::sync::Mutex::new(None);
+
+pub fn request(uuid: u128, menu: Menu) {
+    *PENDING.lock().unwrap_or_else(|error| error.into_inner()) = Some(Pending {
+        uuid,
+        rows: menu.rows,
+        title_key: menu.title_key,
+    });
+}
+
+pub fn take() -> Option<Pending> {
+    PENDING
+        .lock()
+        .unwrap_or_else(|error| error.into_inner())
+        .take()
+}
+
+static PLACED_AT: std::sync::Mutex<Option<u64>> = std::sync::Mutex::new(None);
+
+/// A placement click can be followed by another use in the same tick after the
+/// item leaves the hand. That use is not the empty-hand open.
+pub fn note_placed(tick: u64) {
+    *PLACED_AT.lock().unwrap_or_else(|error| error.into_inner()) = Some(tick);
+}
+
+pub fn placed_this_click(tick: u64) -> bool {
+    PLACED_AT
+        .lock()
+        .unwrap_or_else(|error| error.into_inner())
+        .is_some_and(|placed| tick.saturating_sub(placed) <= 2)
 }
 
 #[cfg(test)]
@@ -186,5 +248,36 @@ mod tests {
             parts.iter().filter(|(_, part)| part.id == TERMINAL).count(),
             1
         );
+    }
+
+    #[test]
+    fn the_north_face_places_only_on_an_empty_side() {
+        assert_eq!(face_name([0, 0, -1]), Some("north"));
+        assert!(places(Some(TERMINAL), "north", false));
+        assert!(!places(Some(TERMINAL), "north", true));
+        assert!(!places(None, "north", false));
+        assert!(!places(Some("ae2:fluix_glass_cable"), "north", false));
+    }
+
+    #[test]
+    fn the_queued_menu_is_sent_once() {
+        let menu = Menu {
+            id: MENU_ID,
+            rows: MENU_ROWS,
+            title_key: TITLE_KEY,
+        };
+        request(7, menu);
+        assert_eq!(
+            take(),
+            Some(Pending {
+                uuid: 7,
+                rows: MENU_ROWS,
+                title_key: TITLE_KEY,
+            })
+        );
+        assert_eq!(take(), None);
+        note_placed(10);
+        assert!(placed_this_click(12));
+        assert!(!placed_this_click(13));
     }
 }

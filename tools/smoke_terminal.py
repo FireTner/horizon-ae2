@@ -70,6 +70,8 @@ def main():
         launch()
         ctl("command", "fill 5 72 3 11 72 9 stone")
         ctl("command", "fill 5 73 3 11 78 9 air")
+        ctl("command", "tp @s 8.5 73 4.5")
+        ctl("wait", 40)
         ctl("tp", 8.5, 73, 4.5)
         ctl("command", "item replace entity @s hotbar.0 with ae2:fluix_glass_cable 1")
         ctl("select", 1)

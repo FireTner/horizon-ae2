@@ -1,15 +1,10 @@
 #!/usr/bin/env python3
 """Throw charged certus, redstone, and nether quartz into water.
 
-The fluix crystals recipe omits no extra circumstance: a missing field is
-the minecraft:water fluid tag, and the result is two ae2:fluix_crystal.
-Source waits until the trigger has stayed in that fluid for more than 60
-ticks before consuming one of each ingredient.
-
-This world check needs mixins/ae2/horizon-mixin.toml to inject
-mixins/ae2/transform_throw.rs into item-entity ticking. That manifest is
-not part of this change, so a drop with no fluix means the throw is not
-wired into the running game yet.
+The fluix crystals recipe treats a missing circumstance as the
+minecraft:water fluid tag and yields two ae2:fluix_crystal. The item-entity
+tick waits until the charged certus has stayed in that fluid for more than
+60 ticks, then consumes one of each ingredient.
 """
 import argparse
 import json
@@ -25,8 +20,8 @@ ITEMS = (
     "minecraft:redstone",
     "minecraft:quartz",
 )
-# ItemEntityMixin transforms only when ae2_transformTime > 60.
-SETTLE_TICKS = 80
+# ItemEntityMixin transforms only when ae2_transformTime > 60, after the fall.
+SETTLE_TICKS = 200
 
 
 def main():
@@ -44,7 +39,7 @@ def main():
     work = Path(tempfile.mkdtemp(prefix="fluix-throw-", dir=parent))
     game_dir = work / "game"
     game_dir.mkdir()
-    socket = Path(tempfile.gettempdir()) / f"ae2-fluix-throw-{os.getpid()}.sock"
+    socket = work / "control.json"
     env = {**os.environ, "HORIZON_HOME": str(work / "home"), "HORIZON_NO_AUDIO": "1"}
     content = ROOT / "target/content/ae2"
     processes, logs, transcript = [], [], []
@@ -117,22 +112,23 @@ def main():
 
     try:
         launch()
-        # One water column so the three throws stay in the same ±1 region.
+        # Open 1x1 shaft so the three throws fall into the same water column.
         ctl("command", "fill 7 72 7 9 72 9 stone")
-        ctl("command", "fill 7 73 7 9 76 9 glass")
-        ctl("command", "fill 8 73 8 8 75 8 minecraft:water")
-        ctl("tp", 8.5, 78, 8.5)
+        ctl("command", "fill 7 73 7 9 80 9 glass")
+        ctl("command", "fill 8 73 8 8 80 8 air")
+        ctl("command", "fill 8 73 8 8 76 8 minecraft:water")
+        ctl("tp", 8.5, 82, 8.5)
         ctl("look-at", 8.5, 74.2, 8.5)
         ctl("command", "clear @s")
         for slot, item in enumerate(ITEMS):
             ctl("command", f"item replace entity @s hotbar.{slot} with {item} 1")
             ctl("select", slot + 1)
             ctl("look-at", 8.5, 74.2, 8.5)
-            ctl("wait", 2)
+            ctl("wait", 1)
             ctl("drop")
-        ctl("tp", 8.5, 73, 20.5)
+        ctl("tp", 8.5, 82, 24.5)
         ctl("wait", SETTLE_TICKS)
-        ctl("tp", 8.5, 74, 8.5)
+        ctl("tp", 8.5, 75, 8.5)
         ctl("wait", 40)
         found = ctl("inventory")["counts"].get("ae2:fluix_crystal", 0)
         if found < 2:

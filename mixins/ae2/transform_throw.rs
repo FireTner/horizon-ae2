@@ -15,6 +15,9 @@ pub const REDSTONE: &str = "minecraft:redstone";
 pub const NETHER_QUARTZ: &str = "minecraft:quartz";
 pub const FLUIX_CRYSTAL: &str = "ae2:fluix_crystal";
 
+/// Server `ItemEntityMixin` calls the throw only after `ae2_transformTime > 60`.
+pub const FLUID_TICKS_BEFORE_TRY: u32 = 60;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Circumstance {
     /// Field omitted. Resolves to [`WATER_TAG`].
@@ -50,8 +53,8 @@ pub fn circumstance_tag(circumstance: Circumstance) -> &'static str {
 
 /// One item entity already inside the trigger's ±1 block region.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct ThrownItem {
-    pub item: &'static str,
+pub struct ThrownItem<'a> {
+    pub item: &'a str,
     pub count: u32,
     pub alive: bool,
 }
@@ -66,7 +69,7 @@ pub struct Product {
 /// entity and `fluid_tags` contains the recipe fluid tag. An empty tag list
 /// is an empty fluid state. A successful throw discards entities left empty.
 pub fn try_fluix_throw(
-    items: &mut [ThrownItem],
+    items: &mut [ThrownItem<'_>],
     trigger: usize,
     fluid_tags: &[&str],
 ) -> Option<Product> {
@@ -120,7 +123,7 @@ pub fn try_fluix_throw(
 mod tests {
     use super::*;
 
-    fn thrown(item: &'static str, count: u32) -> ThrownItem {
+    fn thrown(item: &'static str, count: u32) -> ThrownItem<'static> {
         ThrownItem {
             item,
             count,
@@ -128,7 +131,7 @@ mod tests {
         }
     }
 
-    fn fluix_inputs(charged: u32) -> [ThrownItem; 3] {
+    fn fluix_inputs(charged: u32) -> [ThrownItem<'static>; 3] {
         [
             thrown(CHARGED_CERTUS, charged),
             thrown(REDSTONE, 1),

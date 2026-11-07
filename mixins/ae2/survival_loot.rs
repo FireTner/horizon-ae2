@@ -33,8 +33,5 @@ fn ae2_survival_loot(
                 .collect(),
         );
     }
-    match crate::game::ae2_survival::loot(game, state) {
-        Some(drops) => core::ops::ControlFlow::Break(drops),
-        None => core::ops::ControlFlow::Continue(()),
-    }
+    core::ops::ControlFlow::Continue(())
 }

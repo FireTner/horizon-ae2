@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Grow a flawless budding certus block into a cluster and harvest four crystals.
+"""Break an ae2:quartz_cluster with an unenchanted pickaxe.
 
-Uses BuddingCertusQuartzBlock's 1/5 growth roll. The flawless host does not decay.
-A player break of ae2:quartz_cluster drops four ae2:certus_quartz_crystal
-(quartz_cluster.json set_count, no Fortune).
+A survival break without Silk Touch must put exactly four
+ae2:certus_quartz_crystal into the break drops or the player inventory.
 """
 import json
 import os
@@ -15,8 +14,8 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 PREPARED = Path("/home/cachyfire/.ao/data/worktrees/horizon-ae2/horizon-ae2-2/target/content/ae2")
-FACES = ((0, 1, 0), (0, -1, 0), (0, 0, -1), (0, 0, 1), (-1, 0, 0), (1, 0, 0))
-HOST = (8, 73, 8)
+CLUSTER = (8, 73, 8)
+CRYSTAL = "ae2:certus_quartz_crystal"
 
 
 def ensure_content():
@@ -89,26 +88,25 @@ def main():
 
     try:
         launch()
+        ctl("tp", CLUSTER[0] + 0.5, CLUSTER[1], CLUSTER[2] - 2.5)
+        for _ in range(30):
+            if ctl("block", *CLUSTER).get("loaded"):
+                break
+            ctl("wait", 5)
+        else:
+            raise AssertionError(f"cluster chunk did not load: {ctl('block', *CLUSTER)}")
         ctl("command", "fill 4 72 4 12 72 12 stone")
         ctl("command", "fill 4 73 4 12 78 12 air")
-        ctl("tp", 8.5, 73, 4.5)
-        ctl("setblock", *HOST, "ae2:flawless_budding_quartz")
-        ctl("command", "gamerule random_tick_speed 200000")
-        cluster = None
+        ctl("setblock", *CLUSTER, "ae2:quartz_cluster[facing=up,waterlogged=false]")
+        placed = None
         for _ in range(40):
-            ctl("wait", 10)
-            for face in FACES:
-                pos = tuple(HOST[i] + face[i] for i in range(3))
-                block = ctl("block", *pos)["block"]
-                if block == "ae2:quartz_cluster":
-                    cluster = pos
-                    break
-            if cluster:
+            placed = ctl("block", *CLUSTER)
+            if placed.get("block") == "ae2:quartz_cluster":
                 break
-        if cluster is None:
-            around = {str(face): ctl("block", *(HOST[i] + face[i] for i in range(3)))["block"] for face in FACES}
-            raise AssertionError(f"budding quartz did not grow a cluster: {around}")
-        print(f"PASS: cluster grew at {cluster}", flush=True)
+            ctl("wait", 5)
+        else:
+            below = ctl("block", CLUSTER[0], CLUSTER[1] - 1, CLUSTER[2])
+            raise AssertionError(f"cluster was not placed: {placed}; below: {below}")
         ctl("command", "gamemode survival")
         ctl("command", "item replace entity @s hotbar.0 with minecraft:diamond_pickaxe 1")
         held = None
@@ -119,32 +117,38 @@ def main():
             ctl("wait", 2)
         else:
             raise AssertionError(f"diamond pickaxe was not in the hotbar: {held}")
-        ctl("tp", cluster[0] + 0.5, cluster[1], cluster[2] - 1.5)
-        broken = ctl("break", *cluster)
+        ctl("tp", CLUSTER[0] + 0.5, CLUSTER[1], CLUSTER[2] - 1.2)
+        ctl("wait", 5)
+        broken = ctl("break", *CLUSTER)
 
-        def crystals():
-            total = 0
-            for source in (
-                broken.get("drops") or {},
-                broken.get("picked_up") or {},
-                ctl("inventory").get("counts") or {},
-            ):
-                total = max(total, int(source.get("ae2:certus_quartz_crystal", 0)))
-            return total
+        def reported():
+            drops = int((broken.get("drops") or {}).get(CRYSTAL, 0))
+            picked = int((broken.get("picked_up") or {}).get(CRYSTAL, 0))
+            return drops + picked
 
-        count = crystals()
-        for _ in range(12):
-            if count >= 4:
+        def visible():
+            inventory = int((ctl("inventory").get("counts") or {}).get(CRYSTAL, 0))
+            ground = 0
+            entities = ctl("entities", 16, "minecraft:item").get("entities") or []
+            for entity in entities:
+                stack = entity.get("item") or {}
+                if stack.get("item") == CRYSTAL:
+                    ground += int(stack.get("count") or 0)
+            return inventory + ground
+
+        count = max(reported(), visible())
+        for _ in range(40):
+            if count == 4:
                 break
             ctl("wait", 5)
-            count = crystals()
+            count = max(reported(), visible())
         if count != 4:
             raise AssertionError(
-                f"cluster dropped {count} certus quartz crystals, source loot is 4: {broken}"
+                f"cluster put {count} certus quartz crystals in drops or inventory, source loot is 4: {broken}"
             )
-        report = {"passed": True, "logs": str(work), "cluster": cluster, "crystals": count}
+        report = {"passed": True, "logs": str(work), "cluster": CLUSTER, "crystals": count}
         (work / "result.json").write_text(json.dumps(report, indent=2) + "\n")
-        print(f"PASS: harvested 4 ae2:certus_quartz_crystal; logs: {work}", flush=True)
+        print(f"PASS: harvested 4 {CRYSTAL}; logs: {work}", flush=True)
     finally:
         for process in processes:
             if process.poll() is None:

@@ -15,9 +15,6 @@ pub const REDSTONE: &str = "minecraft:redstone";
 pub const NETHER_QUARTZ: &str = "minecraft:quartz";
 pub const FLUIX_CRYSTAL: &str = "ae2:fluix_crystal";
 
-/// Server `ItemEntityMixin` waits until `ae2_transformTime > 60`.
-pub const FLUID_TICKS_BEFORE_TRY: u32 = 60;
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Circumstance {
     /// Field omitted. Resolves to [`WATER_TAG`].
@@ -143,7 +140,6 @@ mod tests {
     fn water_consumes_one_of_each_and_yields_two_fluix() {
         assert_eq!(FLUIX_CRYSTALS.circumstance, Circumstance::Missing);
         assert_eq!(circumstance_tag(Circumstance::Missing), WATER_TAG);
-        assert_eq!(FLUID_TICKS_BEFORE_TRY, 60);
         let mut items = [
             thrown(CHARGED_CERTUS, 2),
             thrown(REDSTONE, 1),
